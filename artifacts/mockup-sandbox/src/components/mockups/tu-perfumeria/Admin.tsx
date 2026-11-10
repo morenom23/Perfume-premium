@@ -489,4 +489,46 @@ const styles = `
 .ad-editor-disclaimer svg{flex:none;color:#d6be8b}
 .ad-editor-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:13px;border-top:1px solid rgba(226,216,197,.09)}
 @media(max-width:760px){.ad-editor-card{padding:17px 14px}.ad-editor-heading h2{font-size:21px}.ad-editor-grid{grid-template-columns:1fr;gap:10px}.ad-editor-grid input,.ad-editor-grid select{height:35px}.ad-editor-actions{flex-direction:column-reverse}.ad-editor-actions button{width:100%}.ad-products-table{min-width:770px}}
+/* =========================================
+   AJUSTE GLOBAL DE LEGIBILIDAD (ADMIN)
+   ========================================= */
+.ad-root p, 
+.ad-root span, 
+.ad-root small, 
+.ad-root button, 
+.ad-root input, 
+.ad-root select, 
+.ad-root label,
+.ad-root table, 
+.ad-root th, 
+.ad-root td,
+.ad-root li,
+.ad-root div,
+.ad-badge,
+.ad-label,
+.ad-value,
+.ad-table th,
+.ad-table td {
+  font-size: 13px !important;
+}
+
+/* Párrafos y descripciones un poco más grandes */
+.ad-root p {
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+/* Títulos no se tocan para mantener la jerarquía */
+.ad-root h1, 
+.ad-root h2, 
+.ad-root h3,
+.ad-metric-value,
+.ad-title {
+  font-size: revert !important;
+}
+
+/* Ajuste de tablas para que respiren con el nuevo tamaño */
+.ad-root td, .ad-root th {
+  padding: 12px 10px !important;
+}
 `;

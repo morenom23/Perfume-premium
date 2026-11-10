@@ -1,0 +1,87 @@
+
+Perfecto. He revisado el código y ya sé exactamente dónde están los textos pequeños (de 6px, 7px, 8px) y los márgenes de la barra de beneficios. El CSS está todo inyectado al final del archivo Tienda.tsx dentro de la variable styles.
+
+Como es un archivo muy largo, no te voy a pedir que lo reemplaces entero para evitar errores. Haremos unos cambios quirúrgicos usando la función de "Buscar y Reemplazar" de VS Code (Ctrl + H).
+
+Sigue estos pasos uno por uno en VS Code:
+
+1. Aumentar el espacio después de los beneficios (Imagen 2)
+Presiona Ctrl + H, busca esto:
+.tp-discovery { display:grid;grid-template-columns:1fr 1fr;min-height:515px;border-top:1px solid var(--tp-line);border-bottom:1px solid var(--tp-line);background:#0d0c10; }
+Y reemplázalo por esto:
+.tp-discovery { display:grid;grid-template-columns:1fr 1fr;min-height:515px;border-top:1px solid var(--tp-line);border-bottom:1px solid var(--tp-line);background:#0d0c10; margin-top: 72px; }
+
+2. Separar el catálogo del Footer (Imagen 3)
+Busca esto (es la sección de familias olfativas que va antes del footer):
+.tp-family-preview { width:92%;max-width:1640px;margin:0 auto;padding:92px 0 100px; }
+Reemplázalo por:
+.tp-family-preview { width:92%;max-width:1640px;margin:0 auto;padding:92px 0 100px; border-bottom: 1px solid rgba(216,189,130,.15); padding-bottom: 75px; }
+
+3. Subir todos los textos secundarios a 12px mínimo
+Vamos a buscar los tamaños más pequeños y subirlos. Usa Ctrl + H para cada uno:
+
+Menú de navegación: Busca .tp-nav button { padding:11px 0;color:#d0c9d0;font-size:11px; } y cámbialo a font-size:12px;
+
+Buscador: Busca .tp-header-search input { (y en las líneas de abajo verás font-size:10px;). Cámbialo a 12px.
+
+Textos de la tarjeta (Metadatos): Busca .tp-product-meta { gap:6px;color:#aaa1aa;font-size:7px; y cámbialo a font-size:12px;
+
+Botón "Agregar": Busca .tp-product-cta { y abajo verás font-size:8px;. Cámbialo a 12px.
+
+Precio pequeño (PRECIO DEMO): Busca .tp-product-bottom small { margin-top:3px;font-size:6px; } y cámbialo a 12px.
+
+Indicador de stock: Busca .tp-stock { margin-top:6px;font-size:6px; } y cámbialo a 12px.
+
+Filtros y botones de categorías: Busca .tp-family-list button { padding:6px 9px;border-radius:16px;font-size:7px; } y cámbialo a 12px.
+
+Textos de la barra de beneficios: Busca .tp-benefit strong { color:#e6dfe6;font-size:9px;font-weight:500; } y cámbialo a 12px. Luego busca .tp-benefit small { color:#a69da8;font-size:7px; } y cámbialo a 12px.
+
+Textos del Footer: Busca .tp-footer-legal button { y abajo verás font-size:8px;. Cámbialo a 12px.
+
+4. Responsive (Móviles)
+Baja hasta el final del archivo, donde dice @media (max-width:760px).
+Busca .tp-product-meta { font-size:6px; } y cámbialo a 12px. Haz lo mismo con .tp-stock { margin-top:5px;font-size:5px; } (a 12px).
+
+Importante: Si al hacer "Buscar y Reemplazar" te dice que hay múltiples coincidencias, asegúrate de reemplazar solo la que está dentro de la etiqueta .tp-product-meta, .tp-product-cta, etc.
+
+Haz estos cambios, guarda el archivo (Ctrl + S) y mira tu navegador. Dime si ves los cambios o si algún texto se ve desalineado para ajustarlo.
+
+// ------------------------------------------------------------------------------
+
+quí tienes la ruta exacta de los archivos y las funciones donde se dibuja cada vista. Todo está centralizado en el mismo archivo principal y en el del panel:
+
+Archivo principal: artifacts/mockup-sandbox/src/components/mockups/tu-perfumeria/Tienda.tsx
+
+Dentro de este archivo, busca estas funciones (alrededor de la línea 250 en adelante):
+
+Inicio (Home): const renderHome = () => (...)
+
+Ojo aquí: El bloque del texto que mencionas ("Una fragancia es un lugar...") está en la etiqueta <section className="tp-quote-band">.
+
+Catálogo: const renderCatalog = (home = false) => (...)
+
+Detalle: const renderDetail = () => (...)
+
+Carrito: const renderCart = () => (...)
+
+Checkout: const renderCheckout = () => (...)
+
+Nosotros: const renderBrand = () => (...)
+
+Envíos y Pagos: const renderDelivery = () => (...)
+
+Contacto: const renderContact = () => (...)
+
+Archivo del Dashboard:
+artifacts/mockup-sandbox/src/components/mockups/tu-perfumeria/Admin.tsx
+
+Dentro de este archivo, busca las funciones de renderizado de cada módulo (Productos, Pedidos, Inventario, Configuración, etc.).
+
+Nota para tus ajustes:
+El tamaño de los textos en la tienda está definido en dos lugares:
+
+En las clases de la parte superior del archivo (ej. className="tp-section-note").
+
+En el bloque de CSS que está al final del archivo Tienda.tsx (la variable const styles = ...).
+
+Cuando quieras cambiar un texto específico, busca su clase CSS en ese bloque final y ajusta el font-size (por ejemplo, de 12px a 14px o 16px).
