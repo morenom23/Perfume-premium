@@ -1,0 +1,21 @@
+La Fase 1 está muy bien visualmente. Apruebo el diseño actual de la tienda y del panel administrativo. Sin embargo, quiero ampliar únicamente la página de inicio porque actualmente termina inmediatamente después de la franja horizontal de beneficios y pasa directamente al footer.
+
+IMPORTANTE: NO REDISEÑES NI MODIFIQUES LOS ELEMENTOS EXISTENTES. Conserva exactamente como están el encabezado, logo provisional, navegación, icono de usuario, Hero con su imagen de fondo, título, colores, tipografías, efectos neón, catálogo, tarjetas, miniaturas, precios, botones Agregar, carrito, franja de beneficios y footer. El panel administrativo tampoco debe modificarse.
+
+Quiero agregar TRES SECCIONES NUEVAS entre la franja de beneficios y el footer, inspiradas en la tercera imagen de referencia que compartí:
+
+1. SECCIÓN DESCUBRE TU ESENCIA: composición editorial de dos columnas. A la izquierda, una fotografía o ilustración elegante de un perfume con halo luminoso, círculos decorativos y pequeñas etiquetas flotantes. A la derecha, el encabezado «UNA GUÍA SIN PRISA», el título «El perfume no se elige. Te encuentra.», un texto breve sobre cómo encontrar una fragancia según las preferencias y personalidad del cliente, y un botón «Encuentra tu familia». El botón debe llevar al catálogo y facilitar la exploración por familias olfativas.
+
+2. SECCIÓN DE FRASE INSPIRADORA: una franja independiente, centrada y elegante, con la frase «Una fragancia es un lugar al que siempre puedes volver». Fondo negro profundo, halo morado muy sutil, detalle tipográfico champagne/dorado y bastante espacio alrededor del texto.
+
+3. SECCIÓN DE FAMILIAS OLFATIVAS: título «¿Qué te llama?» y seis tarjetas visuales: Floral, Oriental, Fresca, Amaderada, Cítrica y Dulce. Cada tarjeta debe tener una imagen o composición visual atractiva, número de orden y efecto hover elegante. Deben ser seleccionables y llevar al catálogo con el filtro de familia correspondiente aplicado.
+
+Las tres secciones deben mantener estrictamente la identidad visual actual: negro profundo, morado, champagne/dorado, tipografía serif elegante, detalles luminosos discretos, bordes finos y animaciones suaves. No utilices tarjetas genéricas ni bloques repetitivos.
+
+La página debe ganar suficiente altura para permitir desplazarse cómodamente y descubrir contenido antes del footer, pero sin hacerla excesivamente larga ni saturarla. Las secciones deben tener buena separación vertical y composiciones visuales equilibradas. Deben adaptarse correctamente a móviles.
+
+IMPORTANTE SOBRE EL CATÁLOGO: conserva también el requisito previamente aprobado de filtro por género: Todos, Mujer, Hombre y Unisex, combinado con marca, familia olfativa, precio y disponibilidad. No lo omitas.
+
+No cambies ninguna otra funcionalidad ni elimines secciones existentes. No conectes servicios externos ni bases de datos. Esta modificación sigue siendo parte de la Fase 1 visual DEMO.
+
+Cuando termines, muestra la página completa con desplazamiento hasta el footer para revisar las nuevas secciones. No avances a la siguiente fase.

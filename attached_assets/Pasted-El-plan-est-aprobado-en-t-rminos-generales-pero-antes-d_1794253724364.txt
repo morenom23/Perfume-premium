@@ -1,0 +1,16 @@
+El plan está aprobado en términos generales, pero antes de iniciar la Fase 1 incorpora expresamente estos requisitos:
+
+1. Diseño premium futurista con fondos negros, morado y champagne/dorado, ocupando el 92-96 % del ancho disponible en escritorio. Evita diseños genéricos, tarjetas repetitivas y dashboards convencionales.
+2. Cada producto tendrá hasta cuatro fotografías, imagen principal seleccionable, orden configurable y eliminación desde el administrador.
+3. Los dos WhatsApp aparecerán únicamente en Contacto y Footer. En checkout habrá un único botón de compra. El selector Asesor 1 / Asesor 2 solo aparecerá cuando el administrador secundario esté activo; de lo contrario se abrirá directamente el WhatsApp principal.
+4. Métodos de pago: cuenta bancaria, Nequi, Llaves Bre-B y contra entrega. Todos configurables desde el administrador. No solicitar contraseñas, PIN ni credenciales bancarias al comprador. Para transferencias mostrar «Envío priorizado».
+5. El comprador asume el envío. El carrito muestra el subtotal de perfumes y «+ envío según ubicación». Mostrar exactamente: «Tus productos llegarán aproximadamente entre 3 y 4 días hábiles después de haber confirmado el pedido. El costo del envío se calcula según tu ubicación».
+6. Mantener exclusivamente los seis estados de pedido: Pendiente, Confirmado, Pagado, Enviado, Entregado y Cancelado. El estado del pago o recaudo será un campo independiente, sin inventar estados adicionales del pedido. Para contra entrega, registrar el recaudo por separado.
+7. Registrar ventas independientemente del estado del pedido, únicamente cuando corresponda, con verificación de pago/recaudo y protección contra duplicados.
+8. Mantener un propietario y un administrador secundario. El propietario podrá activar o desactivar al secundario desde el panel.
+9. Las exportaciones Excel y PDF deben tener formato ordenado, legible, encabezados claros, fechas, referencias, totales y presentación profesional.
+10. El nombre provisional será «Tu Perfumería», con un icono temporal de perfume. El logo real podrá cargarse y sustituirse desde el administrador.
+
+No cambies la arquitectura aprobada: React, TypeScript, Vite, Tailwind, Netlify Functions, Neon PostgreSQL, ImageKit y GitHub. No utilizar Replit Database ni servicios propietarios de Replit en producción.
+
+Incorpora estos puntos al plan y muéstrame la versión final para aprobación. Todavía no comiences a programar.

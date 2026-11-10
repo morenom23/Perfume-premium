@@ -1,0 +1,81 @@
+Quiero realizar un ajuste global de tipografía y espaciado en TODA la aplicación. No quiero modificar el diseño ni cambiar la identidad visual que ya aprobamos. El objetivo es mejorar la legibilidad de todos los textos, tanto de la tienda pública como del panel administrativo.
+
+### 1. AUMENTAR TODOS LOS TEXTOS SECUNDARIOS
+
+Establece un tamaño mínimo de **12 px para todos los textos informativos y secundarios** de la aplicación.
+
+Esto incluye absolutamente todas las secciones:
+
+- Enlaces del Navbar: Inicio, Catálogo, Nosotros, Envíos y Contacto.
+- Textos del buscador y opciones de navegación.
+- Referencias, descripciones y detalles de las tarjetas de perfumes.
+- Indicadores de disponibilidad y etiquetas DEMO.
+- Precios secundarios, notas y detalles de productos.
+- Textos de filtros, opciones de género, marcas y familias olfativas.
+- Textos de botones, selectores y controles.
+- Detalles, enlaces e información del Footer.
+- Textos descriptivos debajo de los encabezados.
+- Etiquetas, leyendas y cifras auxiliares de los gráficos.
+- Tablas, referencias, estados, fechas y descripciones del Dashboard.
+- Menús laterales, navegación y controles del panel administrativo.
+- Formularios, indicadores, mensajes y detalles de todas las vistas administrativas.
+
+No deben quedar textos de 7, 8, 9, 10 u 11 px. Ningún detalle importante debe obligar al usuario a acercarse a la pantalla para leerlo.
+
+### 2. TÍTULOS Y TEXTOS PRINCIPALES
+
+Los títulos principales, encabezados de sección, nombres destacados de productos y cifras principales que ya tienen un tamaño adecuado pueden conservarlo.
+
+Cuando sea necesario, puedes aumentar como máximo 1 punto su tamaño. No quiero que los títulos se vuelvan excesivamente grandes ni que alteren las proporciones actuales.
+
+Conserva una jerarquía tipográfica clara utilizando pesos, espaciados y diferencias moderadas de tamaño, no reduciendo los textos secundarios.
+
+### 3. ESPACIADO DESPUÉS DE LA FRANJA DE BENEFICIOS
+
+Conserva la franja horizontal con:
+
+- Envíos a todo el país.
+- Compra segura.
+- Atención personalizada.
+- Comprar por WhatsApp.
+
+Actualmente la sección «Descubre tu próxima fragancia» comienza demasiado cerca de esta franja.
+
+Aumenta el espacio vertical superior a aproximadamente **65-80 px**, para que exista una transición visual más agradable y la página no se vea apretada.
+
+### 4. SEPARACIÓN ENTRE EL CATÁLOGO Y EL FOOTER
+
+Añade aproximadamente **55-70 px de espacio inferior** después de la última fila de productos y un separador elegante y discreto, como una línea champagne de baja opacidad o una transición sutil de fondo.
+
+Debe percibirse claramente dónde termina el catálogo y dónde comienza el Footer.
+
+### 5. CONSERVAR EL DISEÑO ACTUAL
+
+Es fundamental que no rediseñes ni elimines elementos existentes.
+
+Conserva exactamente:
+
+- El encabezado y el logo provisional.
+- La navegación y el efecto neón morado/fucsia.
+- El Hero y su fotografía de fondo.
+- Los títulos y colores de la marca.
+- Las tarjetas y sus carruseles de fotografías.
+- Los precios y botones «Agregar».
+- Los filtros, incluido Mujer, Hombre, Unisex y Todos.
+- El carrito.
+- La franja de beneficios.
+- Las tres secciones adicionales de la página de inicio.
+- El Footer y sus elementos.
+- El Dashboard completo y todas las vistas administrativas.
+
+Mantén la estética negra, morada y champagne/dorada, las tipografías elegantes y las animaciones que ya aprobamos.
+
+### 6. ADAPTACIÓN RESPONSIVE
+
+Comprueba que los nuevos tamaños también funcionen en móviles y tablets, sin desbordamientos, textos cortados ni botones demasiado estrechos.
+
+**IMPORTANTE:** este es un ajuste global de legibilidad, no un rediseño. Revisa los estilos compartidos y componentes reutilizados para evitar que queden textos pequeños en alguna pantalla.
+
+Al finalizar, revisa tanto la tienda pública como el panel administrativo y muéstrame capturas de ambas vistas.
+
+No conectes servicios externos, no modifiques la arquitectura y no avances a la siguiente fase.

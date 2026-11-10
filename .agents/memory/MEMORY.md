@@ -1,0 +1,1 @@
+- [Tienda de perfumes](tienda-perfumes.md) — El Documento Maestro es la fuente de verdad; empezar con revisión visual sin conectar servicios.

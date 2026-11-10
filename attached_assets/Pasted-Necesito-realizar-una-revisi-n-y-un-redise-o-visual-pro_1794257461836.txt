@@ -1,0 +1,37 @@
+Necesito realizar una revisión y un rediseño visual profundo de la Fase 1 de nuestra tienda «Tu Perfumería».
+
+IMPORTANTE: He adjuntado dos imágenes. La primera es la referencia visual completa que quiero reproducir lo más fielmente posible. La segunda es el recorte fotográfico que debes utilizar en el Hero. Ambas son referencias obligatorias, no simples fuentes de inspiración.
+
+El diseño que has construido actualmente es demasiado diferente. No quiero que sigas desarrollando tu concepto visual actual. Quiero que MODIFIQUES LA INTERFAZ EXISTENTE para acercarla mucho más a la referencia adjunta, conservando React, TypeScript, Vite y Tailwind, así como el resto de los requisitos funcionales aprobados.
+
+1. ENCABEZADO / NAVBAR:
+Reproduce la composición de la referencia: barra horizontal oscura, elegante, de aproximadamente 78 px de altura, borde inferior fino y distribución equilibrada. A la izquierda debe aparecer un isotipo provisional floral o tipo loto en champagne/dorado, que posteriormente será sustituido por el logo real. En el centro deben aparecer Inicio, Catálogo, Nosotros, Envíos y Contacto. Integra un buscador horizontal redondeado, translúcido y elegante. A la derecha coloca el icono de usuario, el carrito con contador en una burbuja morada y el menú hamburguesa. El icono de usuario debe abrir la vista visual de acceso administrativo, NO una cuenta de cliente. El elemento de navegación activo debe tener una línea inferior NEÓN morada/fucsia con un resplandor luminoso claramente visible, como en la imagen de referencia. Elimina la barra superior DEMO que actualmente ocupa espacio y no aparece en la referencia.
+
+2. HERO / IMAGEN PRINCIPAL:
+Esta sección debe parecerse muchísimo a la referencia. Utiliza el archivo hero-reference-bg.png adjunto como fotografía real de fondo, ubicado principalmente en el lado derecho, ocupando aproximadamente el 60 % de la sección. No sustituyas esta fotografía por ilustraciones SVG, botellas vectoriales ni imágenes generadas diferentes. Mantén la botella morada, las flores, la roca y el halo dorado. Aplica una transición degradada oscura hacia la izquierda para garantizar la legibilidad del texto. A la izquierda coloca el pequeño encabezado «ESENCIA QUE INSPIRA», el título grande «Fragancias que Dejan Huella», con «Fragancias que» en blanco y «Dejan Huella» en champagne/dorado, el texto «Descubre el poder de un aroma único y hazlo parte de tu historia.» y el botón dorado redondeado «Explorar Catálogo» con una flecha. Añade en el extremo izquierdo los indicadores verticales de diapositivas de la referencia. La sección debe ser panorámica, compacta y visualmente impactante, no una portada gigantesca de varias pantallas de altura.
+
+3. CATÁLOGO Y TARJETAS:
+Debes reproducir la composición de las tarjetas de la referencia, no las tarjetas editoriales actuales. En escritorio muestra cuatro productos por fila. Cada tarjeta debe tener fondo oscuro, bordes finos y redondeados, fotografías grandes y una composición elegante. La zona superior de cada tarjeta debe contener una imagen principal amplia y, a su derecha, una columna vertical con tres miniaturas de las otras fotografías. Son cuatro imágenes por producto en total. Las miniaturas deben ser visibles y permitir cambiar la imagen principal al pulsarlas. Debajo aparecen el nombre del perfume en blanco, la referencia en gris, el precio destacado en champagne/dorado y un botón alargado, redondeado y delineado en dorado. El botón debe mostrar el icono de carrito, el texto «Agregar» y una flecha dentro de un pequeño círculo, reproduciendo el estilo de la referencia. No quiero el botón cuadrado con únicamente un icono que tienes actualmente. Las tarjetas deben tener proporciones, márgenes, separación y jerarquía visual muy cercanas a la imagen adjunta.
+
+4. FILTROS DEL CATÁLOGO:
+Añade un filtro visible «¿Para quién?» con Todos, Mujer, Hombre y Unisex. Debe combinarse con marca, familia olfativa, precio y disponibilidad. Añade estos géneros a los 12 productos DEMO y al formulario visual de creación/edición del administrador.
+
+5. FRANJA DE BENEFICIOS:
+Debajo del catálogo reproduce la franja horizontal de la referencia, con iconos elegantes en champagne/dorado y separadores verticales: «Envíos a todo el país», «Compra segura» y «Atención personalizada». En el extremo derecho debe aparecer el botón verde de WhatsApp «Comprar por WhatsApp», como en la referencia. En esta Fase 1 será únicamente demostrativo, sin enviar pedidos reales.
+
+6. FOOTER:
+Diseño oscuro, compacto y refinado. Isotipo provisional, texto de marca, enlaces a términos y condiciones, privacidad y preguntas frecuentes, además de iconos sociales. Conserva una composición cercana a la referencia.
+
+7. IDENTIDAD VISUAL:
+Utiliza negro profundo como fondo, champagne/dorado para precios, títulos secundarios, bordes y botones; blanco cálido para textos principales; grises suaves para referencias y descripciones; y morado/fucsia NEÓN para estados activos, indicadores y resplandores. La tipografía de títulos debe ser serif elegante, similar a Playfair Display o Georgia; los textos y controles, sans serif moderna como Inter o DM Sans. No conviertas todo el texto en dorado ni en morado: respeta la jerarquía cromática de la referencia.
+
+8. ESPACIADO Y COMPOSICIÓN:
+Utiliza el 92-96 % del ancho disponible en escritorio, con márgenes laterales reducidos y proporcionados. Evita espacios vacíos excesivos, secciones innecesarias y bloques genéricos. Retira de la portada actual el marquee, la cita central y las secciones decorativas que alejan el resultado de la referencia. La prioridad es el Hero, el catálogo, las tarjetas y la franja de beneficios. Mantén responsive para móviles sin perder la identidad visual.
+
+9. ADMINISTRADOR Y FUNCIONES:
+Conserva las vistas del panel administrativo de la Fase 1 y sus datos DEMO. Incorpora el acceso de usuario en el encabezado. El rediseño público no debe eliminar las funcionalidades demostrativas ya creadas. El filtro de género debe estar contemplado en la futura estructura de datos.
+
+10. REGLAS DE IMPLEMENTACIÓN:
+No conviertas la captura completa de referencia en una imagen plana que simule una web. Reproduce sus componentes mediante HTML, CSS y React reales. Utiliza la imagen recortada solamente como recurso fotográfico del Hero. No conectes servicios externos, bases de datos ni pagos todavía. No avances a otra fase.
+
+OBJETIVO DE CALIDAD: Al comparar la nueva vista previa con la referencia adjunta, la composición, el encabezado, el Hero, las tarjetas, los colores, los botones y las proporciones deben resultar visualmente muy similares. No consideres terminada la tarea por haber cambiado solamente colores o tipografía. Reconstruye los elementos que sean necesarios. Al terminar, muéstrame la vista previa para revisión.
