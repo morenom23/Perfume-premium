@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import {
   Activity, ArrowDownRight, ArrowUpRight, Bell, Boxes, Check, ChevronDown,
@@ -8,6 +8,7 @@ import {
   Settings2, ShieldCheck, ShoppingBag, SlidersHorizontal, Sparkles, Tag, Trash2,
   TrendingUp, Users, Wallet, WandSparkles, X, MessageCircle, ChartNoAxesCombined,
 } from "lucide-react";
+
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip,
   XAxis, YAxis,
@@ -84,8 +85,11 @@ function ProductThumb({ product, size = "normal" }: { product: DemoProduct; size
 
 export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean; onExit?: () => void } = {}) {
   const [page, setPage] = useState<Page>("Dashboard");
+  const [dbProducts, setDbProducts] = useState<any[]>([]);
   const [mobileNav, setMobileNav] = useState(false);
-  const [loginView, setLoginView] = useState(initialLogin);
+  const [loginView, setLoginView] = useState(() => {
+    return initialLogin ? !localStorage.getItem("admin_session") : false;
+  });
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Todas las familias");
   const [galleryProduct, setGalleryProduct] = useState<DemoProduct | null>(null);
@@ -97,11 +101,29 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
   const [orderFilter, setOrderFilter] = useState("Todos los estados");
   const [reportNotice, setReportNotice] = useState(false);
   const [period, setPeriod] = useState("Últimos 30 días");
+  const [dbOrders, setDbOrders] = useState<any[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  
 
-  const filteredProducts = useMemo(() => demoProducts.filter((product) => {
+    useEffect(() => {
+    fetch("/api/products")
+      .then(res => res.json())
+      .then(data => setDbProducts(data))
+      .catch(err => console.error("Error cargando productos en admin", err));
+  }, []);
+
+    useEffect(() => {
+    fetch("/api/orders")
+      .then(res => res.json())
+      .then(data => setDbOrders(data))
+      .catch(err => console.error("Error cargando pedidos", err));
+  }, []);
+
+    const filteredProducts = useMemo(() => dbProducts.filter((product) => {
     const matchesSearch = `${product.name} ${product.reference} ${product.brand} ${product.audience} ${product.category}`.toLowerCase().includes(search.toLowerCase());
     return matchesSearch && (category === "Todas las familias" || product.category === category);
-  }), [search, category]);
+  }), [search, category, dbProducts]);
+
 
   const notify = (message: string) => {
     setToast(message);
@@ -142,10 +164,38 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
     if (nextView !== undefined) setGalleryViews((views) => [...views, nextView]);
   };
 
-  const orders = demoOrders.filter((order) => orderFilter === "Todos los estados" || order.status === orderFilter);
+  /*PARA EL ADMIN REAL-------------------------*/
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setLoginError("");
+
+    try {
+      // Aquí conectaremos con la base de datos real después
+      // Por ahora, validamos con los datos que creamos en Neon manualmente
+      if (email === "admin@tuperfumeria.com" && password === "Admin123!") {
+        localStorage.setItem("admin_session", "true");
+        setLoginView(false);
+      } else {
+        setLoginError("Credenciales incorrectas. Intenta de nuevo.");
+      }
+    } catch (error) {
+      setLoginError("Error de conexión.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  /*--------------------FIN ADMIN REAL---------------------*/
+
+  const orders = dbOrders;
   const navGroups = [...new Set(pages.map((item) => item.group))];
 
-  if (loginView) {
+  /*if (loginView) {
     return <div className="tp-root ad-root ad-login-screen">
       <style>{styles}</style>
       <div className="ad-login-art"><div className="ad-login-orbit orbit-one" /><div className="ad-login-orbit orbit-two" />
@@ -160,7 +210,69 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
         <div className="ad-login-foot">TU PERFUMERÍA <span>·</span> PROTOTIPO FASE 1</div>
       </div>
     </div>;
+  }*/
+    if (loginView) {
+    return <div className="tp-root ad-root ad-login-screen">
+      <style>{styles}</style>
+      <div className="ad-login-art">
+        <div className="ad-login-orbit orbit-one" />
+        <div className="ad-login-orbit orbit-two" />
+        <div className="ad-login-perfume"><PerfumeBottle tone="#9d70dd" label="NOCTURNE" /></div>
+        <div className="ad-login-caption">
+          <span>CASA DE FRAGANCIAS · COLOMBIA</span>
+          <b>La belleza vive<br />en los detalles.</b>
+          <small>Panel administrativo privado</small>
+        </div>
+      </div>
+      <div className="ad-login-panel">
+        <button className="ad-login-back" onClick={() => onExit ? onExit() : setLoginView(false)}>
+          <ChevronLeft size={16} /> {onExit ? "Volver a la tienda" : "Volver al panel"}
+        </button>
+        <div className="ad-brand-mark">
+          <span className="ad-brand-icon"><Flower2 size={21} /></span>
+          <div><b>Tu Perfumería</b><small>ADMINISTRACIÓN</small></div>
+        </div>
+        
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
+          <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>Iniciar Sesión</h1>
+          
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', color: '#d8c495', marginBottom: '5px' }}>Correo Electrónico</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
+              style={{ width: '100%', padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', color: '#d8c495', marginBottom: '5px' }}>Contraseña</label>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
+              style={{ width: '100%', padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
+            />
+          </div>
+
+          {loginError && <p style={{ color: '#ff6b6b', fontSize: '12px' }}>{loginError}</p>}
+
+          <button type="submit" className="ad-primary" disabled={isLoading} style={{ marginTop: '10px' }}>
+            {isLoading ? "Entrando..." : "Entrar al Panel"} <ChevronRight size={17} />
+          </button>
+        </form>
+
+        <div className="ad-login-safety" style={{ marginTop: '20px' }}>
+          <ShieldCheck size={15} /><span>Sesión segura · Base de datos conectada</span>
+        </div>
+        <div className="ad-login-foot">TU PERFUMERÍA <span>·</span> ADMINISTRACIÓN</div>
+      </div>
+    </div>;
   }
+  /*---------PARTE DEL ADMIN REAL---------------------- */
 
   return <div className="tp-root ad-root">
     <style>{styles}</style>
@@ -183,8 +295,10 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
         </nav>
         <div className="ad-sidebar-bottom">
           <div className="ad-stage-card"><div className="ad-stage-mark"><Sparkles size={14} /></div><span><b>Experiencia de muestra</b><small>Fase 1 · solo visual</small></span><span className="ad-live-dot" /></div>
-          <button className="ad-profile" onClick={() => setLoginView(true)}><span className="ad-avatar">AM</span><span><b>Adriana M.</b><small>Administradora DEMO</small></span><MoreHorizontal size={18} /></button>
-        </div>
+          <button className="ad-profile" onClick={() => {
+          localStorage.removeItem("admin_session");
+          setLoginView(true);}}><span className="ad-avatar">AM</span><span><b>Adriana M.</b><small>Administradora DEMO</small></span><MoreHorizontal size={18} /></button>
+      </div>
       </aside>
       <main className="ad-main">
         <header className="ad-topbar">
@@ -202,7 +316,7 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
           {page === "Dashboard" && <Dashboard period={period} setPeriod={setPeriod} go={go} notify={notify} />}
           {page === "Productos" && <Products search={search} setSearch={setSearch} category={category} setCategory={setCategory} products={filteredProducts} openGallery={openGallery} notify={notify} />}
           {page === "Categorías / Marcas" && <Categories go={go} notify={notify} />}
-          {page === "Pedidos" && <Orders orders={orders} orderFilter={orderFilter} setOrderFilter={setOrderFilter} notify={notify} />}
+          {page === "Pedidos" && <Orders orders={orders} orderFilter={orderFilter} setOrderFilter={setOrderFilter} notify={notify} setSelectedOrder={setSelectedOrder} />}
           {page === "Inventario" && <Inventory showInventory={showInventory} setShowInventory={setShowInventory} notify={notify} />}
           {page === "Ventas" && <Sales period={period} setPeriod={setPeriod} notify={notify} />}
           {page === "Reportes" && <Reports notify={notify} reportNotice={reportNotice} setReportNotice={setReportNotice} />}
@@ -214,8 +328,62 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
       </main>
     </div>
     {galleryProduct && <GalleryModal product={galleryProduct} views={galleryViews} principalView={principalView} setPrincipalView={setPrincipalView} close={() => setGalleryProduct(null)} add={addGalleryView} remove={removeGalleryView} move={moveGalleryView} />}
+
     {toast && <div role="status" className="ad-toast"><Check size={16} /> {toast}</div>}
+          {selectedOrder && (
+        <div className="ad-editor-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedOrder(null); }}>
+          <section className="ad-editor-card" role="dialog" aria-modal="true" style={{ maxWidth: '500px' }}>
+            <header className="ad-editor-heading">
+              <div><span className="ad-eyebrow">DETALLE DEL PEDIDO</span><h2>{selectedOrder.orderNumber}</h2></div>
+              <button className="ad-row-action" onClick={() => setSelectedOrder(null)}><X size={17} /></button>
+            </header>
+            <div style={{ padding: '20px', color: '#eee9e1' }}>
+              <p><strong>Cliente:</strong> {selectedOrder.customerName}</p>
+              <p><strong>Teléfono:</strong> {selectedOrder.customerPhone}</p>
+              <p><strong>Dirección:</strong> {selectedOrder.customerAddress}, {selectedOrder.customerCity}</p>
+              <p><strong>Método de Pago:</strong> {selectedOrder.paymentMethod}</p>
+              
+              <div style={{ marginTop: '20px', borderTop: '1px solid #333', paddingTop: '10px' }}>
+                <h3 style={{ fontSize: '14px', marginBottom: '10px' }}>Cambiar Estado:</h3>
+                  <select 
+                    value={selectedOrder.status} 
+                    onChange={async (e) => {
+                      const nuevoEstado = e.target.value;
+                      try {
+                        const res = await fetch(`/api/orders/${selectedOrder.id}/status`, {
+                          method: "PUT",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ status: nuevoEstado })
+                        });
+                        if (res.ok) {
+                          setSelectedOrder({ ...selectedOrder, status: nuevoEstado });
+                          setDbOrders(dbOrders.map(o => o.id === selectedOrder.id ? { ...o, status: nuevoEstado } : o));
+                          alert("Estado actualizado");
+                        } else {
+                          alert("Error al actualizar el estado");
+                        }
+                      } catch (err) {
+                        alert("Error de conexión");
+                      }
+                    }}
+                    style={{ width: '100%', padding: '10px', background: '#1b1821', color: '#fff', border: '1px solid #39333f', borderRadius: '4px' }}
+                  >
+                    <option value="pending">Pendiente</option>
+                    <option value="confirmed">Confirmado</option>
+                    <option value="paid">Pagado</option>
+                    <option value="shipped">Enviado</option>
+                    <option value="delivered">Entregado</option>
+                    <option value="cancelled">Cancelado</option>
+                </select>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
   </div>;
+  /*---------------------------------ORDER-----------------------------*/
+  
+  
 }
 
 function Dashboard({ period, setPeriod, go, notify }: { period: string; setPeriod: (v: string) => void; go: (p: Page) => void; notify: (s: string) => void }) {
@@ -290,31 +458,66 @@ function Products({ search, setSearch, category, setCategory, products, openGall
 }
 
 function ProductEditor({ product, close, notify }: { product?: DemoProduct; close: () => void; notify: (message: string) => void }) {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    notify("Formulario revisado · no se guardaron cambios en esta DEMO.");
-    close();
-  };
+    const formData = new FormData(event.currentTarget as HTMLFormElement);
+    const newProduct = {
+      name: formData.get("name"),
+      reference: formData.get("reference"),
+      brand: formData.get("brand"),
+      category: formData.get("category"),
+      audience: formData.get("audience"),
+      price: Number(formData.get("price")),
+      stock: Number(formData.get("stock")),
+      size: formData.get("size"),
+      status: "published",
+      isFeatured: false,
+    };
+
+     try {
+        // AQUÍ VAN LAS DOS LÍNEAS NUEVAS:
+        const url = product ? `/api/products/${product.id}` : "/api/products";
+        const method = product ? "PUT" : "POST";
+
+        // Y AQUÍ VA EL FETCH (ya modificado):
+        const res = await fetch(url, {
+          method: method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newProduct)
+        });
+        
+        if (res.ok) {
+          alert("¡Producto guardado exitosamente en la base de datos!");
+          close();
+          window.location.reload();
+        } else {
+          alert("Error al guardar el producto.");
+        }
+      } catch (err) {
+        alert("Error de conexión.");
+      }
+    };
+  
   return <div className="ad-editor-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
     <section className="ad-editor-card" role="dialog" aria-modal="true" aria-labelledby="ad-editor-title">
       <header className="ad-editor-heading"><div><span className="ad-eyebrow">PRODUCTO · VISTA DE DEMOSTRACIÓN</span><h2 id="ad-editor-title">{product ? "Editar producto" : "Crear producto"}</h2></div><DemoTag /><button className="ad-row-action" onClick={close} aria-label="Cerrar formulario"><X size={17} /></button></header>
       <form onSubmit={handleSubmit}>
         <div className="ad-editor-grid">
-          <label>Nombre ficticio<input defaultValue={product?.name ?? ""} placeholder="Nombre de demostración" /></label>
-          <label>Referencia demo<input defaultValue={product?.reference ?? "DEMO-NUEVO"} /></label>
-          <label>Marca ficticia<select defaultValue={product?.brand ?? demoBrands[0]}>{demoBrands.map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>Familia olfativa<select defaultValue={product?.category ?? demoCategories[1]}>{demoCategories.slice(1).map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>¿Para quién?<select defaultValue={product?.audience ?? "Unisex"}>{demoAudiences.filter((item) => item !== "Todos").map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>Precio ficticio (COP)<input type="number" min="0" defaultValue={product?.price ?? ""} placeholder="0" /></label>
-          <label>Unidades DEMO<input type="number" min="0" defaultValue={product?.stock ?? ""} placeholder="0" /></label>
-          <label>Contenido de muestra<input defaultValue={product?.size ?? "100 ml"} /></label>
+          <label>Nombre ficticio<input name="name" defaultValue={product?.name ?? ""} placeholder="Nombre de demostración" required /></label>
+          <label>Referencia demo<input name="reference" defaultValue={product?.reference ?? "DEMO-NUEVO"} required /></label>
+          <label>Marca ficticia<select name="brand" defaultValue={product?.brand ?? demoBrands[0]}>{demoBrands.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label>Familia olfativa<select name="category" defaultValue={product?.category ?? demoCategories[1]}>{demoCategories.slice(1).map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label>¿Para quién?<select name="audience" defaultValue={product?.audience ?? "Unisex"}>{demoAudiences.filter((item) => item !== "Todos").map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label>Precio ficticio (COP)<input name="price" type="number" min="0" defaultValue={product?.price ?? ""} placeholder="0" required /></label>
+          <label>Unidades DEMO<input name="stock" type="number" min="0" defaultValue={product?.stock ?? ""} placeholder="0" required /></label>
+          <label>Contenido de muestra<input name="size" defaultValue={product?.size ?? "100 ml"} /></label>
         </div>
         <p className="ad-editor-disclaimer"><ShieldCheck size={14} /> Vista previa solamente. No se crea ni modifica ningún producto.</p>
-        <div className="ad-editor-actions"><button type="button" className="ad-outline" onClick={close}>Cancelar</button><button type="submit" className="ad-primary"><Check size={15} /> Revisar formulario DEMO</button></div>
+        <div className="ad-editor-actions"><button type="button" className="ad-outline" onClick={close}>Cancelar</button><button type="submit" className="ad-primary"><Check size={15} /> Guardar Producto</button></div>
       </form>
     </section>
   </div>;
-}
+};
 
 function Categories({ go, notify }: { go: (p: Page) => void; notify: (s: string) => void }) {
   const familyCopy: Record<string, string> = { "Amaderada": "Maderas pulidas, resinas y matices verdes.", "Cítrica": "Acordes luminosos con salida vibrante.", "Dulce": "Texturas suaves y envolventes.", "Floral": "Pétalos de carácter contemporáneo.", "Fresca": "Composiciones limpias y aireadas.", "Oriental": "Especias, ámbar y profundidad." };
@@ -330,14 +533,42 @@ function StatusBadge({ status }: { status: string }) {
   return <span className={`ad-order-status ${statusClass[status] || ""}`}><i />{status}</span>;
 }
 
-function Orders({ orders, orderFilter, setOrderFilter, notify }: { orders: typeof demoOrders; orderFilter: string; setOrderFilter: (s: string) => void; notify: (s: string) => void }) {
+function Orders({ orders, orderFilter, setOrderFilter, notify, setSelectedOrder }: { orders: any[], orderFilter: string, setOrderFilter: (v: string) => void, notify: (m: string) => void, setSelectedOrder: (o: any) => void }) {
   return <div className="ad-page"><SectionHeader eyebrow="OPERACIÓN · REGISTROS FICTICIOS" title="Pedidos" description="Una bandeja ilustrativa para revisar jerarquías y estados." action={<button className="ad-outline" onClick={() => notify("Los datos de esta tabla son ficticios; no hay pedidos reales.")}><Filter size={15} /> Filtros demo</button>} />
     <div className="ad-order-summary"><div><span>EN LA MUESTRA</span><b>05</b><small>pedidos ficticios</small></div><div><span>PENDIENTES</span><b>01</b><small>registros demo</small></div><div><span>VALOR ILUSTRATIVO</span><b>$ 959.000</b><small>no son ventas reales</small></div><div className="ad-order-summary-message"><ClipboardList size={19} /><span>Los estados son los seis aprobados y pertenecen únicamente a esta vista ilustrativa.</span><DemoTag /></div></div>
-    <section className="ad-panel ad-order-panel"><div className="ad-order-tools"><div><span className="ad-eyebrow">PEDIDOS RECIENTES</span><h2>Actividad de muestra <DemoTag /></h2></div><select aria-label="Filtrar pedidos por estado" value={orderFilter} onChange={(e) => setOrderFilter(e.target.value)}><option>Todos los estados</option>{orderLabels.map((label) => <option key={label}>{label}</option>)}</select></div>
-      <div className="ad-table-wrap"><table className="ad-table"><thead><tr><th>REFERENCIA FICTICIA</th><th>CLIENTE DEMO</th><th>DETALLE ILUSTRATIVO</th><th>ESTADO</th><th>VALOR DEMO</th><th>ACCIÓN VISUAL</th></tr></thead><tbody>
-        {orders.map((order) => <tr key={order.id}><td className="ad-mono">{order.id}</td><td><b>{order.person}</b><small className="ad-cell-sub">Persona ficticia</small></td><td>{order.products}</td><td><StatusBadge status={order.status} /></td><td>{formatCop(order.amount)}</td><td><button className="ad-row-action" aria-label={`Ver detalle ilustrativo ${order.id}`} onClick={() => notify("Detalle ilustrativo · no corresponde a un pedido real.")}><Eye size={15} /></button></td></tr>)}
-        {orders.length === 0 && <tr><td colSpan={6}><div className="ad-empty">No hay registros con este filtro.</div></td></tr>}
-      </tbody></table></div><div className="ad-table-end">Registros ficticios <span>·</span> DEMO · datos ilustrativos; no son ventas reales</div>
+    <section className="ad-panel ad-order-panel">
+
+      <div className="ad-order-tools"><div><span className="ad-eyebrow">PEDIDOS RECIENTES</span><h2>Actividad de muestra <DemoTag /></h2></div><select aria-label="Filtrar pedidos por estado" value={orderFilter} onChange={(e) => setOrderFilter(e.target.value)}><option>Todos los estados</option>{orderLabels.map((label) => <option key={label}>{label}</option>)}</select>
+      </div>
+
+      <div className="ad-table-wrap"><table className="ad-table"><thead><tr><th>NÚMERO PEDIDO</th><th>CLIENTE</th><th>DETALLE</th><th>ESTADO</th><th>VALOR</th><th>ACCIÓN</th></tr></thead><tbody>
+        {orders.map((order) => <tr key={order.id}>
+          <td className="ad-mono">{order.orderNumber}</td>
+          <td><b>{order.customerName}</b><small className="ad-cell-sub">{order.customerPhone}</small></td>
+          <td>
+            {order.items && order.items.length > 0 
+              ? `${order.items[0].quantity}x ${order.items[0].productName} ${order.items.length > 1 ? `(+${order.items.length - 1} más)` : ''}` 
+              : "Sin detalle"}
+          </td>
+          <td>
+            <StatusBadge 
+              status={
+                order.status === "pending" ? "Pendiente" :
+                order.status === "confirmed" ? "Confirmado" :
+                order.status === "paid" ? "Pagado" :
+                order.status === "shipped" ? "Enviado" :
+                order.status === "delivered" ? "Entregado" :
+                order.status === "cancelled" ? "Cancelado" : order.status
+              } 
+          />
+        </td>
+          <td>{formatCop(order.subtotal)}</td>
+          <td><button className="ad-row-action" aria-label={`Ver detalle ${order.orderNumber}`} onClick={() => setSelectedOrder(order)}><Eye size={15} /></button></td>
+        </tr>)}
+        {orders.length === 0 && <tr><td colSpan={6}><div className="ad-empty">No hay pedidos registrados todavía.</div></td></tr>}
+      </tbody></table></div>
+      
+      <div className="ad-table-end">Registros ficticios <span>·</span> DEMO · datos ilustrativos; no son ventas reales</div>
     </section>
   </div>;
 }

@@ -160,7 +160,12 @@ function ProductCard({
 
 export function Tienda() {
   const [page, setPage] = useState<Page>("Inicio");
-  const [selected, setSelected] = useState<DemoProduct>(demoProducts[0]);
+  const [checkoutData, setCheckoutData] = useState({ name: "", phone: "", city: "", address: "" });
+  /*const [selected, setSelected] = useState<DemoProduct>(productsData[0]);*/
+  const [selected, setSelected] = useState<DemoProduct | null>(null);
+  const [productsData, setProductsData] = useState<DemoProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState("");
   const [family, setFamily] = useState("Todas las familias");
   const [audience, setAudience] = useState<(typeof demoAudiences)[number]>("Todos");
@@ -180,6 +185,28 @@ export function Tienda() {
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
+
+    useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((p: any) => ({
+          ...p,
+          id: String(p.id),
+          tone: "#9a68ef", 
+          notes: ["Nota 1", "Nota 2"], 
+          status: p.status === "published" ? "Disponible" : "Agotado",
+          featured: p.isFeatured,
+        }));
+        setProductsData(formatted);
+        if (formatted.length > 0) setSelected(formatted[0]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error cargando productos", err);
+        setLoading(false);
+      });
+  }, []);
 
   const notify = (message: string) => {
     setToast(message);
@@ -219,10 +246,10 @@ export function Tienda() {
       return next;
     });
   };
-  const cartItems = demoProducts.filter((product) => cart[product.id]);
+  const cartItems = productsData.filter((product) => cart[product.id]);
   const cartCount = Object.values(cart).reduce((sum, count) => sum + count, 0);
   const subtotal = cartItems.reduce((sum, product) => sum + product.price * (cart[product.id] ?? 0), 0);
-  const visibleProducts = demoProducts
+  const visibleProducts = productsData
     .filter((product) => family === "Todas las familias" || product.category === family)
     .filter((product) => audience === "Todos" || product.audience === audience)
     .filter((product) => brand === "Todas las marcas" || product.brand === brand)
@@ -367,7 +394,7 @@ export function Tienda() {
       <div className="tp-breadcrumb"><button type="button" onClick={() => go("Inicio")}>Inicio</button><span>/</span><button type="button" onClick={() => go("Catálogo")}>Catálogo</button><span>/</span><span>{selected.name}</span></div>
       <div className="tp-detail-layout">
         <div className="tp-detail-gallery"><Gallery product={selected} view={detailView} setView={setDetailView} /><div className="tp-gallery-labels">{demoGalleryViews.map((label, index) => <button key={label} type="button" className={detailView === index ? "is-active" : ""} onClick={() => setDetailView(index)}><span>0{index + 1}</span>{label}</button>)}</div><span className="tp-swipe-hint">← DESLIZA O USA LAS FLECHAS DEL TECLADO →</span></div>
-        <div className="tp-detail-info"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> {selected.category.toUpperCase()} · {selected.reference} · DEMO</div><h1>{selected.name}<em>DEMO</em></h1><div className="tp-detail-rule" /><p className="tp-detail-desc">{selected.description} Una lectura sensorial provisional, creada para esta experiencia de demostración.</p><div className="tp-detail-tags">{selected.notes.map((note) => <span key={note}>{note}</span>)}</div><div className="tp-detail-specs"><div><span>CONCENTRACIÓN</span><strong>{selected.concentration}</strong></div><div><span>CONTENIDO</span><strong>{selected.size}</strong></div><div><span>FAMILIA</span><strong>{selected.category}</strong></div></div><div className="tp-detail-price">{formatCop(selected.price)} <DemoFlag>PRECIO DEMO</DemoFlag></div><div className="tp-detail-stock"><span className={selected.stock ? "tp-stock-dot" : "tp-stock-dot out"} />{selected.status} · stock ficticio: {selected.stock}</div><div className="tp-detail-actions"><button type="button" className="tp-button-primary" onClick={() => addToCart(selected)} disabled={selected.stock === 0}>{selected.stock === 0 ? "Agotado en DEMO" : "Agregar al carrito"} <ShoppingBag size={16} /></button><button type="button" className={`tp-detail-fav ${favorites.includes(selected.id) ? "is-favorite" : ""}`} onClick={() => toggleFavorite(selected.id)} aria-label="Guardar en favoritos"><Heart size={19} fill={favorites.includes(selected.id) ? "currentColor" : "none"} /></button></div><p className="tp-demo-disclaimer"><ShieldCheck size={14} /> Compra y disponibilidad no reales. Prototipo no transaccional.</p><button type="button" className="tp-next-product" onClick={() => openProduct(demoProducts[(demoProducts.findIndex((item) => item.id === selected.id) + 1) % demoProducts.length])}>SIGUIENTE FRAGANCIA <ArrowRight size={14} /></button></div>
+        <div className="tp-detail-info"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> {selected.category.toUpperCase()} · {selected.reference} · DEMO</div><h1>{selected.name}<em>DEMO</em></h1><div className="tp-detail-rule" /><p className="tp-detail-desc">{selected.description} Una lectura sensorial provisional, creada para esta experiencia de demostración.</p><div className="tp-detail-tags">{selected.notes.map((note) => <span key={note}>{note}</span>)}</div><div className="tp-detail-specs"><div><span>CONCENTRACIÓN</span><strong>{selected.concentration}</strong></div><div><span>CONTENIDO</span><strong>{selected.size}</strong></div><div><span>FAMILIA</span><strong>{selected.category}</strong></div></div><div className="tp-detail-price">{formatCop(selected.price)} <DemoFlag>PRECIO DEMO</DemoFlag></div><div className="tp-detail-stock"><span className={selected.stock ? "tp-stock-dot" : "tp-stock-dot out"} />{selected.status} · stock ficticio: {selected.stock}</div><div className="tp-detail-actions"><button type="button" className="tp-button-primary" onClick={() => addToCart(selected)} disabled={selected.stock === 0}>{selected.stock === 0 ? "Agotado en DEMO" : "Agregar al carrito"} <ShoppingBag size={16} /></button><button type="button" className={`tp-detail-fav ${favorites.includes(selected.id) ? "is-favorite" : ""}`} onClick={() => toggleFavorite(selected.id)} aria-label="Guardar en favoritos"><Heart size={19} fill={favorites.includes(selected.id) ? "currentColor" : "none"} /></button></div><p className="tp-demo-disclaimer"><ShieldCheck size={14} /> Compra y disponibilidad no reales. Prototipo no transaccional.</p><button type="button" className="tp-next-product" onClick={() => openProduct(productsData[(productsData.findIndex((item) => item.id === selected.id) + 1) % productsData.length])}>SIGUIENTE FRAGANCIA <ArrowRight size={14} /></button></div>
       </div>
     </section>
   );
@@ -384,9 +411,99 @@ export function Tienda() {
       {clearConfirm && <div className="tp-confirm-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setClearConfirm(false); }}><div className="tp-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="clear-title"><button type="button" className="tp-dialog-close" onClick={() => setClearConfirm(false)} aria-label="Cerrar"><X size={18} /></button><div className="tp-dialog-icon"><Trash2 size={20} /></div><h2 id="clear-title">¿Empezar de nuevo?</h2><p>Esto quitará todos los productos de tu carrito de demostración.</p><div><button type="button" className="tp-button-quiet" onClick={() => setClearConfirm(false)}>Conservar selección</button><button type="button" className="tp-button-primary" onClick={() => { setCart({}); setClearConfirm(false); notify("Carrito vacío · cambio solo local"); }}>Sí, vaciar carrito</button></div></div></div>}
     </section>
   );
-
+  
   const renderCheckout = () => (
-    <section className="tp-page-shell tp-checkout-page"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> RECORRIDO VISUAL · SIN TRANSACCIÓN</div><h1>Una pausa antes<br /><em>de continuar.</em></h1><div className="tp-checkout-banner"><CircleHelp size={18} /><div><strong>Esta pantalla es únicamente una demostración.</strong><span>No se crea un pedido, no se solicitan datos financieros y no se envía información.</span></div><DemoFlag>NO CONFIGURADO</DemoFlag></div><div className="tp-checkout-layout"><div className="tp-checkout-main"><div className="tp-stepper"><div className="is-current"><span>01</span><b>Revisión</b></div><i /><div><span>02</span><b>Entrega</b></div><i /><div><span>03</span><b>Confirmación</b></div></div><div className="tp-checkout-panel"><span className="tp-summary-kicker">PASO 01 · REVISIÓN DE LA DEMO</span><h2>Todo listo para imaginar.</h2><p>Tu selección permanece solo en esta pantalla. La tienda aún no tiene pagos ni pedidos configurados.</p><div className="tp-checkout-recap">{cartItems.map((product) => <div key={product.id}><span>{cart[product.id]} × {product.name} <DemoFlag /></span><strong>{formatCop(product.price * cart[product.id])}</strong></div>)}{!cartItems.length && <span>Tu carrito está vacío.</span>}</div><button type="button" className={`tp-button-primary ${checkoutChecked ? "is-complete" : ""}`} onClick={() => { setCheckoutChecked(true); notify("Recorrido visual revisado · no se creó ningún pedido"); }}>{checkoutChecked ? <><Check size={16} /> Demostración revisada</> : <>Ver demostración de confirmación <ArrowRight size={16} /></>}</button>{checkoutChecked && <div className="tp-inline-feedback"><Check size={15} /> Vista completada. No se registró ninguna compra.</div>}</div></div><aside className="tp-checkout-aside"><span className="tp-summary-kicker">RESUMEN FICTICIO</span><div className="tp-summary-line"><span>Subtotal de productos</span><strong>{formatCop(subtotal)}</strong></div><div className="tp-summary-shipping">+ envío según ubicación</div><p>{deliveryCopy}</p><div className="tp-payment-visual"><CreditCard size={18} /><span>Medios de pago</span><DemoFlag>NO CONFIGURADO</DemoFlag></div></aside></div><button type="button" className="tp-text-link tp-back-cart" onClick={() => go("Carrito")}><ArrowLeft size={14} /> Volver al carrito</button></section>
+    <section className="tp-page-shell tp-checkout-page"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> RECORRIDO VISUAL · SIN TRANSACCIÓN</div><h1>Una pausa antes<br /><em>de continuar.</em></h1><div className="tp-checkout-banner"><CircleHelp size={18} /><div><strong>Esta pantalla es únicamente una demostración.</strong><span>No se crea un pedido, no se solicitan datos financieros y no se envía información.</span></div><DemoFlag>NO CONFIGURADO</DemoFlag></div><div className="tp-checkout-layout"><div className="tp-checkout-main"><div className="tp-stepper"><div className="is-current"><span>01</span><b>Revisión</b></div><i /><div><span>02</span><b>Entrega</b></div><i /><div><span>03</span><b>Confirmación</b></div></div><div className="tp-checkout-panel"><span className="tp-summary-kicker">PASO 01 · REVISIÓN DE LA DEMO</span><h2>Todo listo para imaginar.</h2><p>Tu selección permanece solo en esta pantalla. La tienda aún no tiene pagos ni pedidos configurados.</p><div className="tp-checkout-recap">{cartItems.map((product) => <div key={product.id}><span>{cart[product.id]} × {product.name} <DemoFlag /></span><strong>{formatCop(product.price * cart[product.id])}</strong></div>)}{!cartItems.length && <span>Tu carrito está vacío.</span>}</div>
+    
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+      <input 
+        placeholder="Nombre completo" 
+        value={checkoutData.name} 
+        onChange={(e) => setCheckoutData({...checkoutData, name: e.target.value})}
+        style={{ padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
+      />
+      <input 
+        placeholder="Teléfono de contacto" 
+        value={checkoutData.phone} 
+        onChange={(e) => setCheckoutData({...checkoutData, phone: e.target.value})}
+        style={{ padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
+      />
+      <input 
+        placeholder="Ciudad" 
+        value={checkoutData.city} 
+        onChange={(e) => setCheckoutData({...checkoutData, city: e.target.value})}
+        style={{ padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
+      />
+      <input 
+        placeholder="Dirección de entrega" 
+        value={checkoutData.address} 
+        onChange={(e) => setCheckoutData({...checkoutData, address: e.target.value})}
+        style={{ padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}/>
+    </div>
+
+  <button 
+    type="button" 
+    className={`tp-button-primary ${checkoutChecked ? "is-complete" : ""}`} 
+    onClick={async () => {
+      if (!checkoutData.name || !checkoutData.phone || !checkoutData.address) {
+        notify("Por favor completa los datos de envío.");
+        return;
+      }
+      
+      try {
+        // Aquí conectaremos con la API para guardar en la base de datos
+        const response = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerName: checkoutData.name,
+            customerPhone: checkoutData.phone,
+            customerCity: checkoutData.city,
+            customerAddress: checkoutData.address,
+            paymentMethod: "Nequi", // Temporal
+            items: cartItems.map(item => ({
+              productName: item.name,
+              reference: item.reference,
+              quantity: cart[item.id],
+              unitPrice: item.price,
+              subtotal: item.price * cart[item.id]
+            }))
+          })
+        }); 
+        const data = await response.json();// <--- AGREGA ESTO AQUÍ
+
+        if (response.ok) {
+          setCheckoutChecked(true);
+        notify("Pedido guardado. Abriendo WhatsApp...");
+
+        // Construir el mensaje de WhatsApp
+        const mensaje = `Hola, acabo de hacer un pedido en la tienda.%0A%0A` +
+          `*Número de pedido:* ${data.orderNumber}%0A` +
+          `*Nombre:* ${checkoutData.name}%0A` +
+          `*Teléfono:* ${checkoutData.phone}%0A` +
+          `*Ciudad:* ${checkoutData.city}%0A` +
+          `*Dirección:* ${checkoutData.address}%0A%0A` +
+          `*Productos:*%0A` +
+          cartItems.map(item => `- ${cart[item.id]}x ${item.name} (${item.reference}) - $${item.price * cart[item.id]}`).join('%0A') +
+          `%0A%0A*Subtotal:* $${subtotal.toLocaleString('es-CO')}%0A` +
+          `*+ envío según ubicación*`;
+
+        // Abrir WhatsApp (reemplaza el número por el de la tienda)
+        const numeroWhatsApp = "573238016233"; // Pon aquí el número de la tienda
+        window.open(`https://wa.me/${numeroWhatsApp}?text=${mensaje}`, '_blank');
+          // Aquí iría el código para abrir WhatsApp
+        } else {
+          notify("Error al guardar el pedido. Intenta de nuevo.");
+        }
+      } catch (error) {
+        notify("Error de conexión.");
+      }
+    }}
+  >
+    {checkoutChecked ? <><Check size={16} /> Pedido Guardado</> : <>Confirmar Pedido <ArrowRight size={16} /></>}
+</button>
+    
+    {checkoutChecked && <div className="tp-inline-feedback"><Check size={15} /> Vista completada. No se registró ninguna compra.</div>}</div></div><aside className="tp-checkout-aside"><span className="tp-summary-kicker">RESUMEN FICTICIO</span><div className="tp-summary-line"><span>Subtotal de productos</span><strong>{formatCop(subtotal)}</strong></div><div className="tp-summary-shipping">+ envío según ubicación</div><p>{deliveryCopy}</p><div className="tp-payment-visual"><CreditCard size={18} /><span>Medios de pago</span><DemoFlag>NO CONFIGURADO</DemoFlag></div></aside></div><button type="button" className="tp-text-link tp-back-cart" onClick={() => go("Carrito")}><ArrowLeft size={14} /> Volver al carrito</button></section>
   );
 
   const renderBrand = () => (
@@ -400,6 +517,9 @@ export function Tienda() {
   const renderContact = () => (
     <section className="tp-page-shell tp-contact-page"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> PUNTO DE CONTACTO · DEMO</div><h1>Hablemos<br /><em>de aromas.</em></h1><div className="tp-contact-card"><div className="tp-contact-card-art"><Mail size={30} /><span>UN ESPACIO<br />POR CONFIGURAR</span></div><div className="tp-contact-copy"><DemoFlag>CANAL NO CONFIGURADO</DemoFlag><h2>Estamos preparando<br />este espacio.</h2><p>En una tienda activa aquí encontrarás canales de atención. Este prototipo no tiene correo, teléfono, WhatsApp ni redes sociales configuradas.</p><button type="button" className="tp-button-outline" onClick={() => notify("Canal de contacto no configurado en esta DEMO")}><Mail size={15} /> Ver estado de contacto</button><span className="tp-contact-micro">NO SE ENVÍA NINGÚN MENSAJE</span></div></div><div className="tp-contact-bottom"><span>PRÓXIMAMENTE, EN ESTA HISTORIA.</span><span>BOGOTÁ · COLOMBIA · DEMO</span></div></section>
   );
+
+  if (loading) return <div style={{ color: 'white', padding: '50px' }}>Cargando tienda...</div>;
+  if (!selected) return <div style={{ color: 'white', padding: '50px' }}>No hay productos disponibles.</div>;
 
   const mainContent = () => {
     switch (page) {

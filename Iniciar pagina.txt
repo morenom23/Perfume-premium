@@ -1,0 +1,6 @@
+COMANDO EN LA CONSOLA VSCODE--------
+
+pnpm --filter "./artifacts/mockup-sandbox" exec cross-env PORT=3000 BASE_PATH=/ vite dev
+
+RUTA-----------------
+http://localhost:3000/preview/tu-perfumeria/Tienda
