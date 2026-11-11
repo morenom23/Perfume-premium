@@ -1,26 +1,81 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, Bell, Boxes, Check, ChevronDown,
-  ChevronLeft, ChevronRight, CircleHelp, ClipboardList, CreditCard, Download,
-  Eye, EyeOff, FileSpreadsheet, Filter, Flower2, ImagePlus, LayoutDashboard,
-  LockKeyhole, Menu, MoreHorizontal, Package, Pencil, Plus, Search,
-  Settings2, ShieldCheck, ShoppingBag, SlidersHorizontal, Sparkles, Tag, Trash2,
-  TrendingUp, Users, Wallet, WandSparkles, X, MessageCircle, ChartNoAxesCombined,
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  Bell,
+  Boxes,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  CircleHelp,
+  ClipboardList,
+  CreditCard,
+  Download,
+  Eye,
+  EyeOff,
+  FileSpreadsheet,
+  Filter,
+  Flower2,
+  ImagePlus,
+  LayoutDashboard,
+  LockKeyhole,
+  Menu,
+  MoreHorizontal,
+  Package,
+  Pencil,
+  Plus,
+  Search,
+  Settings2,
+  ShieldCheck,
+  ShoppingBag,
+  SlidersHorizontal,
+  Sparkles,
+  Tag,
+  Trash2,
+  TrendingUp,
+  Users,
+  Wallet,
+  WandSparkles,
+  X,
+  MessageCircle,
+  ChartNoAxesCombined,
 } from "lucide-react";
 
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip,
-  XAxis, YAxis,
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 import { PerfumeBottle } from "./_shared/PerfumeBottle";
-import { demoAudiences, demoBrands, demoCategories, demoProducts, formatCop } from "./_shared/demoProducts";
+import {
+  demoAudiences,
+  demoBrands,
+  demoCategories,
+  demoProducts,
+  formatCop,
+} from "./_shared/demoProducts";
 import type { DemoProduct } from "./_shared/demoProducts";
 import "./_shared/theme.css";
 
 type Page =
-  | "Dashboard" | "Productos" | "Categorías / Marcas" | "Pedidos" | "Inventario"
-  | "Ventas" | "Reportes" | "Usuarios / Permisos" | "Configuración comercial"
+  | "Dashboard"
+  | "Productos"
+  | "Categorías / Marcas"
+  | "Pedidos"
+  | "Inventario"
+  | "Ventas"
+  | "Reportes"
+  | "Usuarios / Permisos"
+  | "Configuración comercial"
   | "Actividad / Auditoría";
 
 const pages: { name: Page; icon: typeof LayoutDashboard; group: string }[] = [
@@ -37,23 +92,73 @@ const pages: { name: Page; icon: typeof LayoutDashboard; group: string }[] = [
 ];
 
 const salesSeries = [
-  { day: "01", amount: 22 }, { day: "03", amount: 36 }, { day: "05", amount: 29 },
-  { day: "07", amount: 48 }, { day: "09", amount: 40 }, { day: "11", amount: 62 },
-  { day: "13", amount: 49 }, { day: "15", amount: 74 }, { day: "17", amount: 57 },
-  { day: "19", amount: 83 }, { day: "21", amount: 68 }, { day: "23", amount: 93 },
-  { day: "25", amount: 74 }, { day: "27", amount: 105 }, { day: "29", amount: 88 },
+  { day: "01", amount: 22 },
+  { day: "03", amount: 36 },
+  { day: "05", amount: 29 },
+  { day: "07", amount: 48 },
+  { day: "09", amount: 40 },
+  { day: "11", amount: 62 },
+  { day: "13", amount: 49 },
+  { day: "15", amount: 74 },
+  { day: "17", amount: 57 },
+  { day: "19", amount: 83 },
+  { day: "21", amount: 68 },
+  { day: "23", amount: 93 },
+  { day: "25", amount: 74 },
+  { day: "27", amount: 105 },
+  { day: "29", amount: 88 },
 ];
 const categorySeries = [
-  { name: "Oriental", value: 32 }, { name: "Floral", value: 26 },
-  { name: "Fresca", value: 21 }, { name: "Madera", value: 15 }, { name: "Otras", value: 9 },
+  { name: "Oriental", value: 32 },
+  { name: "Floral", value: 26 },
+  { name: "Fresca", value: 21 },
+  { name: "Madera", value: 15 },
+  { name: "Otras", value: 9 },
 ];
-const orderLabels = ["Pendiente", "Confirmado", "Pagado", "Enviado", "Entregado", "Cancelado"] as const;
+const orderLabels = [
+  "Pendiente",
+  "Confirmado",
+  "Pagado",
+  "Enviado",
+  "Entregado",
+  "Cancelado",
+] as const;
 const demoOrders = [
-  { id: "DEMO-0481", person: "Valentina R.", products: "Noche Violeta · 100 ml", amount: 189000, status: "Pendiente" },
-  { id: "DEMO-0479", person: "Santiago M.", products: "Luz Mineral · 75 ml", amount: 154000, status: "Confirmado" },
-  { id: "DEMO-0476", person: "Camila P.", products: "Jardín Eléctrico · 100 ml", amount: 172000, status: "Enviado" },
-  { id: "DEMO-0472", person: "Martín G.", products: "Madera Líquida · 100 ml", amount: 216000, status: "Entregado" },
-  { id: "DEMO-0468", person: "Isabella C.", products: "Ámbar de Medianoche · 100 ml", amount: 228000, status: "Pagado" },
+  {
+    id: "DEMO-0481",
+    person: "Valentina R.",
+    products: "Noche Violeta · 100 ml",
+    amount: 189000,
+    status: "Pendiente",
+  },
+  {
+    id: "DEMO-0479",
+    person: "Santiago M.",
+    products: "Luz Mineral · 75 ml",
+    amount: 154000,
+    status: "Confirmado",
+  },
+  {
+    id: "DEMO-0476",
+    person: "Camila P.",
+    products: "Jardín Eléctrico · 100 ml",
+    amount: 172000,
+    status: "Enviado",
+  },
+  {
+    id: "DEMO-0472",
+    person: "Martín G.",
+    products: "Madera Líquida · 100 ml",
+    amount: 216000,
+    status: "Entregado",
+  },
+  {
+    id: "DEMO-0468",
+    person: "Isabella C.",
+    products: "Ámbar de Medianoche · 100 ml",
+    amount: 228000,
+    status: "Pagado",
+  },
 ];
 const formatCompact = (value: number) => `${value} M`;
 
@@ -61,29 +166,80 @@ function DemoTag({ children = "DEMO · ilustrativo" }: { children?: string }) {
   return <span className="ad-demo-tag">{children}</span>;
 }
 
-function SectionHeader({ eyebrow, title, description, action }: {
-  eyebrow: string; title: string; description: string; action?: ReactNode;
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  action,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  action?: ReactNode;
 }) {
-  return <div className="ad-section-heading"><div><div className="ad-eyebrow">{eyebrow}</div><h1>{title}</h1><p>{description}</p></div>{action}</div>;
+  return (
+    <div className="ad-section-heading">
+      <div>
+        <div className="ad-eyebrow">{eyebrow}</div>
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </div>
+      {action}
+    </div>
+  );
 }
 
-function Metric({ label, value, delta, icon: Icon, accent = "violet" }: {
-  label: string; value: string; delta: string; icon: typeof TrendingUp; accent?: string;
+function Metric({
+  label,
+  value,
+  delta,
+  icon: Icon,
+  accent = "violet",
+}: {
+  label: string;
+  value: string;
+  delta: string;
+  icon: typeof TrendingUp;
+  accent?: string;
 }) {
-  return <article className={`ad-metric ad-${accent}`}>
-    <div className="ad-metric-top"><span>{label}</span><Icon size={17} strokeWidth={1.7} /></div>
-    <strong>{value}</strong>
-    <div className="ad-metric-bottom"><span><ArrowUpRight size={13} /> {delta}</span><DemoTag /></div>
-  </article>;
+  return (
+    <article className={`ad-metric ad-${accent}`}>
+      <div className="ad-metric-top">
+        <span>{label}</span>
+        <Icon size={17} strokeWidth={1.7} />
+      </div>
+      <strong>{value}</strong>
+      <div className="ad-metric-bottom">
+        <span>
+          <ArrowUpRight size={13} /> {delta}
+        </span>
+        <DemoTag />
+      </div>
+    </article>
+  );
 }
 
-function ProductThumb({ product, size = "normal" }: { product: DemoProduct; size?: "normal" | "small" }) {
-  return <div className={`ad-product-thumb ${size}`} style={{ "--tone": product.tone } as CSSProperties}>
-    <PerfumeBottle tone={product.tone} label={product.name} />
-  </div>;
+function ProductThumb({
+  product,
+  size = "normal",
+}: {
+  product: DemoProduct;
+  size?: "normal" | "small";
+}) {
+  return (
+    <div
+      className={`ad-product-thumb ${size}`}
+      style={{ "--tone": product.tone } as CSSProperties}
+    >
+      <PerfumeBottle tone={product.tone} label={product.name} />
+    </div>
+  );
 }
 
-export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean; onExit?: () => void } = {}) {
+export function Admin({
+  initialLogin = false,
+  onExit,
+}: { initialLogin?: boolean; onExit?: () => void } = {}) {
   const [page, setPage] = useState<Page>("Dashboard");
   const [dbProducts, setDbProducts] = useState<any[]>([]);
   const [mobileNav, setMobileNav] = useState(false);
@@ -92,7 +248,9 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
   });
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Todas las familias");
-  const [galleryProduct, setGalleryProduct] = useState<DemoProduct | null>(null);
+  const [galleryProduct, setGalleryProduct] = useState<DemoProduct | null>(
+    null,
+  );
   const [galleryViews, setGalleryViews] = useState([0, 1, 2, 3]);
   const [principalView, setPrincipalView] = useState(0);
   const [toast, setToast] = useState("");
@@ -103,27 +261,35 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
   const [period, setPeriod] = useState("Últimos 30 días");
   const [dbOrders, setDbOrders] = useState<any[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  
 
-    useEffect(() => {
+  useEffect(() => {
     fetch("/api/products")
-      .then(res => res.json())
-      .then(data => setDbProducts(data))
-      .catch(err => console.error("Error cargando productos en admin", err));
+      .then((res) => res.json())
+      .then((data) => setDbProducts(data))
+      .catch((err) => console.error("Error cargando productos en admin", err));
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     fetch("/api/orders")
-      .then(res => res.json())
-      .then(data => setDbOrders(data))
-      .catch(err => console.error("Error cargando pedidos", err));
+      .then((res) => res.json())
+      .then((data) => setDbOrders(data))
+      .catch((err) => console.error("Error cargando pedidos", err));
   }, []);
 
-    const filteredProducts = useMemo(() => dbProducts.filter((product) => {
-    const matchesSearch = `${product.name} ${product.reference} ${product.brand} ${product.audience} ${product.category}`.toLowerCase().includes(search.toLowerCase());
-    return matchesSearch && (category === "Todas las familias" || product.category === category);
-  }), [search, category, dbProducts]);
-
+  const filteredProducts = useMemo(
+    () =>
+      dbProducts.filter((product) => {
+        const matchesSearch =
+          `${product.name} ${product.reference} ${product.brand} ${product.audience} ${product.category}`
+            .toLowerCase()
+            .includes(search.toLowerCase());
+        return (
+          matchesSearch &&
+          (category === "Todas las familias" || product.category === category)
+        );
+      }),
+    [search, category, dbProducts],
+  );
 
   const notify = (message: string) => {
     setToast(message);
@@ -144,9 +310,13 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
 
   const removeGalleryView = (index: number) => {
     setGalleryViews((views) => views.filter((_, i) => i !== index));
-    setPrincipalView((current) => current === index
-      ? Math.max(0, Math.min(index, galleryViews.length - 2))
-      : current > index ? current - 1 : current);
+    setPrincipalView((current) =>
+      current === index
+        ? Math.max(0, Math.min(index, galleryViews.length - 2))
+        : current > index
+          ? current - 1
+          : current,
+    );
   };
   const moveGalleryView = (index: number, direction: -1 | 1) => {
     const target = index + direction;
@@ -156,12 +326,15 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
       [next[index], next[target]] = [next[target], next[index]];
       return next;
     });
-    setPrincipalView((current) => current === index ? target : current === target ? index : current);
+    setPrincipalView((current) =>
+      current === index ? target : current === target ? index : current,
+    );
   };
   const addGalleryView = () => {
     if (galleryViews.length >= 4) return;
     const nextView = [0, 1, 2, 3].find((view) => !galleryViews.includes(view));
-    if (nextView !== undefined) setGalleryViews((views) => [...views, nextView]);
+    if (nextView !== undefined)
+      setGalleryViews((views) => [...views, nextView]);
   };
 
   /*PARA EL ADMIN REAL-------------------------*/
@@ -211,254 +384,1001 @@ export function Admin({ initialLogin = false, onExit }: { initialLogin?: boolean
       </div>
     </div>;
   }*/
-    if (loginView) {
-    return <div className="tp-root ad-root ad-login-screen">
-      <style>{styles}</style>
-      <div className="ad-login-art">
-        <div className="ad-login-orbit orbit-one" />
-        <div className="ad-login-orbit orbit-two" />
-        <div className="ad-login-perfume"><PerfumeBottle tone="#9d70dd" label="NOCTURNE" /></div>
-        <div className="ad-login-caption">
-          <span>CASA DE FRAGANCIAS · COLOMBIA</span>
-          <b>La belleza vive<br />en los detalles.</b>
-          <small>Panel administrativo privado</small>
-        </div>
-      </div>
-      <div className="ad-login-panel">
-        <button className="ad-login-back" onClick={() => onExit ? onExit() : setLoginView(false)}>
-          <ChevronLeft size={16} /> {onExit ? "Volver a la tienda" : "Volver al panel"}
-        </button>
-        <div className="ad-brand-mark">
-          <span className="ad-brand-icon"><Flower2 size={21} /></span>
-          <div><b>Tu Perfumería</b><small>ADMINISTRACIÓN</small></div>
-        </div>
-        
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
-          <h1 style={{ fontSize: '24px', marginBottom: '10px' }}>Iniciar Sesión</h1>
-          
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#d8c495', marginBottom: '5px' }}>Correo Electrónico</label>
-            <input 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
-              style={{ width: '100%', padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
-            />
+  if (loginView) {
+    return (
+      <div className="tp-root ad-root ad-login-screen">
+        <style>{styles}</style>
+        <div className="ad-login-art">
+          <div className="ad-login-orbit orbit-one" />
+          <div className="ad-login-orbit orbit-two" />
+          <div className="ad-login-perfume">
+            <PerfumeBottle tone="#9d70dd" label="NOCTURNE" />
           </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#d8c495', marginBottom: '5px' }}>Contraseña</label>
-            <input 
-              type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-              style={{ width: '100%', padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
-            />
+          <div className="ad-login-caption">
+            <span>CASA DE FRAGANCIAS · COLOMBIA</span>
+            <b>
+              La belleza vive
+              <br />
+              en los detalles.
+            </b>
+            <small>Panel administrativo privado</small>
           </div>
-
-          {loginError && <p style={{ color: '#ff6b6b', fontSize: '12px' }}>{loginError}</p>}
-
-          <button type="submit" className="ad-primary" disabled={isLoading} style={{ marginTop: '10px' }}>
-            {isLoading ? "Entrando..." : "Entrar al Panel"} <ChevronRight size={17} />
+        </div>
+        <div className="ad-login-panel">
+          <button
+            className="ad-login-back"
+            onClick={() => (onExit ? onExit() : setLoginView(false))}
+          >
+            <ChevronLeft size={16} />{" "}
+            {onExit ? "Volver a la tienda" : "Volver al panel"}
           </button>
-        </form>
+          <div className="ad-brand-mark">
+            <span className="ad-brand-icon">
+              <Flower2 size={21} />
+            </span>
+            <div>
+              <b>Tu Perfumería</b>
+              <small>ADMINISTRACIÓN</small>
+            </div>
+          </div>
 
-        <div className="ad-login-safety" style={{ marginTop: '20px' }}>
-          <ShieldCheck size={15} /><span>Sesión segura · Base de datos conectada</span>
+          <form
+            onSubmit={handleLogin}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "15px",
+              marginTop: "20px",
+            }}
+          >
+            <h1 style={{ fontSize: "24px", marginBottom: "10px" }}>
+              Iniciar Sesión
+            </h1>
+
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "12px",
+                  color: "#d8c495",
+                  marginBottom: "5px",
+                }}
+              >
+                Correo Electrónico
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  background: "#1b1821",
+                  border: "1px solid #39333f",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
+              />
+            </div>
+
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "12px",
+                  color: "#d8c495",
+                  marginBottom: "5px",
+                }}
+              >
+                Contraseña
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  background: "#1b1821",
+                  border: "1px solid #39333f",
+                  color: "#fff",
+                  borderRadius: "4px",
+                }}
+              />
+            </div>
+
+            {loginError && (
+              <p style={{ color: "#ff6b6b", fontSize: "12px" }}>{loginError}</p>
+            )}
+
+            <button
+              type="submit"
+              className="ad-primary"
+              disabled={isLoading}
+              style={{ marginTop: "10px" }}
+            >
+              {isLoading ? "Entrando..." : "Entrar al Panel"}{" "}
+              <ChevronRight size={17} />
+            </button>
+          </form>
+
+          <div className="ad-login-safety" style={{ marginTop: "20px" }}>
+            <ShieldCheck size={15} />
+            <span>Sesión segura · Base de datos conectada</span>
+          </div>
+          <div className="ad-login-foot">
+            TU PERFUMERÍA <span>·</span> ADMINISTRACIÓN
+          </div>
         </div>
-        <div className="ad-login-foot">TU PERFUMERÍA <span>·</span> ADMINISTRACIÓN</div>
       </div>
-    </div>;
+    );
   }
   /*---------PARTE DEL ADMIN REAL---------------------- */
 
-  return <div className="tp-root ad-root">
-    <style>{styles}</style>
-    <div className="ad-shell">
-      {mobileNav && <button className="ad-mobile-scrim" aria-label="Cerrar navegación" onClick={() => setMobileNav(false)} />}
-      <aside className={`ad-sidebar ${mobileNav ? "is-open" : ""}`}>
-        <div className="ad-brand">
-          <div className="ad-brand-icon"><Flower2 size={21} strokeWidth={1.5} /></div>
-          <div className="ad-brand-name"><b>Tu Perfumería</b><span>ESTUDIO DE FRAGANCIAS</span></div>
-          <button className="ad-close-nav" aria-label="Cerrar menú" onClick={() => setMobileNav(false)}><X size={18} /></button>
-        </div>
-        <div className="ad-store-switch"><span className="ad-store-glyph">TP</span><span><b>Casa principal</b><small>Colombia · DEMO</small></span><ChevronDown size={14} /></div>
-        <nav className="ad-nav">
-          {navGroups.map((group) => <div className="ad-nav-group" key={group}><span className="ad-nav-label">{group}</span>
-            {pages.filter((item) => item.group === group).map(({ name, icon: Icon }) =>
-              <button key={name} onClick={() => go(name)} className={`ad-nav-link ${page === name ? "active" : ""}`}>
-                <Icon size={16} strokeWidth={1.7} /><span>{name}</span>{name === "Pedidos" && <b className="ad-nav-count">05</b>}
-              </button>)}
-          </div>)}
-        </nav>
-        <div className="ad-sidebar-bottom">
-          <div className="ad-stage-card"><div className="ad-stage-mark"><Sparkles size={14} /></div><span><b>Experiencia de muestra</b><small>Fase 1 · solo visual</small></span><span className="ad-live-dot" /></div>
-          <button className="ad-profile" onClick={() => {
-          localStorage.removeItem("admin_session");
-          setLoginView(true);}}><span className="ad-avatar">AM</span><span><b>Adriana M.</b><small>Administradora DEMO</small></span><MoreHorizontal size={18} /></button>
+  return (
+    <div className="tp-root ad-root">
+      <style>{styles}</style>
+      <div className="ad-shell">
+        {mobileNav && (
+          <button
+            className="ad-mobile-scrim"
+            aria-label="Cerrar navegación"
+            onClick={() => setMobileNav(false)}
+          />
+        )}
+        <aside className={`ad-sidebar ${mobileNav ? "is-open" : ""}`}>
+          <div className="ad-brand">
+            <div className="ad-brand-icon">
+              <Flower2 size={21} strokeWidth={1.5} />
+            </div>
+            <div className="ad-brand-name">
+              <b>Tu Perfumería</b>
+              <span>ESTUDIO DE FRAGANCIAS</span>
+            </div>
+            <button
+              className="ad-close-nav"
+              aria-label="Cerrar menú"
+              onClick={() => setMobileNav(false)}
+            >
+              <X size={18} />
+            </button>
+          </div>
+          <div className="ad-store-switch">
+            <span className="ad-store-glyph">TP</span>
+            <span>
+              <b>Casa principal</b>
+              <small>Colombia · DEMO</small>
+            </span>
+            <ChevronDown size={14} />
+          </div>
+          <nav className="ad-nav">
+            {navGroups.map((group) => (
+              <div className="ad-nav-group" key={group}>
+                <span className="ad-nav-label">{group}</span>
+                {pages
+                  .filter((item) => item.group === group)
+                  .map(({ name, icon: Icon }) => (
+                    <button
+                      key={name}
+                      onClick={() => go(name)}
+                      className={`ad-nav-link ${page === name ? "active" : ""}`}
+                    >
+                      <Icon size={16} strokeWidth={1.7} />
+                      <span>{name}</span>
+                      {name === "Pedidos" && <b className="ad-nav-count">05</b>}
+                    </button>
+                  ))}
+              </div>
+            ))}
+          </nav>
+          <div className="ad-sidebar-bottom">
+            <div className="ad-stage-card">
+              <div className="ad-stage-mark">
+                <Sparkles size={14} />
+              </div>
+              <span>
+                <b>Experiencia de muestra</b>
+                <small>Fase 1 · solo visual</small>
+              </span>
+              <span className="ad-live-dot" />
+            </div>
+            <button
+              className="ad-profile"
+              onClick={() => {
+                localStorage.removeItem("admin_session");
+                setLoginView(true);
+              }}
+            >
+              <span className="ad-avatar">AM</span>
+              <span>
+                <b>Adriana M.</b>
+                <small>Administradora DEMO</small>
+              </span>
+              <MoreHorizontal size={18} />
+            </button>
+          </div>
+        </aside>
+        <main className="ad-main">
+          <header className="ad-topbar">
+            <div className="ad-top-left">
+              <button
+                className="ad-menu-trigger"
+                aria-label="Abrir menú"
+                onClick={() => setMobileNav(true)}
+              >
+                <Menu size={20} />
+              </button>
+              <div className="ad-breadcrumb">
+                Administración <ChevronRight size={14} /> <b>{page}</b>
+              </div>
+            </div>
+            <div className="ad-top-actions">
+              <div className="ad-mode-chip">
+                <span /> DEMO VISUAL <b>FASE 1</b>
+              </div>
+              <button
+                className="ad-icon-button"
+                aria-label="Ayuda"
+                onClick={() =>
+                  notify(
+                    "Este panel es una experiencia visual de demostración.",
+                  )
+                }
+              >
+                <CircleHelp size={17} />
+              </button>
+              <button
+                className="ad-icon-button ad-notice"
+                aria-label="Notificaciones de demostración"
+                onClick={() => go("Actividad / Auditoría")}
+              >
+                <Bell size={17} />
+                <i />
+              </button>
+              <button
+                className="ad-user-chip"
+                onClick={() => setLoginView(true)}
+              >
+                <span className="ad-avatar">AM</span>
+                <span>Adriana M.</span>
+                <ChevronDown size={13} />
+              </button>
+            </div>
+          </header>
+          <div className="ad-content">
+            <div className="ad-demo-banner">
+              <span className="ad-banner-symbol">
+                <WandSparkles size={15} />
+              </span>
+              <span>
+                <b>Espacio de demostración.</b> Todas las cifras, productos y
+                registros son ilustrativos; no representan operaciones reales ni
+                se guardan.
+              </span>
+              <button
+                aria-label="Ir a configuración demo"
+                onClick={() => go("Configuración comercial")}
+              >
+                <span>Sobre este demo</span>
+                <ChevronRight size={15} />
+              </button>
+            </div>
+            {page === "Dashboard" && (
+              <Dashboard
+                period={period}
+                setPeriod={setPeriod}
+                go={go}
+                notify={notify}
+              />
+            )}
+            {page === "Productos" && (
+              <Products
+                search={search}
+                setSearch={setSearch}
+                category={category}
+                setCategory={setCategory}
+                products={filteredProducts}
+                openGallery={openGallery}
+                notify={notify}
+              />
+            )}
+            {page === "Categorías / Marcas" && (
+              <Categories go={go} notify={notify} />
+            )}
+            {page === "Pedidos" && (
+              <Orders
+                orders={orders}
+                orderFilter={orderFilter}
+                setOrderFilter={setOrderFilter}
+                notify={notify}
+                setSelectedOrder={setSelectedOrder}
+              />
+            )}
+            {page === "Inventario" && (
+              <Inventory
+                showInventory={showInventory}
+                setShowInventory={setShowInventory}
+                notify={notify}
+              />
+            )}
+            {page === "Ventas" && (
+              <Sales period={period} setPeriod={setPeriod} notify={notify} />
+            )}
+            {page === "Reportes" && (
+              <Reports
+                notify={notify}
+                reportNotice={reportNotice}
+                setReportNotice={setReportNotice}
+                dbOrders={dbOrders}
+              />
+            )}
+            {page === "Usuarios / Permisos" && (
+              <UsersPage
+                active={secondaryActive}
+                setActive={setSecondaryActive}
+                notify={notify}
+              />
+            )}
+            {page === "Configuración comercial" && <Settings notify={notify} />}
+            {page === "Actividad / Auditoría" && <ActivityPage />}
+            <footer className="ad-footer">
+              <span>
+                Tu Perfumería <i>·</i> Panel privado de demostración
+              </span>
+              <span>
+                FASE 1 <i>·</i> SIN DATOS REALES
+              </span>
+            </footer>
+          </div>
+        </main>
       </div>
-      </aside>
-      <main className="ad-main">
-        <header className="ad-topbar">
-          <div className="ad-top-left"><button className="ad-menu-trigger" aria-label="Abrir menú" onClick={() => setMobileNav(true)}><Menu size={20} /></button>
-            <div className="ad-breadcrumb">Administración <ChevronRight size={14} /> <b>{page}</b></div>
-          </div>
-          <div className="ad-top-actions"><div className="ad-mode-chip"><span /> DEMO VISUAL <b>FASE 1</b></div>
-            <button className="ad-icon-button" aria-label="Ayuda" onClick={() => notify("Este panel es una experiencia visual de demostración.")}><CircleHelp size={17} /></button>
-            <button className="ad-icon-button ad-notice" aria-label="Notificaciones de demostración" onClick={() => go("Actividad / Auditoría")}><Bell size={17} /><i /></button>
-            <button className="ad-user-chip" onClick={() => setLoginView(true)}><span className="ad-avatar">AM</span><span>Adriana M.</span><ChevronDown size={13} /></button>
-          </div>
-        </header>
-        <div className="ad-content">
-          <div className="ad-demo-banner"><span className="ad-banner-symbol"><WandSparkles size={15} /></span><span><b>Espacio de demostración.</b> Todas las cifras, productos y registros son ilustrativos; no representan operaciones reales ni se guardan.</span><button aria-label="Ir a configuración demo" onClick={() => go("Configuración comercial")}><span>Sobre este demo</span><ChevronRight size={15} /></button></div>
-          {page === "Dashboard" && <Dashboard period={period} setPeriod={setPeriod} go={go} notify={notify} />}
-          {page === "Productos" && <Products search={search} setSearch={setSearch} category={category} setCategory={setCategory} products={filteredProducts} openGallery={openGallery} notify={notify} />}
-          {page === "Categorías / Marcas" && <Categories go={go} notify={notify} />}
-          {page === "Pedidos" && <Orders orders={orders} orderFilter={orderFilter} setOrderFilter={setOrderFilter} notify={notify} setSelectedOrder={setSelectedOrder} />}
-          {page === "Inventario" && <Inventory showInventory={showInventory} setShowInventory={setShowInventory} notify={notify} />}
-          {page === "Ventas" && <Sales period={period} setPeriod={setPeriod} notify={notify} />}
-          {page === "Reportes" && <Reports notify={notify} reportNotice={reportNotice} setReportNotice={setReportNotice} />}
-          {page === "Usuarios / Permisos" && <UsersPage active={secondaryActive} setActive={setSecondaryActive} notify={notify} />}
-          {page === "Configuración comercial" && <Settings notify={notify} />}
-          {page === "Actividad / Auditoría" && <ActivityPage />}
-          <footer className="ad-footer"><span>Tu Perfumería <i>·</i> Panel privado de demostración</span><span>FASE 1 <i>·</i> SIN DATOS REALES</span></footer>
-        </div>
-      </main>
-    </div>
-    {galleryProduct && <GalleryModal product={galleryProduct} views={galleryViews} principalView={principalView} setPrincipalView={setPrincipalView} close={() => setGalleryProduct(null)} add={addGalleryView} remove={removeGalleryView} move={moveGalleryView} />}
+      {galleryProduct && (
+        <GalleryModal
+          product={galleryProduct}
+          views={galleryViews}
+          principalView={principalView}
+          setPrincipalView={setPrincipalView}
+          close={() => setGalleryProduct(null)}
+          add={addGalleryView}
+          remove={removeGalleryView}
+          move={moveGalleryView}
+        />
+      )}
 
-    {toast && <div role="status" className="ad-toast"><Check size={16} /> {toast}</div>}
-          {selectedOrder && (
-        <div className="ad-editor-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedOrder(null); }}>
-          <section className="ad-editor-card" role="dialog" aria-modal="true" style={{ maxWidth: '500px' }}>
+      {toast && (
+        <div role="status" className="ad-toast">
+          <Check size={16} /> {toast}
+        </div>
+      )}
+      {selectedOrder && (
+        <div
+          className="ad-editor-backdrop"
+          role="presentation"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setSelectedOrder(null);
+          }}
+        >
+          <section
+            className="ad-editor-card"
+            role="dialog"
+            aria-modal="true"
+            style={{ maxWidth: "500px" }}
+          >
             <header className="ad-editor-heading">
-              <div><span className="ad-eyebrow">DETALLE DEL PEDIDO</span><h2>{selectedOrder.orderNumber}</h2></div>
-              <button className="ad-row-action" onClick={() => setSelectedOrder(null)}><X size={17} /></button>
+              <div>
+                <span className="ad-eyebrow">DETALLE DEL PEDIDO</span>
+                <h2>{selectedOrder.orderNumber}</h2>
+              </div>
+              <button
+                className="ad-row-action"
+                onClick={() => setSelectedOrder(null)}
+              >
+                <X size={17} />
+              </button>
             </header>
-            <div style={{ padding: '20px', color: '#eee9e1' }}>
-              <p><strong>Cliente:</strong> {selectedOrder.customerName}</p>
-              <p><strong>Teléfono:</strong> {selectedOrder.customerPhone}</p>
-              <p><strong>Dirección:</strong> {selectedOrder.customerAddress}, {selectedOrder.customerCity}</p>
-              <p><strong>Método de Pago:</strong> {selectedOrder.paymentMethod}</p>
-              
-              <div style={{ marginTop: '20px', borderTop: '1px solid #333', paddingTop: '10px' }}>
-                <h3 style={{ fontSize: '14px', marginBottom: '10px' }}>Cambiar Estado:</h3>
-                  <select 
-                    value={selectedOrder.status} 
-                    onChange={async (e) => {
-                      const nuevoEstado = e.target.value;
-                      try {
-                        const res = await fetch(`/api/orders/${selectedOrder.id}/status`, {
+            <div style={{ padding: "20px", color: "#eee9e1" }}>
+              <p>
+                <strong>Cliente:</strong> {selectedOrder.customerName}
+              </p>
+              <p>
+                <strong>Teléfono:</strong> {selectedOrder.customerPhone}
+              </p>
+              <p>
+                <strong>Dirección:</strong> {selectedOrder.customerAddress},{" "}
+                {selectedOrder.customerCity}
+              </p>
+              <p>
+                <strong>Método de Pago:</strong> {selectedOrder.paymentMethod}
+              </p>
+
+              <div
+                style={{
+                  marginTop: "20px",
+                  borderTop: "1px solid #333",
+                  paddingTop: "10px",
+                }}
+              >
+                <h3 style={{ fontSize: "14px", marginBottom: "10px" }}>
+                  Cambiar Estado:
+                </h3>
+                <select
+                  value={selectedOrder.status}
+                  onChange={async (e) => {
+                    const nuevoEstado = e.target.value;
+                    try {
+                      const res = await fetch(
+                        `/api/orders/${selectedOrder.id}/status`,
+                        {
                           method: "PUT",
                           headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ status: nuevoEstado })
+                          body: JSON.stringify({ status: nuevoEstado }),
+                        },
+                      );
+                      if (res.ok) {
+                        setSelectedOrder({
+                          ...selectedOrder,
+                          status: nuevoEstado,
                         });
-                        if (res.ok) {
-                          setSelectedOrder({ ...selectedOrder, status: nuevoEstado });
-                          setDbOrders(dbOrders.map(o => o.id === selectedOrder.id ? { ...o, status: nuevoEstado } : o));
-                          alert("Estado actualizado");
-                        } else {
-                          alert("Error al actualizar el estado");
-                        }
-                      } catch (err) {
-                        alert("Error de conexión");
+                        setDbOrders(
+                          dbOrders.map((o) =>
+                            o.id === selectedOrder.id
+                              ? { ...o, status: nuevoEstado }
+                              : o,
+                          ),
+                        );
+                        alert("Estado actualizado");
+                      } else {
+                        alert("Error al actualizar el estado");
                       }
-                    }}
-                    style={{ width: '100%', padding: '10px', background: '#1b1821', color: '#fff', border: '1px solid #39333f', borderRadius: '4px' }}
-                  >
-                    <option value="pending">Pendiente</option>
-                    <option value="confirmed">Confirmado</option>
-                    <option value="paid">Pagado</option>
-                    <option value="shipped">Enviado</option>
-                    <option value="delivered">Entregado</option>
-                    <option value="cancelled">Cancelado</option>
+                    } catch (err) {
+                      alert("Error de conexión");
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    background: "#1b1821",
+                    color: "#fff",
+                    border: "1px solid #39333f",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <option value="pending">Pendiente</option>
+                  <option value="confirmed">Confirmado</option>
+                  <option value="paid">Pagado</option>
+                  <option value="shipped">Enviado</option>
+                  <option value="delivered">Entregado</option>
+                  <option value="cancelled">Cancelado</option>
                 </select>
               </div>
             </div>
           </section>
         </div>
       )}
-  </div>;
+    </div>
+  );
   /*---------------------------------ORDER-----------------------------*/
-  
-  
 }
 
-function Dashboard({ period, setPeriod, go, notify }: { period: string; setPeriod: (v: string) => void; go: (p: Page) => void; notify: (s: string) => void }) {
-  return <div className="ad-page">
-    <SectionHeader eyebrow="MARTES, 18 DE JUNIO · VISTA GENERAL" title="Buenos días, Adriana" description="Un pulso de muestra para la casa de fragancias." action={<div className="ad-heading-actions"><select aria-label="Periodo ilustrativo" value={period} onChange={(e) => setPeriod(e.target.value)}><option>Últimos 30 días</option><option>Últimos 7 días</option><option>Este año</option></select><button className="ad-outline" onClick={() => notify("El informe es únicamente ilustrativo; no se descargó ningún archivo.")}><Download size={15} /> Exportar vista</button></div>} />
-    <div className="ad-metrics">
-      <Metric label="Ventas ilustrativas" value="$ 8,42 M" delta="+12,8% vs. periodo anterior" icon={Wallet} />
-      <Metric label="Pedidos de muestra" value="128" delta="+8,2% vs. periodo anterior" icon={ShoppingBag} accent="gold" />
-      <Metric label="Ticket promedio" value="$ 65.781" delta="+3,4% vs. periodo anterior" icon={CreditCard} accent="rose" />
-      <Metric label="Unidades en catálogo" value="81" delta="12 referencias demo" icon={Package} accent="green" />
-    </div>
-    <div className="ad-dashboard-grid">
-      <section className="ad-panel ad-sales-panel">
-        <div className="ad-panel-heading"><div><span className="ad-eyebrow">RITMO DE LA CASA <DemoTag /></span><h2>Ventas de demostración</h2><p>Valores ficticios · miles de COP</p></div><button className="ad-text-link" onClick={() => go("Ventas")}>Ver análisis <ChevronRight size={14} /></button></div>
-        <div className="ad-chart-key"><span><i /> Valor ilustrativo</span><span className="ad-chart-period">{period}</span></div>
-        <div className="ad-line-chart"><ResponsiveContainer width="100%" height="100%"><AreaChart data={salesSeries} margin={{ top: 14, right: 8, left: -17, bottom: 0 }}>
-          <defs><linearGradient id="adminChartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#a985ef" stopOpacity={0.28} /><stop offset="100%" stopColor="#a985ef" stopOpacity={0} /></linearGradient></defs>
-          <CartesianGrid stroke="rgba(226,216,197,.07)" vertical={false} />
-          <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "#8e8994", fontSize: 10 }} tickMargin={11} />
-          <YAxis axisLine={false} tickLine={false} tick={{ fill: "#8e8994", fontSize: 10 }} tickFormatter={formatCompact} />
-          <Tooltip contentStyle={{ background: "#1c1921", border: "1px solid rgba(214,190,139,.23)", borderRadius: 8, color: "#f3eee6", fontSize: 12 }} formatter={(value) => [`$${value} mil COP · DEMO`, "Valor ilustrativo"]} labelFormatter={(label) => `Día ${label} · datos demo`} />
-          <Area type="monotone" dataKey="amount" stroke="#b99af7" strokeWidth={2.5} fill="url(#adminChartFill)" activeDot={{ r: 4, fill: "#d6be8b", stroke: "#1c1921", strokeWidth: 2 }} />
-        </AreaChart></ResponsiveContainer></div>
-      </section>
-      <section className="ad-panel ad-category-panel">
-        <div className="ad-panel-heading"><div><span className="ad-eyebrow">PERFIL OLFATIVO <DemoTag /></span><h2>Interés por familia</h2><p>Composición ilustrativa · no ventas reales</p></div><button className="ad-square-button" aria-label="Más detalles de categorías" onClick={() => go("Categorías / Marcas")}><MoreHorizontal size={18} /></button></div>
-        <div className="ad-bar-chart"><ResponsiveContainer width="100%" height="100%"><BarChart data={categorySeries} layout="vertical" margin={{ top: 5, right: 26, left: -12, bottom: 0 }}>
-          <CartesianGrid stroke="rgba(226,216,197,.06)" horizontal={false} />
-          <XAxis type="number" hide domain={[0, 36]} /><YAxis type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#b9b3bf", fontSize: 11 }} width={74} />
-          <Tooltip cursor={{ fill: "rgba(255,255,255,.025)" }} contentStyle={{ background: "#1c1921", border: "1px solid rgba(214,190,139,.23)", borderRadius: 8, color: "#f3eee6", fontSize: 12 }} formatter={(value) => [`${value}% · DEMO`, "Distribución ficticia"]} />
-          <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={12} fill="#9270c7" />
-        </BarChart></ResponsiveContainer></div>
-        <button className="ad-panel-footlink" onClick={() => go("Productos")}>Explorar catálogo <ChevronRight size={14} /></button>
-      </section>
-    </div>
-    <div className="ad-lower-grid">
-      <section className="ad-panel ad-recent-panel">
-        <div className="ad-panel-heading"><div><span className="ad-eyebrow">ACTIVIDAD RECIENTE <DemoTag /></span><h2>Pedidos de muestra</h2><p>Registros enteramente ficticios</p></div><button className="ad-text-link" onClick={() => go("Pedidos")}>Todos los pedidos <ChevronRight size={14} /></button></div>
-        <div className="ad-table-wrap"><table className="ad-table"><thead><tr><th>REFERENCIA DEMO</th><th>CLIENTE FICTICIO</th><th>PRODUCTO ILUSTRATIVO</th><th>ESTADO</th><th>VALOR DEMO</th></tr></thead>
-          <tbody>{demoOrders.slice(0, 3).map((order) => <tr key={order.id}><td className="ad-mono">{order.id}</td><td>{order.person}</td><td>{order.products}</td><td><StatusBadge status={order.status} /></td><td>{formatCop(order.amount)}</td></tr>)}</tbody></table></div>
-      </section>
-      <section className="ad-stock-card"><div className="ad-stock-orb" /><div className="ad-stock-top"><span className="ad-eyebrow">SEÑAL DEL CATÁLOGO</span><Boxes size={17} /></div><div className="ad-stock-num">03 <span>referencias</span></div><p>Inventario bajo en esta muestra ficticia.</p><div className="ad-stock-bottom"><span>DEMO · no representa existencias reales</span><button onClick={() => go("Inventario")}>Revisar <ChevronRight size={13} /></button></div></section>
-    </div>
-    <div className="ad-note-strip"><Sparkles size={14} /><span>Este tablero es una composición de datos ficticios para revisión visual. Ningún valor representa ventas u operaciones reales.</span><button onClick={() => go("Configuración comercial")}>Revisar avisos</button></div>
-  </div>;
-}
-
-function Products({ search, setSearch, category, setCategory, products, openGallery, notify }: {
-  search: string; setSearch: (v: string) => void; category: string; setCategory: (v: string) => void;
-  products: DemoProduct[]; openGallery: (p: DemoProduct) => void; notify: (s: string) => void;
+function Dashboard({
+  period,
+  setPeriod,
+  go,
+  notify,
+}: {
+  period: string;
+  setPeriod: (v: string) => void;
+  go: (p: Page) => void;
+  notify: (s: string) => void;
 }) {
-  const [editorProduct, setEditorProduct] = useState<DemoProduct | "new" | null>(null);
-  return <div className="ad-page">
-    <SectionHeader eyebrow="CATÁLOGO · 12 REFERENCIAS FICTICIAS" title="Productos" description="Una vitrina de muestra, lista para explorar. Los cambios solo viven en esta sesión." action={<button className="ad-primary" onClick={() => setEditorProduct("new")}><Plus size={16} /> Nuevo producto <span className="ad-mini-demo">DEMO</span></button>} />
-    <div className="ad-catalog-toolbar"><label className="ad-search"><Search size={16} /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nombre, referencia o familia..." /><kbd>⌘ K</kbd></label>
-      <div className="ad-filter-group"><SlidersHorizontal size={15} /><select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filtrar por familia">{demoCategories.map((item) => <option key={item}>{item}</option>)}</select><span className="ad-result-count">{products.length} resultados</span></div></div>
-    <div className="ad-product-layout">
-      <section className="ad-product-table-panel"><div className="ad-table-caption"><div><b>Catálogo de muestra</b><small>Los doce productos son demo; ningún dato es comercial.</small></div><DemoTag /></div>
-        <div className="ad-table-wrap"><table className="ad-table ad-products-table"><thead><tr><th>PRODUCTO DEMO</th><th>FAMILIA</th><th>¿PARA QUIÉN?</th><th>PRECIO ILUSTRATIVO</th><th>STOCK DEMO</th><th>ESTADO DEMO</th><th /></tr></thead><tbody>
-          {products.map((product) => <tr key={product.id}><td><div className="ad-product-cell"><ProductThumb product={product} size="small" /><span><b>{product.name}</b><small>{product.reference} · {product.brand}</small></span></div></td><td>{product.category}</td><td><span className="ad-audience-pill">{product.audience}</span></td><td>{formatCop(product.price)}</td><td><span className={`ad-stock-value ${product.stock < 5 ? "low" : ""}`}>{String(product.stock).padStart(2, "0")} <small>uds.</small></span></td><td><span className={`ad-product-status ${product.stock ? "" : "unavailable"}`}><i />{product.status}</span></td><td><div className="ad-product-actions"><button className="ad-row-action" aria-label={`Editar ${product.name}`} onClick={() => setEditorProduct(product)}><Pencil size={15} /></button><button className="ad-row-action" aria-label={`Gestionar galería de ${product.name}`} onClick={() => openGallery(product)}><ImagePlus size={16} /></button></div></td></tr>)}
-          {products.length === 0 && <tr><td colSpan={7}><div className="ad-empty"><Search size={20} /><b>Sin coincidencias</b><span>Prueba otro término o familia.</span><button onClick={() => { setSearch(""); setCategory("Todas las familias"); }}>Limpiar filtros</button></div></td></tr>}
-        </tbody></table></div>
-        <div className="ad-table-end">Mostrando {products.length} de 12 productos <span>·</span> DEMO · datos ilustrativos</div>
-      </section>
-      <aside className="ad-catalog-aside"><div className="ad-catalog-art"><div className="ad-catalog-art-glow" /><PerfumeBottle tone="#a37be0" label="NOCTURNE" /><span className="ad-art-stamp">ESSENCE<br />DEMO 01</span></div>
-        <div className="ad-aside-copy"><span className="ad-eyebrow">CURADURÍA VISUAL</span><h3>Una colección<br />para descubrir.</h3><p>La gestión de imágenes admite cuatro vistas temporales por producto. Nada se guarda al salir.</p><button onClick={() => openGallery(demoProducts[0])}>Abrir galería de muestra <ChevronRight size={14} /></button></div>
-        <div className="ad-aside-foot"><span>12</span><div><b>fragancias de muestra</b><small>Todos los nombres y valores son ficticios.</small></div></div>
-      </aside>
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="MARTES, 18 DE JUNIO · VISTA GENERAL"
+        title="Buenos días, Adriana"
+        description="Un pulso de muestra para la casa de fragancias."
+        action={
+          <div className="ad-heading-actions">
+            <select
+              aria-label="Periodo ilustrativo"
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+            >
+              <option>Últimos 30 días</option>
+              <option>Últimos 7 días</option>
+              <option>Este año</option>
+            </select>
+            <button
+              className="ad-outline"
+              onClick={() =>
+                notify(
+                  "El informe es únicamente ilustrativo; no se descargó ningún archivo.",
+                )
+              }
+            >
+              <Download size={15} /> Exportar vista
+            </button>
+          </div>
+        }
+      />
+      <div className="ad-metrics">
+        <Metric
+          label="Ventas ilustrativas"
+          value="$ 8,42 M"
+          delta="+12,8% vs. periodo anterior"
+          icon={Wallet}
+        />
+        <Metric
+          label="Pedidos de muestra"
+          value="128"
+          delta="+8,2% vs. periodo anterior"
+          icon={ShoppingBag}
+          accent="gold"
+        />
+        <Metric
+          label="Ticket promedio"
+          value="$ 65.781"
+          delta="+3,4% vs. periodo anterior"
+          icon={CreditCard}
+          accent="rose"
+        />
+        <Metric
+          label="Unidades en catálogo"
+          value="81"
+          delta="12 referencias demo"
+          icon={Package}
+          accent="green"
+        />
+      </div>
+      <div className="ad-dashboard-grid">
+        <section className="ad-panel ad-sales-panel">
+          <div className="ad-panel-heading">
+            <div>
+              <span className="ad-eyebrow">
+                RITMO DE LA CASA <DemoTag />
+              </span>
+              <h2>Ventas de demostración</h2>
+              <p>Valores ficticios · miles de COP</p>
+            </div>
+            <button className="ad-text-link" onClick={() => go("Ventas")}>
+              Ver análisis <ChevronRight size={14} />
+            </button>
+          </div>
+          <div className="ad-chart-key">
+            <span>
+              <i /> Valor ilustrativo
+            </span>
+            <span className="ad-chart-period">{period}</span>
+          </div>
+          <div className="ad-line-chart">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={salesSeries}
+                margin={{ top: 14, right: 8, left: -17, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient
+                    id="adminChartFill"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#a985ef" stopOpacity={0.28} />
+                    <stop offset="100%" stopColor="#a985ef" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  stroke="rgba(226,216,197,.07)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#8e8994", fontSize: 10 }}
+                  tickMargin={11}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#8e8994", fontSize: 10 }}
+                  tickFormatter={formatCompact}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "#1c1921",
+                    border: "1px solid rgba(214,190,139,.23)",
+                    borderRadius: 8,
+                    color: "#f3eee6",
+                    fontSize: 12,
+                  }}
+                  formatter={(value) => [
+                    `$${value} mil COP · DEMO`,
+                    "Valor ilustrativo",
+                  ]}
+                  labelFormatter={(label) => `Día ${label} · datos demo`}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="#b99af7"
+                  strokeWidth={2.5}
+                  fill="url(#adminChartFill)"
+                  activeDot={{
+                    r: 4,
+                    fill: "#d6be8b",
+                    stroke: "#1c1921",
+                    strokeWidth: 2,
+                  }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+        <section className="ad-panel ad-category-panel">
+          <div className="ad-panel-heading">
+            <div>
+              <span className="ad-eyebrow">
+                PERFIL OLFATIVO <DemoTag />
+              </span>
+              <h2>Interés por familia</h2>
+              <p>Composición ilustrativa · no ventas reales</p>
+            </div>
+            <button
+              className="ad-square-button"
+              aria-label="Más detalles de categorías"
+              onClick={() => go("Categorías / Marcas")}
+            >
+              <MoreHorizontal size={18} />
+            </button>
+          </div>
+          <div className="ad-bar-chart">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={categorySeries}
+                layout="vertical"
+                margin={{ top: 5, right: 26, left: -12, bottom: 0 }}
+              >
+                <CartesianGrid
+                  stroke="rgba(226,216,197,.06)"
+                  horizontal={false}
+                />
+                <XAxis type="number" hide domain={[0, 36]} />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#b9b3bf", fontSize: 11 }}
+                  width={74}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgba(255,255,255,.025)" }}
+                  contentStyle={{
+                    background: "#1c1921",
+                    border: "1px solid rgba(214,190,139,.23)",
+                    borderRadius: 8,
+                    color: "#f3eee6",
+                    fontSize: 12,
+                  }}
+                  formatter={(value) => [
+                    `${value}% · DEMO`,
+                    "Distribución ficticia",
+                  ]}
+                />
+                <Bar
+                  dataKey="value"
+                  radius={[0, 4, 4, 0]}
+                  barSize={12}
+                  fill="#9270c7"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <button className="ad-panel-footlink" onClick={() => go("Productos")}>
+            Explorar catálogo <ChevronRight size={14} />
+          </button>
+        </section>
+      </div>
+      <div className="ad-lower-grid">
+        <section className="ad-panel ad-recent-panel">
+          <div className="ad-panel-heading">
+            <div>
+              <span className="ad-eyebrow">
+                ACTIVIDAD RECIENTE <DemoTag />
+              </span>
+              <h2>Pedidos de muestra</h2>
+              <p>Registros enteramente ficticios</p>
+            </div>
+            <button className="ad-text-link" onClick={() => go("Pedidos")}>
+              Todos los pedidos <ChevronRight size={14} />
+            </button>
+          </div>
+          <div className="ad-table-wrap">
+            <table className="ad-table">
+              <thead>
+                <tr>
+                  <th>REFERENCIA DEMO</th>
+                  <th>CLIENTE FICTICIO</th>
+                  <th>PRODUCTO ILUSTRATIVO</th>
+                  <th>ESTADO</th>
+                  <th>VALOR DEMO</th>
+                </tr>
+              </thead>
+              <tbody>
+                {demoOrders.slice(0, 3).map((order) => (
+                  <tr key={order.id}>
+                    <td className="ad-mono">{order.id}</td>
+                    <td>{order.person}</td>
+                    <td>{order.products}</td>
+                    <td>
+                      <StatusBadge status={order.status} />
+                    </td>
+                    <td>{formatCop(order.amount)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section className="ad-stock-card">
+          <div className="ad-stock-orb" />
+          <div className="ad-stock-top">
+            <span className="ad-eyebrow">SEÑAL DEL CATÁLOGO</span>
+            <Boxes size={17} />
+          </div>
+          <div className="ad-stock-num">
+            03 <span>referencias</span>
+          </div>
+          <p>Inventario bajo en esta muestra ficticia.</p>
+          <div className="ad-stock-bottom">
+            <span>DEMO · no representa existencias reales</span>
+            <button onClick={() => go("Inventario")}>
+              Revisar <ChevronRight size={13} />
+            </button>
+          </div>
+        </section>
+      </div>
+      <div className="ad-note-strip">
+        <Sparkles size={14} />
+        <span>
+          Este tablero es una composición de datos ficticios para revisión
+          visual. Ningún valor representa ventas u operaciones reales.
+        </span>
+        <button onClick={() => go("Configuración comercial")}>
+          Revisar avisos
+        </button>
+      </div>
     </div>
-    {editorProduct && <ProductEditor product={editorProduct === "new" ? undefined : editorProduct} close={() => setEditorProduct(null)} notify={notify} />}
-  </div>;
+  );
 }
 
-function ProductEditor({ product, close, notify }: { product?: DemoProduct; close: () => void; notify: (message: string) => void }) {
-    const handleSubmit = async (event: React.FormEvent) => {
+function Products({
+  search,
+  setSearch,
+  category,
+  setCategory,
+  products,
+  openGallery,
+  notify,
+}: {
+  search: string;
+  setSearch: (v: string) => void;
+  category: string;
+  setCategory: (v: string) => void;
+  products: DemoProduct[];
+  openGallery: (p: DemoProduct) => void;
+  notify: (s: string) => void;
+}) {
+  const [editorProduct, setEditorProduct] = useState<
+    DemoProduct | "new" | null
+  >(null);
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="CATÁLOGO · 12 REFERENCIAS FICTICIAS"
+        title="Productos"
+        description="Una vitrina de muestra, lista para explorar. Los cambios solo viven en esta sesión."
+        action={
+          <button
+            className="ad-primary"
+            onClick={() => setEditorProduct("new")}
+          >
+            <Plus size={16} /> Nuevo producto{" "}
+            <span className="ad-mini-demo">DEMO</span>
+          </button>
+        }
+      />
+      <div className="ad-catalog-toolbar">
+        <label className="ad-search">
+          <Search size={16} />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por nombre, referencia o familia..."
+          />
+          <kbd>⌘ K</kbd>
+        </label>
+        <div className="ad-filter-group">
+          <SlidersHorizontal size={15} />
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            aria-label="Filtrar por familia"
+          >
+            {demoCategories.map((item) => (
+              <option key={item}>{item}</option>
+            ))}
+          </select>
+          <span className="ad-result-count">{products.length} resultados</span>
+        </div>
+      </div>
+      <div className="ad-product-layout">
+        <section className="ad-product-table-panel">
+          <div className="ad-table-caption">
+            <div>
+              <b>Catálogo de muestra</b>
+              <small>
+                Los doce productos son demo; ningún dato es comercial.
+              </small>
+            </div>
+            <DemoTag />
+          </div>
+          <div className="ad-table-wrap">
+            <table className="ad-table ad-products-table">
+              <thead>
+                <tr>
+                  <th>PRODUCTO DEMO</th>
+                  <th>FAMILIA</th>
+                  <th>¿PARA QUIÉN?</th>
+                  <th>PRECIO ILUSTRATIVO</th>
+                  <th>STOCK DEMO</th>
+                  <th>ESTADO DEMO</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr key={product.id}>
+                    <td>
+                      <div className="ad-product-cell">
+                        <ProductThumb product={product} size="small" />
+                        <span>
+                          <b>{product.name}</b>
+                          <small>
+                            {product.reference} · {product.brand}
+                          </small>
+                        </span>
+                      </div>
+                    </td>
+                    <td>{product.category}</td>
+                    <td>
+                      <span className="ad-audience-pill">
+                        {product.audience}
+                      </span>
+                    </td>
+                    <td>{formatCop(product.price)}</td>
+                    <td>
+                      <span
+                        className={`ad-stock-value ${product.stock < 5 ? "low" : ""}`}
+                      >
+                        {String(product.stock).padStart(2, "0")}{" "}
+                        <small>uds.</small>
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`ad-product-status ${product.stock ? "" : "unavailable"}`}
+                      >
+                        <i />
+                        {product.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="ad-product-actions">
+                        <button
+                          className="ad-row-action"
+                          aria-label={`Editar ${product.name}`}
+                          onClick={() => setEditorProduct(product)}
+                        >
+                          <Pencil size={15} />
+                        </button>
+                        <button
+                          className="ad-row-action"
+                          aria-label={`Gestionar galería de ${product.name}`}
+                          onClick={() => openGallery(product)}
+                        >
+                          <ImagePlus size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {products.length === 0 && (
+                  <tr>
+                    <td colSpan={7}>
+                      <div className="ad-empty">
+                        <Search size={20} />
+                        <b>Sin coincidencias</b>
+                        <span>Prueba otro término o familia.</span>
+                        <button
+                          onClick={() => {
+                            setSearch("");
+                            setCategory("Todas las familias");
+                          }}
+                        >
+                          Limpiar filtros
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="ad-table-end">
+            Mostrando {products.length} de 12 productos <span>·</span> DEMO ·
+            datos ilustrativos
+          </div>
+        </section>
+        <aside className="ad-catalog-aside">
+          <div className="ad-catalog-art">
+            <div className="ad-catalog-art-glow" />
+            <PerfumeBottle tone="#a37be0" label="NOCTURNE" />
+            <span className="ad-art-stamp">
+              ESSENCE
+              <br />
+              DEMO 01
+            </span>
+          </div>
+          <div className="ad-aside-copy">
+            <span className="ad-eyebrow">CURADURÍA VISUAL</span>
+            <h3>
+              Una colección
+              <br />
+              para descubrir.
+            </h3>
+            <p>
+              La gestión de imágenes admite cuatro vistas temporales por
+              producto. Nada se guarda al salir.
+            </p>
+            <button onClick={() => openGallery(demoProducts[0])}>
+              Abrir galería de muestra <ChevronRight size={14} />
+            </button>
+          </div>
+          <div className="ad-aside-foot">
+            <span>12</span>
+            <div>
+              <b>fragancias de muestra</b>
+              <small>Todos los nombres y valores son ficticios.</small>
+            </div>
+          </div>
+        </aside>
+      </div>
+      {editorProduct && (
+        <ProductEditor
+          product={editorProduct === "new" ? undefined : editorProduct}
+          close={() => setEditorProduct(null)}
+          notify={notify}
+        />
+      )}
+    </div>
+  );
+}
+
+function ProductEditor({
+  product,
+  close,
+  notify,
+}: {
+  product?: DemoProduct;
+  close: () => void;
+  notify: (message: string) => void;
+}) {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
     const newProduct = {
@@ -474,197 +1394,1452 @@ function ProductEditor({ product, close, notify }: { product?: DemoProduct; clos
       isFeatured: false,
     };
 
-     try {
-        // AQUÍ VAN LAS DOS LÍNEAS NUEVAS:
-        const url = product ? `/api/products/${product.id}` : "/api/products";
-        const method = product ? "PUT" : "POST";
+    try {
+      // AQUÍ VAN LAS DOS LÍNEAS NUEVAS:
+      const url = product ? `/api/products/${product.id}` : "/api/products";
+      const method = product ? "PUT" : "POST";
 
-        // Y AQUÍ VA EL FETCH (ya modificado):
-        const res = await fetch(url, {
-          method: method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newProduct)
-        });
-        
-        if (res.ok) {
-          alert("¡Producto guardado exitosamente en la base de datos!");
-          close();
-          window.location.reload();
-        } else {
-          alert("Error al guardar el producto.");
-        }
-      } catch (err) {
-        alert("Error de conexión.");
+      // Y AQUÍ VA EL FETCH (ya modificado):
+      const res = await fetch(url, {
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProduct),
+      });
+
+      if (res.ok) {
+        alert("¡Producto guardado exitosamente en la base de datos!");
+        close();
+        window.location.reload();
+      } else {
+        alert("Error al guardar el producto.");
       }
-    };
-  
-  return <div className="ad-editor-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
-    <section className="ad-editor-card" role="dialog" aria-modal="true" aria-labelledby="ad-editor-title">
-      <header className="ad-editor-heading"><div><span className="ad-eyebrow">PRODUCTO · VISTA DE DEMOSTRACIÓN</span><h2 id="ad-editor-title">{product ? "Editar producto" : "Crear producto"}</h2></div><DemoTag /><button className="ad-row-action" onClick={close} aria-label="Cerrar formulario"><X size={17} /></button></header>
-      <form onSubmit={handleSubmit}>
-        <div className="ad-editor-grid">
-          <label>Nombre ficticio<input name="name" defaultValue={product?.name ?? ""} placeholder="Nombre de demostración" required /></label>
-          <label>Referencia demo<input name="reference" defaultValue={product?.reference ?? "DEMO-NUEVO"} required /></label>
-          <label>Marca ficticia<select name="brand" defaultValue={product?.brand ?? demoBrands[0]}>{demoBrands.map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>Familia olfativa<select name="category" defaultValue={product?.category ?? demoCategories[1]}>{demoCategories.slice(1).map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>¿Para quién?<select name="audience" defaultValue={product?.audience ?? "Unisex"}>{demoAudiences.filter((item) => item !== "Todos").map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>Precio ficticio (COP)<input name="price" type="number" min="0" defaultValue={product?.price ?? ""} placeholder="0" required /></label>
-          <label>Unidades DEMO<input name="stock" type="number" min="0" defaultValue={product?.stock ?? ""} placeholder="0" required /></label>
-          <label>Contenido de muestra<input name="size" defaultValue={product?.size ?? "100 ml"} /></label>
-        </div>
-        <p className="ad-editor-disclaimer"><ShieldCheck size={14} /> Vista previa solamente. No se crea ni modifica ningún producto.</p>
-        <div className="ad-editor-actions"><button type="button" className="ad-outline" onClick={close}>Cancelar</button><button type="submit" className="ad-primary"><Check size={15} /> Guardar Producto</button></div>
-      </form>
-    </section>
-  </div>;
-};
+    } catch (err) {
+      alert("Error de conexión.");
+    }
+  };
 
-function Categories({ go, notify }: { go: (p: Page) => void; notify: (s: string) => void }) {
-  const familyCopy: Record<string, string> = { "Amaderada": "Maderas pulidas, resinas y matices verdes.", "Cítrica": "Acordes luminosos con salida vibrante.", "Dulce": "Texturas suaves y envolventes.", "Floral": "Pétalos de carácter contemporáneo.", "Fresca": "Composiciones limpias y aireadas.", "Oriental": "Especias, ámbar y profundidad." };
-  return <div className="ad-page"><SectionHeader eyebrow="ORGANIZACIÓN DEL CATÁLOGO · DEMO" title="Categorías / Marcas" description="Familias olfativas y sellos ficticios para ordenar la colección." action={<button className="ad-primary" onClick={() => notify("Esta acción es solo visual; no se guardaron cambios.")}><Plus size={16} /> Nueva categoría</button>} />
-    <div className="ad-category-intro"><div className="ad-category-orbit"><Flower2 size={28} /></div><div><span className="ad-eyebrow">MAPA OLFATIVO · DATOS ILUSTRATIVOS</span><h2>Seis familias, doce historias.</h2><p>Taxonomía de demostración · no representa marcas comerciales disponibles.</p></div><DemoTag /></div>
-    <div className="ad-family-grid">{demoCategories.slice(1).map((family, index) => <article className="ad-family-card" key={family} style={{ "--family-index": index } as CSSProperties}><span className="ad-family-count">0{index + 1}</span><span className="ad-family-icon"><Flower2 size={19} /></span><h3>{family}</h3><p>{familyCopy[family]}</p><div className="ad-family-bottom"><span>{demoProducts.filter((p) => p.category === family).length} referencias DEMO</span><button onClick={() => go("Productos")} aria-label={`Ver productos de ${family}`}><ChevronRight size={16} /></button></div></article>)}</div>
-    <section className="ad-panel ad-brand-panel"><div className="ad-panel-heading"><div><span className="ad-eyebrow">MARCAS DE EJEMPLO</span><h2>Firmas que viven en esta maqueta</h2><p>Nombres inventados para ambientar el catálogo. Sin relación comercial.</p></div><DemoTag /></div><div className="ad-brands-row">{["Atelier Niebla", "Orbe Parfums", "Casa Sillage", "Lumen No. 4"].map((brand, i) => <div key={brand} className="ad-brand-sample"><span className="ad-brand-monogram">{["AN", "OP", "CS", "L4"][i]}</span><span><b>{brand}</b><small>MARCA FICTICIA · DEMO</small></span><span className="ad-brand-kind">Sello de muestra</span></div>)}</div></section>
-  </div>;
+  return (
+    <div
+      className="ad-editor-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) close();
+      }}
+    >
+      <section
+        className="ad-editor-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ad-editor-title"
+      >
+        <header className="ad-editor-heading">
+          <div>
+            <span className="ad-eyebrow">PRODUCTO · VISTA DE DEMOSTRACIÓN</span>
+            <h2 id="ad-editor-title">
+              {product ? "Editar producto" : "Crear producto"}
+            </h2>
+          </div>
+          <DemoTag />
+          <button
+            className="ad-row-action"
+            onClick={close}
+            aria-label="Cerrar formulario"
+          >
+            <X size={17} />
+          </button>
+        </header>
+        <form onSubmit={handleSubmit}>
+          <div className="ad-editor-grid">
+            <label>
+              Nombre ficticio
+              <input
+                name="name"
+                defaultValue={product?.name ?? ""}
+                placeholder="Nombre de demostración"
+                required
+              />
+            </label>
+            <label>
+              Referencia demo
+              <input
+                name="reference"
+                defaultValue={product?.reference ?? "DEMO-NUEVO"}
+                required
+              />
+            </label>
+            <label>
+              Marca ficticia
+              <select
+                name="brand"
+                defaultValue={product?.brand ?? demoBrands[0]}
+              >
+                {demoBrands.map((item) => (
+                  <option key={item}>{item}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Familia olfativa
+              <select
+                name="category"
+                defaultValue={product?.category ?? demoCategories[1]}
+              >
+                {demoCategories.slice(1).map((item) => (
+                  <option key={item}>{item}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              ¿Para quién?
+              <select
+                name="audience"
+                defaultValue={product?.audience ?? "Unisex"}
+              >
+                {demoAudiences
+                  .filter((item) => item !== "Todos")
+                  .map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+              </select>
+            </label>
+            <label>
+              Precio ficticio (COP)
+              <input
+                name="price"
+                type="number"
+                min="0"
+                defaultValue={product?.price ?? ""}
+                placeholder="0"
+                required
+              />
+            </label>
+            <label>
+              Unidades DEMO
+              <input
+                name="stock"
+                type="number"
+                min="0"
+                defaultValue={product?.stock ?? ""}
+                placeholder="0"
+                required
+              />
+            </label>
+            <label>
+              Contenido de muestra
+              <input name="size" defaultValue={product?.size ?? "100 ml"} />
+            </label>
+          </div>
+          <p className="ad-editor-disclaimer">
+            <ShieldCheck size={14} /> Vista previa solamente. No se crea ni
+            modifica ningún producto.
+          </p>
+          <div className="ad-editor-actions">
+            <button type="button" className="ad-outline" onClick={close}>
+              Cancelar
+            </button>
+            <button type="submit" className="ad-primary">
+              <Check size={15} /> Guardar Producto
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
+
+function Categories({
+  go,
+  notify,
+}: {
+  go: (p: Page) => void;
+  notify: (s: string) => void;
+}) {
+  const familyCopy: Record<string, string> = {
+    Amaderada: "Maderas pulidas, resinas y matices verdes.",
+    Cítrica: "Acordes luminosos con salida vibrante.",
+    Dulce: "Texturas suaves y envolventes.",
+    Floral: "Pétalos de carácter contemporáneo.",
+    Fresca: "Composiciones limpias y aireadas.",
+    Oriental: "Especias, ámbar y profundidad.",
+  };
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="ORGANIZACIÓN DEL CATÁLOGO · DEMO"
+        title="Categorías / Marcas"
+        description="Familias olfativas y sellos ficticios para ordenar la colección."
+        action={
+          <button
+            className="ad-primary"
+            onClick={() =>
+              notify("Esta acción es solo visual; no se guardaron cambios.")
+            }
+          >
+            <Plus size={16} /> Nueva categoría
+          </button>
+        }
+      />
+      <div className="ad-category-intro">
+        <div className="ad-category-orbit">
+          <Flower2 size={28} />
+        </div>
+        <div>
+          <span className="ad-eyebrow">MAPA OLFATIVO · DATOS ILUSTRATIVOS</span>
+          <h2>Seis familias, doce historias.</h2>
+          <p>
+            Taxonomía de demostración · no representa marcas comerciales
+            disponibles.
+          </p>
+        </div>
+        <DemoTag />
+      </div>
+      <div className="ad-family-grid">
+        {demoCategories.slice(1).map((family, index) => (
+          <article
+            className="ad-family-card"
+            key={family}
+            style={{ "--family-index": index } as CSSProperties}
+          >
+            <span className="ad-family-count">0{index + 1}</span>
+            <span className="ad-family-icon">
+              <Flower2 size={19} />
+            </span>
+            <h3>{family}</h3>
+            <p>{familyCopy[family]}</p>
+            <div className="ad-family-bottom">
+              <span>
+                {demoProducts.filter((p) => p.category === family).length}{" "}
+                referencias DEMO
+              </span>
+              <button
+                onClick={() => go("Productos")}
+                aria-label={`Ver productos de ${family}`}
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+      <section className="ad-panel ad-brand-panel">
+        <div className="ad-panel-heading">
+          <div>
+            <span className="ad-eyebrow">MARCAS DE EJEMPLO</span>
+            <h2>Firmas que viven en esta maqueta</h2>
+            <p>
+              Nombres inventados para ambientar el catálogo. Sin relación
+              comercial.
+            </p>
+          </div>
+          <DemoTag />
+        </div>
+        <div className="ad-brands-row">
+          {[
+            "Atelier Niebla",
+            "Orbe Parfums",
+            "Casa Sillage",
+            "Lumen No. 4",
+          ].map((brand, i) => (
+            <div key={brand} className="ad-brand-sample">
+              <span className="ad-brand-monogram">
+                {["AN", "OP", "CS", "L4"][i]}
+              </span>
+              <span>
+                <b>{brand}</b>
+                <small>MARCA FICTICIA · DEMO</small>
+              </span>
+              <span className="ad-brand-kind">Sello de muestra</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const statusClass: Record<string, string> = { Pendiente: "pending", Confirmado: "confirmed", Pagado: "paid", Enviado: "shipped", Entregado: "delivered", Cancelado: "cancelled" };
-  return <span className={`ad-order-status ${statusClass[status] || ""}`}><i />{status}</span>;
+  const statusClass: Record<string, string> = {
+    Pendiente: "pending",
+    Confirmado: "confirmed",
+    Pagado: "paid",
+    Enviado: "shipped",
+    Entregado: "delivered",
+    Cancelado: "cancelled",
+  };
+  return (
+    <span className={`ad-order-status ${statusClass[status] || ""}`}>
+      <i />
+      {status}
+    </span>
+  );
 }
 
-function Orders({ orders, orderFilter, setOrderFilter, notify, setSelectedOrder }: { orders: any[], orderFilter: string, setOrderFilter: (v: string) => void, notify: (m: string) => void, setSelectedOrder: (o: any) => void }) {
-  return <div className="ad-page"><SectionHeader eyebrow="OPERACIÓN · REGISTROS FICTICIOS" title="Pedidos" description="Una bandeja ilustrativa para revisar jerarquías y estados." action={<button className="ad-outline" onClick={() => notify("Los datos de esta tabla son ficticios; no hay pedidos reales.")}><Filter size={15} /> Filtros demo</button>} />
-    <div className="ad-order-summary"><div><span>EN LA MUESTRA</span><b>05</b><small>pedidos ficticios</small></div><div><span>PENDIENTES</span><b>01</b><small>registros demo</small></div><div><span>VALOR ILUSTRATIVO</span><b>$ 959.000</b><small>no son ventas reales</small></div><div className="ad-order-summary-message"><ClipboardList size={19} /><span>Los estados son los seis aprobados y pertenecen únicamente a esta vista ilustrativa.</span><DemoTag /></div></div>
-    <section className="ad-panel ad-order-panel">
-
-      <div className="ad-order-tools"><div><span className="ad-eyebrow">PEDIDOS RECIENTES</span><h2>Actividad de muestra <DemoTag /></h2></div><select aria-label="Filtrar pedidos por estado" value={orderFilter} onChange={(e) => setOrderFilter(e.target.value)}><option>Todos los estados</option>{orderLabels.map((label) => <option key={label}>{label}</option>)}</select>
+function Orders({
+  orders,
+  orderFilter,
+  setOrderFilter,
+  notify,
+  setSelectedOrder,
+}: {
+  orders: any[];
+  orderFilter: string;
+  setOrderFilter: (v: string) => void;
+  notify: (m: string) => void;
+  setSelectedOrder: (o: any) => void;
+}) {
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="OPERACIÓN · REGISTROS FICTICIOS"
+        title="Pedidos"
+        description="Una bandeja ilustrativa para revisar jerarquías y estados."
+        action={
+          <button
+            className="ad-outline"
+            onClick={() =>
+              notify(
+                "Los datos de esta tabla son ficticios; no hay pedidos reales.",
+              )
+            }
+          >
+            <Filter size={15} /> Filtros demo
+          </button>
+        }
+      />
+      <div className="ad-order-summary">
+        <div>
+          <span>EN LA MUESTRA</span>
+          <b>05</b>
+          <small>pedidos ficticios</small>
+        </div>
+        <div>
+          <span>PENDIENTES</span>
+          <b>01</b>
+          <small>registros demo</small>
+        </div>
+        <div>
+          <span>VALOR ILUSTRATIVO</span>
+          <b>$ 959.000</b>
+          <small>no son ventas reales</small>
+        </div>
+        <div className="ad-order-summary-message">
+          <ClipboardList size={19} />
+          <span>
+            Los estados son los seis aprobados y pertenecen únicamente a esta
+            vista ilustrativa.
+          </span>
+          <DemoTag />
+        </div>
       </div>
+      <section className="ad-panel ad-order-panel">
+        <div className="ad-order-tools">
+          <div>
+            <span className="ad-eyebrow">PEDIDOS RECIENTES</span>
+            <h2>
+              Actividad de muestra <DemoTag />
+            </h2>
+          </div>
+          <select
+            aria-label="Filtrar pedidos por estado"
+            value={orderFilter}
+            onChange={(e) => setOrderFilter(e.target.value)}
+          >
+            <option>Todos los estados</option>
+            {orderLabels.map((label) => (
+              <option key={label}>{label}</option>
+            ))}
+          </select>
+        </div>
 
-      <div className="ad-table-wrap"><table className="ad-table"><thead><tr><th>NÚMERO PEDIDO</th><th>CLIENTE</th><th>DETALLE</th><th>ESTADO</th><th>VALOR</th><th>ACCIÓN</th></tr></thead><tbody>
-        {orders.map((order) => <tr key={order.id}>
-          <td className="ad-mono">{order.orderNumber}</td>
-          <td><b>{order.customerName}</b><small className="ad-cell-sub">{order.customerPhone}</small></td>
-          <td>
-            {order.items && order.items.length > 0 
-              ? `${order.items[0].quantity}x ${order.items[0].productName} ${order.items.length > 1 ? `(+${order.items.length - 1} más)` : ''}` 
-              : "Sin detalle"}
-          </td>
-          <td>
-            <StatusBadge 
-              status={
-                order.status === "pending" ? "Pendiente" :
-                order.status === "confirmed" ? "Confirmado" :
-                order.status === "paid" ? "Pagado" :
-                order.status === "shipped" ? "Enviado" :
-                order.status === "delivered" ? "Entregado" :
-                order.status === "cancelled" ? "Cancelado" : order.status
-              } 
-          />
-        </td>
-          <td>{formatCop(order.subtotal)}</td>
-          <td><button className="ad-row-action" aria-label={`Ver detalle ${order.orderNumber}`} onClick={() => setSelectedOrder(order)}><Eye size={15} /></button></td>
-        </tr>)}
-        {orders.length === 0 && <tr><td colSpan={6}><div className="ad-empty">No hay pedidos registrados todavía.</div></td></tr>}
-      </tbody></table></div>
-      
-      <div className="ad-table-end">Registros ficticios <span>·</span> DEMO · datos ilustrativos; no son ventas reales</div>
-    </section>
-  </div>;
+        <div className="ad-table-wrap">
+          <table className="ad-table">
+            <thead>
+              <tr>
+                <th>NÚMERO PEDIDO</th>
+                <th>CLIENTE</th>
+                <th>DETALLE</th>
+                <th>ESTADO</th>
+                <th>VALOR</th>
+                <th>ACCIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td className="ad-mono">{order.orderNumber}</td>
+                  <td>
+                    <b>{order.customerName}</b>
+                    <small className="ad-cell-sub">{order.customerPhone}</small>
+                  </td>
+                  <td>
+                    {order.items && order.items.length > 0
+                      ? `${order.items[0].quantity}x ${order.items[0].productName} ${order.items.length > 1 ? `(+${order.items.length - 1} más)` : ""}`
+                      : "Sin detalle"}
+                  </td>
+                  <td>
+                    <StatusBadge
+                      status={
+                        order.status === "pending"
+                          ? "Pendiente"
+                          : order.status === "confirmed"
+                            ? "Confirmado"
+                            : order.status === "paid"
+                              ? "Pagado"
+                              : order.status === "shipped"
+                                ? "Enviado"
+                                : order.status === "delivered"
+                                  ? "Entregado"
+                                  : order.status === "cancelled"
+                                    ? "Cancelado"
+                                    : order.status
+                      }
+                    />
+                  </td>
+                  <td>{formatCop(order.subtotal)}</td>
+                  <td>
+                    <button
+                      className="ad-row-action"
+                      aria-label={`Ver detalle ${order.orderNumber}`}
+                      onClick={() => setSelectedOrder(order)}
+                    >
+                      <Eye size={15} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={6}>
+                    <div className="ad-empty">
+                      No hay pedidos registrados todavía.
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="ad-table-end">
+          Registros ficticios <span>·</span> DEMO · datos ilustrativos; no son
+          ventas reales
+        </div>
+      </section>
+    </div>
+  );
 }
 
-function Inventory({ showInventory, setShowInventory, notify }: { showInventory: boolean; setShowInventory: (v: boolean) => void; notify: (s: string) => void }) {
+function Inventory({
+  showInventory,
+  setShowInventory,
+  notify,
+}: {
+  showInventory: boolean;
+  setShowInventory: (v: boolean) => void;
+  notify: (s: string) => void;
+}) {
   const rows = demoProducts.slice().sort((a, b) => a.stock - b.stock);
   const shown = showInventory ? rows : rows.slice(0, 7);
-  return <div className="ad-page"><SectionHeader eyebrow="OPERACIÓN · STOCK DE MUESTRA" title="Inventario" description="Existencias ficticias para probar alertas, filtros y lectura rápida." action={<button className="ad-outline" onClick={() => notify("La sincronización está desactivada en este prototipo.")}><Activity size={15} /> Sin sincronización</button>} />
-    <div className="ad-inventory-alert"><span className="ad-alert-icon"><ArrowDownRight size={17} /></span><span><b>3 referencias con stock bajo en esta muestra</b><small>Las unidades son completamente ficticias; no representan inventario real.</small></span><DemoTag /></div>
-    <div className="ad-inventory-metrics"><div><span>REFERENCIAS</span><b>12</b><small>productos de muestra</small></div><div><span>UNIDADES ILUSTRATIVAS</span><b>81</b><small>conteo de demostración</small></div><div><span>BAJO UMBRAL DEMO</span><b>03</b><small>menos de 5 unidades ficticias</small></div><div className="ad-inventory-action"><button className="ad-primary" onClick={() => notify("Ajustar inventario no está habilitado; ningún dato se modifica.")}><Pencil size={15} /> Ajustar inventario</button><small>No se guarda en esta demo</small></div></div>
-    <section className="ad-panel ad-inventory-table"><div className="ad-panel-heading"><div><span className="ad-eyebrow">REFERENCIAS POR NIVEL DE MUESTRA</span><h2>Stock del catálogo <DemoTag /></h2></div><button className="ad-text-link" onClick={() => setShowInventory(!showInventory)}>{showInventory ? "Ver menos" : "Ver las 12"} <ChevronRight size={14} /></button></div>
-      <div className="ad-table-wrap"><table className="ad-table"><thead><tr><th>PRODUCTO FICTICIO</th><th>REFERENCIA DEMO</th><th>FAMILIA</th><th>UNIDADES DE MUESTRA</th><th>NIVEL ILUSTRATIVO</th><th>INDICADOR</th></tr></thead><tbody>{shown.map((product) => <tr key={product.id}><td><div className="ad-product-cell"><ProductThumb product={product} size="small" /><span><b>{product.name}</b><small>Producto ilustrativo</small></span></div></td><td className="ad-mono">{product.reference}</td><td>{product.category}</td><td><b>{String(product.stock).padStart(2, "0")} uds.</b></td><td><div className="ad-stock-bar"><i style={{ width: `${Math.max(2, Math.min(product.stock / 16 * 100, 100))}%` }} /></div></td><td><span className={`ad-level ${product.stock === 0 ? "zero" : product.stock < 5 ? "low" : "healthy"}`}><i />{product.stock === 0 ? "Agotado DEMO" : product.stock < 5 ? "Bajo DEMO" : "Disponible"}</span></td></tr>)}</tbody></table></div></section>
-  </div>;
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="OPERACIÓN · STOCK DE MUESTRA"
+        title="Inventario"
+        description="Existencias ficticias para probar alertas, filtros y lectura rápida."
+        action={
+          <button
+            className="ad-outline"
+            onClick={() =>
+              notify("La sincronización está desactivada en este prototipo.")
+            }
+          >
+            <Activity size={15} /> Sin sincronización
+          </button>
+        }
+      />
+      <div className="ad-inventory-alert">
+        <span className="ad-alert-icon">
+          <ArrowDownRight size={17} />
+        </span>
+        <span>
+          <b>3 referencias con stock bajo en esta muestra</b>
+          <small>
+            Las unidades son completamente ficticias; no representan inventario
+            real.
+          </small>
+        </span>
+        <DemoTag />
+      </div>
+      <div className="ad-inventory-metrics">
+        <div>
+          <span>REFERENCIAS</span>
+          <b>12</b>
+          <small>productos de muestra</small>
+        </div>
+        <div>
+          <span>UNIDADES ILUSTRATIVAS</span>
+          <b>81</b>
+          <small>conteo de demostración</small>
+        </div>
+        <div>
+          <span>BAJO UMBRAL DEMO</span>
+          <b>03</b>
+          <small>menos de 5 unidades ficticias</small>
+        </div>
+        <div className="ad-inventory-action">
+          <button
+            className="ad-primary"
+            onClick={() =>
+              notify(
+                "Ajustar inventario no está habilitado; ningún dato se modifica.",
+              )
+            }
+          >
+            <Pencil size={15} /> Ajustar inventario
+          </button>
+          <small>No se guarda en esta demo</small>
+        </div>
+      </div>
+      <section className="ad-panel ad-inventory-table">
+        <div className="ad-panel-heading">
+          <div>
+            <span className="ad-eyebrow">REFERENCIAS POR NIVEL DE MUESTRA</span>
+            <h2>
+              Stock del catálogo <DemoTag />
+            </h2>
+          </div>
+          <button
+            className="ad-text-link"
+            onClick={() => setShowInventory(!showInventory)}
+          >
+            {showInventory ? "Ver menos" : "Ver las 12"}{" "}
+            <ChevronRight size={14} />
+          </button>
+        </div>
+        <div className="ad-table-wrap">
+          <table className="ad-table">
+            <thead>
+              <tr>
+                <th>PRODUCTO FICTICIO</th>
+                <th>REFERENCIA DEMO</th>
+                <th>FAMILIA</th>
+                <th>UNIDADES DE MUESTRA</th>
+                <th>NIVEL ILUSTRATIVO</th>
+                <th>INDICADOR</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shown.map((product) => (
+                <tr key={product.id}>
+                  <td>
+                    <div className="ad-product-cell">
+                      <ProductThumb product={product} size="small" />
+                      <span>
+                        <b>{product.name}</b>
+                        <small>Producto ilustrativo</small>
+                      </span>
+                    </div>
+                  </td>
+                  <td className="ad-mono">{product.reference}</td>
+                  <td>{product.category}</td>
+                  <td>
+                    <b>{String(product.stock).padStart(2, "0")} uds.</b>
+                  </td>
+                  <td>
+                    <div className="ad-stock-bar">
+                      <i
+                        style={{
+                          width: `${Math.max(2, Math.min((product.stock / 16) * 100, 100))}%`,
+                        }}
+                      />
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      className={`ad-level ${product.stock === 0 ? "zero" : product.stock < 5 ? "low" : "healthy"}`}
+                    >
+                      <i />
+                      {product.stock === 0
+                        ? "Agotado DEMO"
+                        : product.stock < 5
+                          ? "Bajo DEMO"
+                          : "Disponible"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
 }
 
-function Sales({ period, setPeriod, notify }: { period: string; setPeriod: (v: string) => void; notify: (s: string) => void }) {
-  return <div className="ad-page"><SectionHeader eyebrow="ANÁLISIS · MUESTRA SINTÉTICA" title="Ventas" description="Lectura de ejemplo construida para esta maqueta. No refleja ventas del negocio." action={<select className="ad-period-select" value={period} onChange={(e) => setPeriod(e.target.value)}><option>Últimos 30 días</option><option>Últimos 7 días</option><option>Este año</option></select>} />
-    <div className="ad-synthetic-callout"><WandSparkles size={16} /><span><b>Datos generados para demostración</b> · Todas las cifras y visualizaciones de esta página son simuladas, no corresponden a ventas reales ni a datos conectados.</span></div>
-    <div className="ad-sales-summary"><article><span>INGRESO ILUSTRATIVO</span><b>$ 8,42 M</b><small>DEMO · COP ficticios</small><i><ArrowUpRight size={14} /> 12,8% vs. periodo ficticio</i></article><article className="ad-sales-highlight"><span>UNIDADES DE MUESTRA</span><b>128</b><small>DEMO · sin transacciones reales</small><i><ArrowUpRight size={14} /> 8,2% vs. periodo ficticio</i></article><article><span>VALOR PROMEDIO DEMO</span><b>$ 65.781</b><small>DEMO · valor calculado</small><i><ArrowUpRight size={14} /> 3,4% vs. periodo ficticio</i></article></div>
-    <div className="ad-sales-chart-panel"><div className="ad-panel-heading"><div><span className="ad-eyebrow">SERIE SINTÉTICA <DemoTag /></span><h2>Una curva imaginada</h2><p>Valores de demostración · miles de pesos colombianos</p></div><div className="ad-chart-unit">COP <small>· demo</small></div></div>
-      <div className="ad-large-chart"><ResponsiveContainer width="100%" height="100%"><AreaChart data={salesSeries} margin={{ top: 14, right: 14, left: -9, bottom: 0 }}><defs><linearGradient id="salesDemoGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#d6be8b" stopOpacity={0.22} /><stop offset="100%" stopColor="#d6be8b" stopOpacity={0} /></linearGradient></defs><CartesianGrid stroke="rgba(226,216,197,.07)" vertical={false} /><XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "#8e8994", fontSize: 11 }} tickMargin={12} /><YAxis axisLine={false} tickLine={false} tick={{ fill: "#8e8994", fontSize: 11 }} tickFormatter={formatCompact} /><Tooltip contentStyle={{ background: "#1c1921", border: "1px solid rgba(214,190,139,.23)", borderRadius: 8, color: "#f3eee6", fontSize: 12 }} formatter={(v) => [`$${v} mil · DEMO`, "Venta ficticia"]} labelFormatter={(l) => `Día ${l} · solo demostración`} /><Area type="monotone" dataKey="amount" stroke="#d6be8b" strokeWidth={2} fill="url(#salesDemoGradient)" /></AreaChart></ResponsiveContainer></div>
-      <div className="ad-sales-chart-foot"><span><i /> Simulación visual</span><span>Sin conexión a transacciones</span></div></div>
-    <div className="ad-sales-bottom"><div><span className="ad-eyebrow">FAMILIA CON MAYOR PARTICIPACIÓN DEMO</span><b>Oriental <small>32% · dato ficticio</small></b></div><div><span className="ad-eyebrow">REFERENCIA MÁS VISTA EN ESTA MUESTRA</span><b>Noche Violeta <small>DEMO · producto ficticio</small></b></div><button className="ad-outline" onClick={() => notify("No hay exportación real disponible en este prototipo.")}><FileSpreadsheet size={15} /> Exportar visualización</button></div>
-  </div>;
+function Sales({
+  period,
+  setPeriod,
+  notify,
+}: {
+  period: string;
+  setPeriod: (v: string) => void;
+  notify: (s: string) => void;
+}) {
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="ANÁLISIS · MUESTRA SINTÉTICA"
+        title="Ventas"
+        description="Lectura de ejemplo construida para esta maqueta. No refleja ventas del negocio."
+        action={
+          <select
+            className="ad-period-select"
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+          >
+            <option>Últimos 30 días</option>
+            <option>Últimos 7 días</option>
+            <option>Este año</option>
+          </select>
+        }
+      />
+      <div className="ad-synthetic-callout">
+        <WandSparkles size={16} />
+        <span>
+          <b>Datos generados para demostración</b> · Todas las cifras y
+          visualizaciones de esta página son simuladas, no corresponden a ventas
+          reales ni a datos conectados.
+        </span>
+      </div>
+      <div className="ad-sales-summary">
+        <article>
+          <span>INGRESO ILUSTRATIVO</span>
+          <b>$ 8,42 M</b>
+          <small>DEMO · COP ficticios</small>
+          <i>
+            <ArrowUpRight size={14} /> 12,8% vs. periodo ficticio
+          </i>
+        </article>
+        <article className="ad-sales-highlight">
+          <span>UNIDADES DE MUESTRA</span>
+          <b>128</b>
+          <small>DEMO · sin transacciones reales</small>
+          <i>
+            <ArrowUpRight size={14} /> 8,2% vs. periodo ficticio
+          </i>
+        </article>
+        <article>
+          <span>VALOR PROMEDIO DEMO</span>
+          <b>$ 65.781</b>
+          <small>DEMO · valor calculado</small>
+          <i>
+            <ArrowUpRight size={14} /> 3,4% vs. periodo ficticio
+          </i>
+        </article>
+      </div>
+      <div className="ad-sales-chart-panel">
+        <div className="ad-panel-heading">
+          <div>
+            <span className="ad-eyebrow">
+              SERIE SINTÉTICA <DemoTag />
+            </span>
+            <h2>Una curva imaginada</h2>
+            <p>Valores de demostración · miles de pesos colombianos</p>
+          </div>
+          <div className="ad-chart-unit">
+            COP <small>· demo</small>
+          </div>
+        </div>
+        <div className="ad-large-chart">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={salesSeries}
+              margin={{ top: 14, right: 14, left: -9, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient
+                  id="salesDemoGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="0%" stopColor="#d6be8b" stopOpacity={0.22} />
+                  <stop offset="100%" stopColor="#d6be8b" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="rgba(226,216,197,.07)" vertical={false} />
+              <XAxis
+                dataKey="day"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#8e8994", fontSize: 11 }}
+                tickMargin={12}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#8e8994", fontSize: 11 }}
+                tickFormatter={formatCompact}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: "#1c1921",
+                  border: "1px solid rgba(214,190,139,.23)",
+                  borderRadius: 8,
+                  color: "#f3eee6",
+                  fontSize: 12,
+                }}
+                formatter={(v) => [`$${v} mil · DEMO`, "Venta ficticia"]}
+                labelFormatter={(l) => `Día ${l} · solo demostración`}
+              />
+              <Area
+                type="monotone"
+                dataKey="amount"
+                stroke="#d6be8b"
+                strokeWidth={2}
+                fill="url(#salesDemoGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="ad-sales-chart-foot">
+          <span>
+            <i /> Simulación visual
+          </span>
+          <span>Sin conexión a transacciones</span>
+        </div>
+      </div>
+      <div className="ad-sales-bottom">
+        <div>
+          <span className="ad-eyebrow">
+            FAMILIA CON MAYOR PARTICIPACIÓN DEMO
+          </span>
+          <b>
+            Oriental <small>32% · dato ficticio</small>
+          </b>
+        </div>
+        <div>
+          <span className="ad-eyebrow">
+            REFERENCIA MÁS VISTA EN ESTA MUESTRA
+          </span>
+          <b>
+            Noche Violeta <small>DEMO · producto ficticio</small>
+          </b>
+        </div>
+        <button
+          className="ad-outline"
+          onClick={() =>
+            notify("No hay exportación real disponible en este prototipo.")
+          }
+        >
+          <FileSpreadsheet size={15} /> Exportar visualización
+        </button>
+      </div>
+    </div>
+  );
 }
 
-function Reports({ notify, reportNotice, setReportNotice }: { notify: (s: string) => void; reportNotice: boolean; setReportNotice: (b: boolean) => void }) {
+function Reports({
+  notify,
+  reportNotice,
+  setReportNotice,
+  dbOrders,
+}: {
+  notify: (s: string) => void;
+  reportNotice: boolean;
+  setReportNotice: (b: boolean) => void;
+  dbOrders: any[];
+}) {
   const cards = [
-    { icon: ChartNoAxesCombined, title: "Ritmo de ventas", subtitle: "Serie ficticia · COP ilustrativos", color: "lavender" },
-    { icon: Boxes, title: "Pulso de inventario", subtitle: "Existencias de muestra", color: "gold" },
-    { icon: Flower2, title: "Afinidad olfativa", subtitle: "Preferencias inventadas", color: "rose" },
-    { icon: ShoppingBag, title: "Actividad de pedidos", subtitle: "Registros de demostración", color: "mint" },
+    {
+      icon: ChartNoAxesCombined,
+      title: "Ritmo de ventas",
+      subtitle: "Serie ficticia · COP ilustrativos",
+      color: "lavender",
+    },
+    {
+      icon: Boxes,
+      title: "Pulso de inventario",
+      subtitle: "Existencias de muestra",
+      color: "gold",
+    },
+    {
+      icon: Flower2,
+      title: "Afinidad olfativa",
+      subtitle: "Preferencias inventadas",
+      color: "rose",
+    },
+    {
+      icon: ShoppingBag,
+      title: "Actividad de pedidos",
+      subtitle: "Registros de demostración",
+      color: "mint",
+    },
   ];
-  return <div className="ad-page"><SectionHeader eyebrow="ANÁLISIS · CENTRO DE INFORMES VISUALES" title="Reportes" description="Cuatro ventanas a un universo ficticio. No se crean ni descargan archivos." action={<span className="ad-visual-only"><Eye size={14} /> SOLO VISTA</span>} />
-    <div className="ad-report-hero"><div className="ad-report-orb"><ChartNoAxesCombined size={25} /></div><div><span className="ad-eyebrow">COLECCIÓN DE INFORMES · DEMO</span><h2>Los datos cuentan una historia inventada.</h2><p>Estas vistas usan valores generados para evaluar el diseño. Nada aquí es una cifra real de negocio.</p></div><DemoTag /></div>
-    <div className="ad-report-grid">{cards.map(({ icon: Icon, title, subtitle, color }, i) => <article className={`ad-report-card ${color}`} key={title}><div className="ad-report-card-top"><span className="ad-report-icon"><Icon size={18} /></span><span>DEMO · {String(i + 1).padStart(2, "0")}</span><MoreHorizontal size={17} /></div><div className={`ad-report-spark spark-${i}`}><svg viewBox="0 0 280 70" preserveAspectRatio="none"><path d={["M0 53 C23 49 32 23 56 34 S91 54 111 30 S146 13 167 38 S195 53 216 27 S249 32 280 8", "M0 22 C28 29 36 12 68 26 S108 61 133 43 S171 15 196 35 S237 55 280 23", "M0 49 C30 53 41 24 70 39 S110 53 134 21 S170 18 192 37 S229 25 280 13", "M0 45 C26 46 43 17 72 30 S111 42 140 29 S181 57 204 37 S247 11 280 24"][i]} /></svg></div><span className="ad-eyebrow">{subtitle}</span><h3>{title}</h3><p>Previsualización ilustrativa · no representa datos comerciales.</p><button onClick={() => setReportNotice(true)}>Abrir visualización <ChevronRight size={14} /></button></article>)}</div>
-    {reportNotice && <div className="ad-report-notice"><div><Eye size={17} /><span><b>Vista previa en modo de demostración</b><small>El informe es sintético. No se generó ningún archivo ni se consultaron datos.</small></span></div><button className="ad-close-notice" aria-label="Cerrar aviso" onClick={() => setReportNotice(false)}><X size={17} /></button></div>}
-    <section className="ad-export-panel"><div className="ad-export-icon"><Download size={18} /></div><div><b>Descargas desactivadas en el prototipo</b><p>Excel y PDF se muestran como controles visuales. Este demo no genera ni descarga reportes.</p></div><div className="ad-export-actions"><button className="ad-outline" onClick={() => notify("Excel · control visual únicamente. No se generó archivo.")}><FileSpreadsheet size={15} /> Excel <span>DEMO</span></button><button className="ad-outline" onClick={() => notify("PDF · control visual únicamente. No se generó archivo.")}>PDF <span>DEMO</span></button></div></section>
-  </div>;
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="ANÁLISIS · CENTRO DE INFORMES VISUALES"
+        title="Reportes"
+        description="Cuatro ventanas a un universo ficticio. No se crean ni descargan archivos."
+        action={
+          <span className="ad-visual-only">
+            <Eye size={14} /> SOLO VISTA
+          </span>
+        }
+      />
+      <div className="ad-report-hero">
+        <div className="ad-report-orb">
+          <ChartNoAxesCombined size={25} />
+        </div>
+        <div>
+          <span className="ad-eyebrow">COLECCIÓN DE INFORMES · DEMO</span>
+          <h2>Los datos cuentan una historia inventada.</h2>
+          <p>
+            Estas vistas usan valores generados para evaluar el diseño. Nada
+            aquí es una cifra real de negocio.
+          </p>
+        </div>
+        <DemoTag />
+      </div>
+      <div className="ad-report-grid">
+        {cards.map(({ icon: Icon, title, subtitle, color }, i) => (
+          <article className={`ad-report-card ${color}`} key={title}>
+            <div className="ad-report-card-top">
+              <span className="ad-report-icon">
+                <Icon size={18} />
+              </span>
+              <span>DEMO · {String(i + 1).padStart(2, "0")}</span>
+              <MoreHorizontal size={17} />
+            </div>
+            <div className={`ad-report-spark spark-${i}`}>
+              <svg viewBox="0 0 280 70" preserveAspectRatio="none">
+                <path
+                  d={
+                    [
+                      "M0 53 C23 49 32 23 56 34 S91 54 111 30 S146 13 167 38 S195 53 216 27 S249 32 280 8",
+                      "M0 22 C28 29 36 12 68 26 S108 61 133 43 S171 15 196 35 S237 55 280 23",
+                      "M0 49 C30 53 41 24 70 39 S110 53 134 21 S170 18 192 37 S229 25 280 13",
+                      "M0 45 C26 46 43 17 72 30 S111 42 140 29 S181 57 204 37 S247 11 280 24",
+                    ][i]
+                  }
+                />
+              </svg>
+            </div>
+            <span className="ad-eyebrow">{subtitle}</span>
+            <h3>{title}</h3>
+            <p>
+              Previsualización ilustrativa · no representa datos comerciales.
+            </p>
+            <button onClick={() => setReportNotice(true)}>
+              Abrir visualización <ChevronRight size={14} />
+            </button>
+          </article>
+        ))}
+      </div>
+      {reportNotice && (
+        <div className="ad-report-notice">
+          <div>
+            <Eye size={17} />
+            <span>
+              <b>Vista previa en modo de demostración</b>
+              <small>
+                El informe es sintético. No se generó ningún archivo ni se
+                consultaron datos.
+              </small>
+            </span>
+          </div>
+          <button
+            className="ad-close-notice"
+            aria-label="Cerrar aviso"
+            onClick={() => setReportNotice(false)}
+          >
+            <X size={17} />
+          </button>
+        </div>
+      )}
+      <section className="ad-export-panel">
+        <div className="ad-export-icon">
+          <Download size={18} />
+        </div>
+        <div>
+          <b>Descargas desactivadas en el prototipo</b>
+          <p>
+            Excel y PDF se muestran como controles visuales. Este demo no genera
+            ni descarga reportes.
+          </p>
+        </div>
+        <div className="ad-export-actions">
+          <button
+            className="ad-outline"
+            onClick={() => {
+              import("xlsx").then((XLSX) => {
+                const ws = XLSX.utils.json_to_sheet(
+                  dbOrders.map((o) => ({
+                    Pedido: o.orderNumber,
+                    Cliente: o.customerName,
+                    Teléfono: o.customerPhone,
+                    Ciudad: o.customerCity,
+                    Estado: o.status,
+                    Subtotal: o.subtotal,
+                  })),
+                );
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
+                XLSX.writeFile(wb, "Reporte_Pedidos.xlsx");
+              });
+            }}
+          >
+            <Download size={15} /> Exportar Excel
+          </button>
+          <button
+            className="ad-outline"
+            onClick={() =>
+              notify("PDF · control visual únicamente. No se generó archivo.")
+            }
+          >
+            PDF <span>DEMO</span>
+          </button>
+        </div>
+      </section>
+    </div>
+  );
 }
 
-function UsersPage({ active, setActive, notify }: { active: boolean; setActive: (b: boolean) => void; notify: (s: string) => void }) {
-  return <div className="ad-page"><SectionHeader eyebrow="ADMINISTRACIÓN · PERMISOS SIMULADOS" title="Usuarios / Permisos" description="Una vista de roles para revisar la experiencia. El interruptor es local y no se guarda." action={<button className="ad-primary" onClick={() => notify("Invitar usuario no está disponible en esta demo.")}><Plus size={16} /> Invitar usuario</button>} />
-    <div className="ad-users-note"><ShieldCheck size={17} /><span><b>Sin acceso real ni autenticación.</b> Las personas y roles aquí son ficticios. El estado de usuarios solo existe en memoria mientras esta vista permanece abierta.</span><DemoTag /></div>
-    <div className="ad-user-layout"><section className="ad-panel ad-users-panel"><div className="ad-panel-heading"><div><span className="ad-eyebrow">PERFILES DE DEMOSTRACIÓN</span><h2>Accesos del espacio</h2></div><span className="ad-user-total">02 perfiles demo</span></div>
-      <div className="ad-user-row"><span className="ad-avatar ad-avatar-large">AM</span><div className="ad-user-details"><b>Adriana M.</b><small>Propietaria · identidad ficticia</small><span className="ad-user-email">adriana@demo.local <i>· no es un correo operativo</i></span></div><span className="ad-role-tag">PROPIETARIA DEMO</span><span className="ad-user-state active"><i /> Activa</span><button className="ad-row-action" aria-label="Editar perfil de Adriana" onClick={() => notify("Perfil de muestra · edición desactivada.")}><MoreHorizontal size={16} /></button></div>
-      <div className="ad-user-row"><span className="ad-avatar ad-avatar-large secondary">LC</span><div className="ad-user-details"><b>Lucía C.</b><small>Asistente de catálogo · persona ficticia</small><span className="ad-user-email">lucia@demo.local <i>· no es un correo operativo</i></span></div><span className="ad-role-tag">CATÁLOGO DEMO</span><span className={`ad-user-state ${active ? "active" : "inactive"}`}><i />{active ? "Activa" : "Inactiva"}</span><button role="switch" aria-checked={active} className={`ad-switch ${active ? "on" : ""}`} onClick={() => { setActive(!active); notify(`Estado local de muestra: ${active ? "inactiva" : "activa"}. No se guardó.`); }} aria-label="Alternar estado local del perfil de Lucía"><i /></button></div>
-      <div className="ad-local-warning"><LockKeyhole size={14} /> Activar / desactivar solo cambia la vista local. El cambio no se guarda ni otorga permisos reales.</div>
-    </section><aside className="ad-permission-aside"><div className="ad-permission-symbol"><ShieldCheck size={22} /></div><span className="ad-eyebrow">MATRIZ DE DEMOSTRACIÓN</span><h3>Permisos visibles</h3><p>Los roles son muestras de interfaz, no controles de acceso reales.</p><div className="ad-perm-line"><span>Catálogo</span><span>Gestionar · DEMO</span></div><div className="ad-perm-line"><span>Pedidos</span><span>Solo lectura · DEMO</span></div><div className="ad-perm-line"><span>Reportes</span><span>Solo lectura · DEMO</span></div><div className="ad-perm-line"><span>Configuración</span><span>Sin acceso · DEMO</span></div></aside></div>
-  </div>;
+function UsersPage({
+  active,
+  setActive,
+  notify,
+}: {
+  active: boolean;
+  setActive: (b: boolean) => void;
+  notify: (s: string) => void;
+}) {
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="ADMINISTRACIÓN · PERMISOS SIMULADOS"
+        title="Usuarios / Permisos"
+        description="Una vista de roles para revisar la experiencia. El interruptor es local y no se guarda."
+        action={
+          <button
+            className="ad-primary"
+            onClick={() =>
+              notify("Invitar usuario no está disponible en esta demo.")
+            }
+          >
+            <Plus size={16} /> Invitar usuario
+          </button>
+        }
+      />
+      <div className="ad-users-note">
+        <ShieldCheck size={17} />
+        <span>
+          <b>Sin acceso real ni autenticación.</b> Las personas y roles aquí son
+          ficticios. El estado de usuarios solo existe en memoria mientras esta
+          vista permanece abierta.
+        </span>
+        <DemoTag />
+      </div>
+      <div className="ad-user-layout">
+        <section className="ad-panel ad-users-panel">
+          <div className="ad-panel-heading">
+            <div>
+              <span className="ad-eyebrow">PERFILES DE DEMOSTRACIÓN</span>
+              <h2>Accesos del espacio</h2>
+            </div>
+            <span className="ad-user-total">02 perfiles demo</span>
+          </div>
+          <div className="ad-user-row">
+            <span className="ad-avatar ad-avatar-large">AM</span>
+            <div className="ad-user-details">
+              <b>Adriana M.</b>
+              <small>Propietaria · identidad ficticia</small>
+              <span className="ad-user-email">
+                adriana@demo.local <i>· no es un correo operativo</i>
+              </span>
+            </div>
+            <span className="ad-role-tag">PROPIETARIA DEMO</span>
+            <span className="ad-user-state active">
+              <i /> Activa
+            </span>
+            <button
+              className="ad-row-action"
+              aria-label="Editar perfil de Adriana"
+              onClick={() => notify("Perfil de muestra · edición desactivada.")}
+            >
+              <MoreHorizontal size={16} />
+            </button>
+          </div>
+          <div className="ad-user-row">
+            <span className="ad-avatar ad-avatar-large secondary">LC</span>
+            <div className="ad-user-details">
+              <b>Lucía C.</b>
+              <small>Asistente de catálogo · persona ficticia</small>
+              <span className="ad-user-email">
+                lucia@demo.local <i>· no es un correo operativo</i>
+              </span>
+            </div>
+            <span className="ad-role-tag">CATÁLOGO DEMO</span>
+            <span className={`ad-user-state ${active ? "active" : "inactive"}`}>
+              <i />
+              {active ? "Activa" : "Inactiva"}
+            </span>
+            <button
+              role="switch"
+              aria-checked={active}
+              className={`ad-switch ${active ? "on" : ""}`}
+              onClick={() => {
+                setActive(!active);
+                notify(
+                  `Estado local de muestra: ${active ? "inactiva" : "activa"}. No se guardó.`,
+                );
+              }}
+              aria-label="Alternar estado local del perfil de Lucía"
+            >
+              <i />
+            </button>
+          </div>
+          <div className="ad-local-warning">
+            <LockKeyhole size={14} /> Activar / desactivar solo cambia la vista
+            local. El cambio no se guarda ni otorga permisos reales.
+          </div>
+        </section>
+        <aside className="ad-permission-aside">
+          <div className="ad-permission-symbol">
+            <ShieldCheck size={22} />
+          </div>
+          <span className="ad-eyebrow">MATRIZ DE DEMOSTRACIÓN</span>
+          <h3>Permisos visibles</h3>
+          <p>
+            Los roles son muestras de interfaz, no controles de acceso reales.
+          </p>
+          <div className="ad-perm-line">
+            <span>Catálogo</span>
+            <span>Gestionar · DEMO</span>
+          </div>
+          <div className="ad-perm-line">
+            <span>Pedidos</span>
+            <span>Solo lectura · DEMO</span>
+          </div>
+          <div className="ad-perm-line">
+            <span>Reportes</span>
+            <span>Solo lectura · DEMO</span>
+          </div>
+          <div className="ad-perm-line">
+            <span>Configuración</span>
+            <span>Sin acceso · DEMO</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
 }
 
 function Settings({ notify }: { notify: (s: string) => void }) {
-  return <div className="ad-page"><SectionHeader eyebrow="ADMINISTRACIÓN · SIN CONEXIONES ACTIVAS" title="Configuración comercial" description="Canales y destinos preparados como placeholders. No hay credenciales ni datos de contacto." action={<span className="ad-visual-only"><EyeOff size={14} /> NO CONECTADO</span>} />
-    <div className="ad-setup-banner"><span className="ad-setup-mark"><Settings2 size={18} /></span><div><b>Todo permanece sin configurar.</b><span>Este prototipo no se conecta a servicios, entidades financieras ni números telefónicos.</span></div><DemoTag /></div>
-    <div className="ad-settings-grid">
-      <section className="ad-panel ad-setting-card"><div className="ad-setting-card-top"><span className="ad-setting-icon"><Wallet size={19} /></span><span className="ad-connection-state"><i /> Sin configurar</span></div><span className="ad-eyebrow">DESTINO DE PAGO</span><h2>Cuenta de recaudo</h2><p>Configura el destino de pago en una etapa futura. No se muestra ni solicita información bancaria.</p><div className="ad-unset-box"><LockKeyhole size={15} /><span><b>Sin cuenta vinculada</b><small>Sin banco · sin número · sin credenciales</small></span><span className="ad-unset-pill">PLACEHOLDER</span></div><button className="ad-outline ad-config-button" onClick={() => notify("No se solicitan ni guardan datos financieros en este prototipo.")}>Vista de configuración <ChevronRight size={14} /></button></section>
-      <section className="ad-panel ad-setting-card"><div className="ad-setting-card-top"><span className="ad-setting-icon whatsapp"><MessageCircle size={19} /></span><span className="ad-connection-state"><i /> Sin configurar</span></div><span className="ad-eyebrow">CANAL DE ATENCIÓN</span><h2>WhatsApp comercial</h2><p>El canal está sin configurar. No se proporciona un número ficticio ni se abre ninguna conexión.</p><div className="ad-unset-box"><MessageCircle size={15} /><span><b>Sin número vinculado</b><small>Sin contacto · sin integración · desconectado</small></span><span className="ad-unset-pill">PLACEHOLDER</span></div><button className="ad-outline ad-config-button" onClick={() => notify("WhatsApp permanece sin configurar: no hay conexión activa.")}>Vista de configuración <ChevronRight size={14} /></button></section>
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="ADMINISTRACIÓN · SIN CONEXIONES ACTIVAS"
+        title="Configuración comercial"
+        description="Canales y destinos preparados como placeholders. No hay credenciales ni datos de contacto."
+        action={
+          <span className="ad-visual-only">
+            <EyeOff size={14} /> NO CONECTADO
+          </span>
+        }
+      />
+      <div className="ad-setup-banner">
+        <span className="ad-setup-mark">
+          <Settings2 size={18} />
+        </span>
+        <div>
+          <b>Todo permanece sin configurar.</b>
+          <span>
+            Este prototipo no se conecta a servicios, entidades financieras ni
+            números telefónicos.
+          </span>
+        </div>
+        <DemoTag />
+      </div>
+      <div className="ad-settings-grid">
+        <section className="ad-panel ad-setting-card">
+          <div className="ad-setting-card-top">
+            <span className="ad-setting-icon">
+              <Wallet size={19} />
+            </span>
+            <span className="ad-connection-state">
+              <i /> Sin configurar
+            </span>
+          </div>
+          <span className="ad-eyebrow">DESTINO DE PAGO</span>
+          <h2>Cuenta de recaudo</h2>
+          <p>
+            Configura el destino de pago en una etapa futura. No se muestra ni
+            solicita información bancaria.
+          </p>
+          <div className="ad-unset-box">
+            <LockKeyhole size={15} />
+            <span>
+              <b>Sin cuenta vinculada</b>
+              <small>Sin banco · sin número · sin credenciales</small>
+            </span>
+            <span className="ad-unset-pill">PLACEHOLDER</span>
+          </div>
+          <button
+            className="ad-outline ad-config-button"
+            onClick={() =>
+              notify(
+                "No se solicitan ni guardan datos financieros en este prototipo.",
+              )
+            }
+          >
+            Vista de configuración <ChevronRight size={14} />
+          </button>
+        </section>
+        <section className="ad-panel ad-setting-card">
+          <div className="ad-setting-card-top">
+            <span className="ad-setting-icon whatsapp">
+              <MessageCircle size={19} />
+            </span>
+            <span className="ad-connection-state">
+              <i /> Sin configurar
+            </span>
+          </div>
+          <span className="ad-eyebrow">CANAL DE ATENCIÓN</span>
+          <h2>WhatsApp comercial</h2>
+          <p>
+            El canal está sin configurar. No se proporciona un número ficticio
+            ni se abre ninguna conexión.
+          </p>
+          <div className="ad-unset-box">
+            <MessageCircle size={15} />
+            <span>
+              <b>Sin número vinculado</b>
+              <small>Sin contacto · sin integración · desconectado</small>
+            </span>
+            <span className="ad-unset-pill">PLACEHOLDER</span>
+          </div>
+          <button
+            className="ad-outline ad-config-button"
+            onClick={() =>
+              notify(
+                "WhatsApp permanece sin configurar: no hay conexión activa.",
+              )
+            }
+          >
+            Vista de configuración <ChevronRight size={14} />
+          </button>
+        </section>
+      </div>
+      <section className="ad-panel ad-business-details">
+        <div className="ad-panel-heading">
+          <div>
+            <span className="ad-eyebrow">
+              PERFIL DE LA TIENDA · AMBIENTACIÓN DEMO
+            </span>
+            <h2>Identidad de muestra</h2>
+            <p>
+              Contexto ficticio usado exclusivamente para vestir esta interfaz.
+            </p>
+          </div>
+          <DemoTag />
+        </div>
+        <div className="ad-details-row">
+          <span>Nombre visible</span>
+          <b>
+            Tu Perfumería <small>· provisional</small>
+          </b>
+        </div>
+        <div className="ad-details-row">
+          <span>País de referencia</span>
+          <b>
+            Colombia <small>· contexto ilustrativo</small>
+          </b>
+        </div>
+        <div className="ad-details-row">
+          <span>Moneda de la interfaz</span>
+          <b>
+            COP <small>· no son tarifas reales</small>
+          </b>
+        </div>
+        <div className="ad-details-row">
+          <span>Conexiones externas</span>
+          <b className="ad-none-connected">
+            <i /> Ninguna activa
+          </b>
+        </div>
+      </section>
     </div>
-    <section className="ad-panel ad-business-details"><div className="ad-panel-heading"><div><span className="ad-eyebrow">PERFIL DE LA TIENDA · AMBIENTACIÓN DEMO</span><h2>Identidad de muestra</h2><p>Contexto ficticio usado exclusivamente para vestir esta interfaz.</p></div><DemoTag /></div><div className="ad-details-row"><span>Nombre visible</span><b>Tu Perfumería <small>· provisional</small></b></div><div className="ad-details-row"><span>País de referencia</span><b>Colombia <small>· contexto ilustrativo</small></b></div><div className="ad-details-row"><span>Moneda de la interfaz</span><b>COP <small>· no son tarifas reales</small></b></div><div className="ad-details-row"><span>Conexiones externas</span><b className="ad-none-connected"><i /> Ninguna activa</b></div></section>
-  </div>;
+  );
 }
 
 function ActivityPage() {
   const entries = [
-    { time: "10:42", icon: Eye, title: "Vista de resumen abierta", detail: "Sesión de demostración · acción ilustrativa", kind: "NAVEGACIÓN" },
-    { time: "10:18", icon: Package, title: "Catálogo de muestra consultado", detail: "12 productos ficticios · sin cambios", kind: "CATÁLOGO DEMO" },
-    { time: "09:56", icon: Boxes, title: "Panel de inventario visualizado", detail: "Valores de stock ilustrativos · no guardados", kind: "INVENTARIO DEMO" },
-    { time: "09:31", icon: ChartNoAxesCombined, title: "Reporte de demostración revisado", detail: "Contenido sintético · sin descarga", kind: "ANÁLISIS DEMO" },
-    { time: "09:04", icon: ShieldCheck, title: "Vista de permisos explorada", detail: "Perfiles ficticios · sin autenticación", kind: "ACCESOS DEMO" },
+    {
+      time: "10:42",
+      icon: Eye,
+      title: "Vista de resumen abierta",
+      detail: "Sesión de demostración · acción ilustrativa",
+      kind: "NAVEGACIÓN",
+    },
+    {
+      time: "10:18",
+      icon: Package,
+      title: "Catálogo de muestra consultado",
+      detail: "12 productos ficticios · sin cambios",
+      kind: "CATÁLOGO DEMO",
+    },
+    {
+      time: "09:56",
+      icon: Boxes,
+      title: "Panel de inventario visualizado",
+      detail: "Valores de stock ilustrativos · no guardados",
+      kind: "INVENTARIO DEMO",
+    },
+    {
+      time: "09:31",
+      icon: ChartNoAxesCombined,
+      title: "Reporte de demostración revisado",
+      detail: "Contenido sintético · sin descarga",
+      kind: "ANÁLISIS DEMO",
+    },
+    {
+      time: "09:04",
+      icon: ShieldCheck,
+      title: "Vista de permisos explorada",
+      detail: "Perfiles ficticios · sin autenticación",
+      kind: "ACCESOS DEMO",
+    },
   ];
-  return <div className="ad-page"><SectionHeader eyebrow="ADMINISTRACIÓN · REGISTRO FICTICIO" title="Actividad / Auditoría" description="Una cronología ilustrativa para mostrar cómo podría leerse la actividad." action={<button className="ad-outline" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><Activity size={15} /> Registro demo</button>} />
-    <div className="ad-audit-notice"><Activity size={17} /><span><b>No es una auditoría real.</b> Los eventos se inventaron para la maqueta y no se registra actividad de usuarios.</span><DemoTag /></div>
-    <section className="ad-panel ad-timeline-panel"><div className="ad-panel-heading"><div><span className="ad-eyebrow">MARTES, 18 DE JUNIO · DATOS ILUSTRATIVOS</span><h2>Un recorrido de muestra</h2><p>Cada evento es ficticio y no representa una acción real en el negocio.</p></div><span className="ad-timezone">HORA LOCAL · DEMO</span></div>
-      <div className="ad-timeline">{entries.map(({ time, icon: Icon, title, detail, kind }) => <div className="ad-timeline-item" key={time}><span className="ad-timeline-time">{time}</span><span className="ad-timeline-node"><Icon size={15} /></span><span className="ad-timeline-copy"><b>{title}</b><small>{detail}</small></span><span className="ad-timeline-kind">{kind}</span></div>)}</div>
-      <div className="ad-timeline-foot"><span>FIN DE LA MUESTRA</span><span>DEMO · DATOS ILUSTRATIVOS</span></div>
-    </section><div className="ad-note-strip"><LockKeyhole size={14} /><span>Sin persistencia · sin backend · sin registros de auditoría reales.</span></div>
-  </div>;
+  return (
+    <div className="ad-page">
+      <SectionHeader
+        eyebrow="ADMINISTRACIÓN · REGISTRO FICTICIO"
+        title="Actividad / Auditoría"
+        description="Una cronología ilustrativa para mostrar cómo podría leerse la actividad."
+        action={
+          <button
+            className="ad-outline"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          >
+            <Activity size={15} /> Registro demo
+          </button>
+        }
+      />
+      <div className="ad-audit-notice">
+        <Activity size={17} />
+        <span>
+          <b>No es una auditoría real.</b> Los eventos se inventaron para la
+          maqueta y no se registra actividad de usuarios.
+        </span>
+        <DemoTag />
+      </div>
+      <section className="ad-panel ad-timeline-panel">
+        <div className="ad-panel-heading">
+          <div>
+            <span className="ad-eyebrow">
+              MARTES, 18 DE JUNIO · DATOS ILUSTRATIVOS
+            </span>
+            <h2>Un recorrido de muestra</h2>
+            <p>
+              Cada evento es ficticio y no representa una acción real en el
+              negocio.
+            </p>
+          </div>
+          <span className="ad-timezone">HORA LOCAL · DEMO</span>
+        </div>
+        <div className="ad-timeline">
+          {entries.map(({ time, icon: Icon, title, detail, kind }) => (
+            <div className="ad-timeline-item" key={time}>
+              <span className="ad-timeline-time">{time}</span>
+              <span className="ad-timeline-node">
+                <Icon size={15} />
+              </span>
+              <span className="ad-timeline-copy">
+                <b>{title}</b>
+                <small>{detail}</small>
+              </span>
+              <span className="ad-timeline-kind">{kind}</span>
+            </div>
+          ))}
+        </div>
+        <div className="ad-timeline-foot">
+          <span>FIN DE LA MUESTRA</span>
+          <span>DEMO · DATOS ILUSTRATIVOS</span>
+        </div>
+      </section>
+      <div className="ad-note-strip">
+        <LockKeyhole size={14} />
+        <span>
+          Sin persistencia · sin backend · sin registros de auditoría reales.
+        </span>
+      </div>
+    </div>
+  );
 }
 
-function GalleryModal({ product, views, principalView, setPrincipalView, close, add, remove, move }: {
-  product: DemoProduct; views: number[]; principalView: number; setPrincipalView: (n: number) => void;
-  close: () => void; add: () => void; remove: (index: number) => void; move: (index: number, direction: -1 | 1) => void;
+function GalleryModal({
+  product,
+  views,
+  principalView,
+  setPrincipalView,
+  close,
+  add,
+  remove,
+  move,
+}: {
+  product: DemoProduct;
+  views: number[];
+  principalView: number;
+  setPrincipalView: (n: number) => void;
+  close: () => void;
+  add: () => void;
+  remove: (index: number) => void;
+  move: (index: number, direction: -1 | 1) => void;
 }) {
-  return <div className="ad-modal-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) close(); }}>
-    <section className="ad-gallery-modal" role="dialog" aria-modal="true" aria-labelledby="gallery-title"><header className="ad-gallery-header"><div><span className="ad-eyebrow">CATÁLOGO · GESTIÓN VISUAL</span><h2 id="gallery-title">Galería de producto</h2><p>{product.name} <span>·</span> {product.reference}</p></div><button className="ad-icon-button" onClick={close} aria-label="Cerrar galería"><X size={18} /></button></header>
-      <div className="ad-gallery-disclaimer"><ImagePlus size={15} /><span>Vista previa de hasta cuatro imágenes. El orden, la imagen principal y los borrados solo duran esta sesión.</span><b>NO PERSISTENTE</b></div>
-      <div className="ad-gallery-main"><div className="ad-gallery-large"><div className="ad-gallery-backdrop"><PerfumeBottle tone={product.tone} label={product.name} view={views[principalView] ?? 0} /></div><span className="ad-gallery-large-tag">VISTA {String(principalView + 1).padStart(2, "0")} · {principalView === 0 ? "FRASCO" : principalView === 1 ? "DETALLE" : principalView === 2 ? "ETIQUETA" : "ESTUCHE"}</span><span className="ad-principal-badge"><Check size={12} /> Principal</span></div>
-        <aside className="ad-gallery-details"><span className="ad-eyebrow">PRODUCTO DEMO</span><h3>{product.name}</h3><p>{product.category} · {product.size} · {product.concentration}</p><div className="ad-gallery-views-label"><b>Vistas disponibles</b><span>{views.length} / 4</span></div><div className="ad-gallery-thumbs">{views.map((view, i) => <div className={`ad-gallery-thumb ${principalView === i ? "selected" : ""}`} key={`${view}-${i}`}><button className="ad-thumb-select" onClick={() => setPrincipalView(i)} aria-label={`Elegir vista ${i + 1}${principalView === i ? ", principal" : ""}`}><PerfumeBottle tone={product.tone} label={product.name} view={view} /><span>{principalView === i && <Check size={12} />} {["Frasco", "Detalle", "Etiqueta", "Estuche"][view]}</span></button><button className="ad-thumb-delete" aria-label={`Eliminar vista ${i + 1}`} onClick={() => remove(i)}><Trash2 size={13} /></button>{i > 0 && <button className="ad-thumb-move" aria-label={`Mover vista ${i + 1} antes`} onClick={() => move(i, -1)}><ChevronLeft size={12} /></button>}{i < views.length - 1 && <button className="ad-thumb-move ad-thumb-move-next" aria-label={`Mover vista ${i + 1} después`} onClick={() => move(i, 1)}><ChevronRight size={12} /></button>}</div>)}
-          {views.length < 4 && <button className="ad-add-view" onClick={add}><ImagePlus size={16} /><span>Añadir vista<br /><small>Solo en esta sesión</small></span></button>}</div>
-          <div className="ad-gallery-local-note"><LockKeyhole size={13} /> Ningún cambio se guarda.</div>
-          <button className="ad-primary ad-gallery-close" onClick={close}>Listo <Check size={15} /></button>
-        </aside>
-      </div>
-    </section>
-  </div>;
+  return (
+    <div
+      className="ad-modal-backdrop"
+      role="presentation"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) close();
+      }}
+    >
+      <section
+        className="ad-gallery-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gallery-title"
+      >
+        <header className="ad-gallery-header">
+          <div>
+            <span className="ad-eyebrow">CATÁLOGO · GESTIÓN VISUAL</span>
+            <h2 id="gallery-title">Galería de producto</h2>
+            <p>
+              {product.name} <span>·</span> {product.reference}
+            </p>
+          </div>
+          <button
+            className="ad-icon-button"
+            onClick={close}
+            aria-label="Cerrar galería"
+          >
+            <X size={18} />
+          </button>
+        </header>
+        <div className="ad-gallery-disclaimer">
+          <ImagePlus size={15} />
+          <span>
+            Vista previa de hasta cuatro imágenes. El orden, la imagen principal
+            y los borrados solo duran esta sesión.
+          </span>
+          <b>NO PERSISTENTE</b>
+        </div>
+        <div className="ad-gallery-main">
+          <div className="ad-gallery-large">
+            <div className="ad-gallery-backdrop">
+              <PerfumeBottle
+                tone={product.tone}
+                label={product.name}
+                view={views[principalView] ?? 0}
+              />
+            </div>
+            <span className="ad-gallery-large-tag">
+              VISTA {String(principalView + 1).padStart(2, "0")} ·{" "}
+              {principalView === 0
+                ? "FRASCO"
+                : principalView === 1
+                  ? "DETALLE"
+                  : principalView === 2
+                    ? "ETIQUETA"
+                    : "ESTUCHE"}
+            </span>
+            <span className="ad-principal-badge">
+              <Check size={12} /> Principal
+            </span>
+          </div>
+          <aside className="ad-gallery-details">
+            <span className="ad-eyebrow">PRODUCTO DEMO</span>
+            <h3>{product.name}</h3>
+            <p>
+              {product.category} · {product.size} · {product.concentration}
+            </p>
+            <div className="ad-gallery-views-label">
+              <b>Vistas disponibles</b>
+              <span>{views.length} / 4</span>
+            </div>
+            <div className="ad-gallery-thumbs">
+              {views.map((view, i) => (
+                <div
+                  className={`ad-gallery-thumb ${principalView === i ? "selected" : ""}`}
+                  key={`${view}-${i}`}
+                >
+                  <button
+                    className="ad-thumb-select"
+                    onClick={() => setPrincipalView(i)}
+                    aria-label={`Elegir vista ${i + 1}${principalView === i ? ", principal" : ""}`}
+                  >
+                    <PerfumeBottle
+                      tone={product.tone}
+                      label={product.name}
+                      view={view}
+                    />
+                    <span>
+                      {principalView === i && <Check size={12} />}{" "}
+                      {["Frasco", "Detalle", "Etiqueta", "Estuche"][view]}
+                    </span>
+                  </button>
+                  <button
+                    className="ad-thumb-delete"
+                    aria-label={`Eliminar vista ${i + 1}`}
+                    onClick={() => remove(i)}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                  {i > 0 && (
+                    <button
+                      className="ad-thumb-move"
+                      aria-label={`Mover vista ${i + 1} antes`}
+                      onClick={() => move(i, -1)}
+                    >
+                      <ChevronLeft size={12} />
+                    </button>
+                  )}
+                  {i < views.length - 1 && (
+                    <button
+                      className="ad-thumb-move ad-thumb-move-next"
+                      aria-label={`Mover vista ${i + 1} después`}
+                      onClick={() => move(i, 1)}
+                    >
+                      <ChevronRight size={12} />
+                    </button>
+                  )}
+                </div>
+              ))}
+              {views.length < 4 && (
+                <button className="ad-add-view" onClick={add}>
+                  <ImagePlus size={16} />
+                  <span>
+                    Añadir vista
+                    <br />
+                    <small>Solo en esta sesión</small>
+                  </span>
+                </button>
+              )}
+            </div>
+            <div className="ad-gallery-local-note">
+              <LockKeyhole size={13} /> Ningún cambio se guarda.
+            </div>
+            <button className="ad-primary ad-gallery-close" onClick={close}>
+              Listo <Check size={15} />
+            </button>
+          </aside>
+        </div>
+      </section>
+    </div>
+  );
 }
 
 const styles = `

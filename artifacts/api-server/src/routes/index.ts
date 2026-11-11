@@ -103,6 +103,25 @@ router.put("/orders/:id/status", async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     
+    // 1. Obtener el pedido actual para saber qué productos tiene
+    const [currentOrder] = await db.select().from(orders).where(eq(orders.id, Number(id)));
+    if (!currentOrder) return res.status(404).json({ error: "Pedido no encontrado" });
+
+    // 2. Si el nuevo estado es "shipped" (Enviado) y antes no lo era, restamos el stock
+    if (status === "shipped" && currentOrder.status !== "shipped") {
+      const items = await db.select().from(orderItems).where(eq(orderItems.orderId, Number(id)));
+      
+      for (const item of items) {
+        // Buscar el producto por referencia y restar el stock
+        const [product] = await db.select().from(products).where(eq(products.reference, item.reference));
+        if (product) {
+          const newStock = Math.max(0, product.stock - item.quantity);
+          await db.update(products).set({ stock: newStock }).where(eq(products.id, product.id));
+        }
+      }
+    }
+
+    // 3. Actualizar el estado del pedido
     const [updatedOrder] = await db.update(orders).set({ status }).where(eq(orders.id, Number(id))).returning();
     
     res.json({ success: true, order: updatedOrder });
