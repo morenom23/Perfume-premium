@@ -32,12 +32,29 @@ import {
   Youtube,
   X,
 } from "lucide-react";
-import { demoAudiences, demoBrands, demoCategories, demoGalleryViews, demoProducts, formatCop, type DemoProduct } from "./_shared/demoProducts";
+import {
+  demoAudiences,
+  demoBrands,
+  demoCategories,
+  demoGalleryViews,
+  demoProducts,
+  formatCop,
+  type DemoProduct,
+} from "./_shared/demoProducts";
 import { PerfumeBottle } from "./_shared/PerfumeBottle";
 import "./_shared/theme.css";
 import { Admin } from "./Admin";
 
-type Page = "Inicio" | "Catálogo" | "Detalle" | "Marca" | "Envíos y pagos" | "Contacto" | "Carrito" | "Checkout" | "Administración";
+type Page =
+  | "Inicio"
+  | "Catálogo"
+  | "Detalle"
+  | "Marca"
+  | "Envíos y pagos"
+  | "Contacto"
+  | "Carrito"
+  | "Checkout"
+  | "Administración";
 type SortMode = "featured" | "price-low" | "price-high" | "name";
 
 const publicPages: { label: string; page: Page }[] = [
@@ -47,7 +64,8 @@ const publicPages: { label: string; page: Page }[] = [
   { label: "Envíos", page: "Envíos y pagos" },
   { label: "Contacto", page: "Contacto" },
 ];
-const deliveryCopy = "Tus productos llegarán aproximadamente entre 3 y 4 días hábiles después de haber confirmado el pedido. El costo del envío se calcula según tu ubicación";
+const deliveryCopy =
+  "Tus productos llegarán aproximadamente entre 3 y 4 días hábiles después de haber confirmado el pedido. El costo del envío se calcula según tu ubicación";
 
 function DemoFlag({ children = "DEMO" }: { children?: string }) {
   return <span className="tp-demo-flag">{children}</span>;
@@ -65,7 +83,8 @@ function Gallery({
   compact?: boolean;
 }) {
   const touchStart = useRef<number | null>(null);
-  const cycle = (step: number) => setView((view + step + demoGalleryViews.length) % demoGalleryViews.length);
+  const cycle = (step: number) =>
+    setView((view + step + demoGalleryViews.length) % demoGalleryViews.length);
   return (
     <div
       className={`tp-gallery ${compact ? "tp-gallery-compact" : ""}`}
@@ -73,41 +92,92 @@ function Gallery({
       aria-label={`Galería de ${product.name}, vista ${demoGalleryViews[view]}`}
       tabIndex={0}
       onKeyDown={(event) => {
-        if (event.key === "ArrowRight") { event.preventDefault(); cycle(1); }
-        if (event.key === "ArrowLeft") { event.preventDefault(); cycle(-1); }
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          cycle(1);
+        }
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          cycle(-1);
+        }
       }}
-      onTouchStart={(event) => { touchStart.current = event.touches[0]?.clientX ?? null; }}
+      onTouchStart={(event) => {
+        touchStart.current = event.touches[0]?.clientX ?? null;
+      }}
       onTouchEnd={(event) => {
         if (touchStart.current === null) return;
-        const delta = (event.changedTouches[0]?.clientX ?? touchStart.current) - touchStart.current;
+        const delta =
+          (event.changedTouches[0]?.clientX ?? touchStart.current) -
+          touchStart.current;
         if (Math.abs(delta) > 32) cycle(delta < 0 ? 1 : -1);
         touchStart.current = null;
       }}
     >
       <div className="tp-gallery-main">
-        <div className="tp-gallery-glow" style={{ background: `radial-gradient(ellipse at 50% 59%, ${product.tone}45, transparent 68%)` }} />
-        <div className="tp-gallery-number">{String(view + 1).padStart(2, "0")} <span>/ 04</span></div>
-        <PerfumeBottle tone={product.tone} view={view} label={product.name} className="tp-bottle-art" />
+        <div
+          className="tp-gallery-glow"
+          style={{
+            background: `radial-gradient(ellipse at 50% 59%, ${product.tone}45, transparent 68%)`,
+          }}
+        />
+        <div className="tp-gallery-number">
+          {String(view + 1).padStart(2, "0")} <span>/ 04</span>
+        </div>
+        <PerfumeBottle
+          tone={product.tone}
+          view={view}
+          label={product.name}
+          className="tp-bottle-art"
+        />
         {view === 1 && <div className="tp-art-caption">VIDRIO · REFLEJO</div>}
         {view === 2 && <div className="tp-art-caption">ETIQUETA · DETALLE</div>}
-        {view === 3 && <div className="tp-art-caption">ESTUCHE · EDICIÓN DEMO</div>}
+        {view === 3 && (
+          <div className="tp-art-caption">ESTUCHE · EDICIÓN DEMO</div>
+        )}
       </div>
       <div className="tp-gallery-thumbs" aria-label="Vistas del producto">
-        {demoGalleryViews.map((label, index) => index !== view && (
-          <button
-            key={label}
-            type="button"
-            className="tp-gallery-thumb"
-            aria-label={`Ver ${label}`}
-            aria-pressed={false}
-            onClick={(event) => { event.stopPropagation(); setView(index); }}
-          ><PerfumeBottle tone={product.tone} view={index} label={`${product.name}: ${label}`} className="tp-thumb-bottle" /></button>
-        ))}
+        {demoGalleryViews.map(
+          (label, index) =>
+            index !== view && (
+              <button
+                key={label}
+                type="button"
+                className="tp-gallery-thumb"
+                aria-label={`Ver ${label}`}
+                aria-pressed={false}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setView(index);
+                }}
+              >
+                <PerfumeBottle
+                  tone={product.tone}
+                  view={index}
+                  label={`${product.name}: ${label}`}
+                  className="tp-thumb-bottle"
+                />
+              </button>
+            ),
+        )}
       </div>
       {!compact && (
         <>
-          <button type="button" className="tp-gallery-arrow tp-gallery-prev" onClick={() => cycle(-1)} aria-label="Vista anterior"><ChevronLeft size={17} /></button>
-          <button type="button" className="tp-gallery-arrow tp-gallery-next" onClick={() => cycle(1)} aria-label="Vista siguiente"><ChevronRight size={17} /></button>
+          <button
+            type="button"
+            className="tp-gallery-arrow tp-gallery-prev"
+            onClick={() => cycle(-1)}
+            aria-label="Vista anterior"
+          >
+            <ChevronLeft size={17} />
+          </button>
+          <button
+            type="button"
+            className="tp-gallery-arrow tp-gallery-next"
+            onClick={() => cycle(1)}
+            aria-label="Vista siguiente"
+          >
+            <ChevronRight size={17} />
+          </button>
         </>
       )}
     </div>
@@ -137,22 +207,55 @@ function ProductCard({
     <article className="tp-product-card">
       <div className="tp-card-visual">
         <Gallery product={product} view={view} setView={setView} compact />
-        <button type="button" className={`tp-heart ${favorite ? "is-favorite" : ""}`} onClick={onFavorite} aria-label={favorite ? "Quitar de favoritos" : "Guardar en favoritos"} aria-pressed={favorite}>
+        <button
+          type="button"
+          className={`tp-heart ${favorite ? "is-favorite" : ""}`}
+          onClick={onFavorite}
+          aria-label={favorite ? "Quitar de favoritos" : "Guardar en favoritos"}
+          aria-pressed={favorite}
+        >
           <Heart size={17} fill={favorite ? "currentColor" : "none"} />
         </button>
       </div>
       <div className="tp-product-copy">
-        <button type="button" className="tp-product-name" onClick={onOpen}>{product.name}</button>
-        <div className="tp-product-meta"><span>Ref. {product.reference}</span><span>{product.audience} · {product.category}</span></div>
+        <button type="button" className="tp-product-name" onClick={onOpen}>
+          {product.name}
+        </button>
+        <div className="tp-product-meta">
+          <span>Ref. {product.reference}</span>
+          <span>
+            {product.audience} · {product.category}
+          </span>
+        </div>
         <div className="tp-product-bottom">
-          <div><strong>{formatCop(product.price)}</strong><small>PRECIO DEMO</small></div>
-          <button type="button" className={`tp-product-cta ${added ? "is-added" : ""}`} disabled={product.stock === 0} onClick={onAdd}>
-            {product.stock === 0 ? <X size={14} /> : added ? <Check size={14} /> : <ShoppingCart size={14} />}
-            <span>{product.stock === 0 ? "Agotado" : added ? "Agregado" : "Agregar"}</span>
-            <i><ChevronRight size={13} /></i>
+          <div>
+            <strong>{formatCop(product.price)}</strong>
+            <small>PRECIO DEMO</small>
+          </div>
+          <button
+            type="button"
+            className={`tp-product-cta ${added ? "is-added" : ""}`}
+            disabled={product.stock === 0}
+            onClick={onAdd}
+          >
+            {product.stock === 0 ? (
+              <X size={14} />
+            ) : added ? (
+              <Check size={14} />
+            ) : (
+              <ShoppingCart size={14} />
+            )}
+            <span>
+              {product.stock === 0 ? "Agotado" : added ? "Agregado" : "Agregar"}
+            </span>
+            <i>
+              <ChevronRight size={13} />
+            </i>
           </button>
         </div>
-        <div className={`tp-stock ${product.stock === 0 ? "is-out" : ""}`}>{product.status} · DEMO</div>
+        <div className={`tp-stock ${product.stock === 0 ? "is-out" : ""}`}>
+          {product.status} · DEMO
+        </div>
       </div>
     </article>
   );
@@ -160,7 +263,12 @@ function ProductCard({
 
 export function Tienda() {
   const [page, setPage] = useState<Page>("Inicio");
-  const [checkoutData, setCheckoutData] = useState({ name: "", phone: "", city: "", address: "" });
+  const [checkoutData, setCheckoutData] = useState({
+    name: "",
+    phone: "",
+    city: "",
+    address: "",
+  });
   /*const [selected, setSelected] = useState<DemoProduct>(productsData[0]);*/
   const [selected, setSelected] = useState<DemoProduct | null>(null);
   const [productsData, setProductsData] = useState<DemoProduct[]>([]);
@@ -168,7 +276,8 @@ export function Tienda() {
 
   const [search, setSearch] = useState("");
   const [family, setFamily] = useState("Todas las familias");
-  const [audience, setAudience] = useState<(typeof demoAudiences)[number]>("Todos");
+  const [audience, setAudience] =
+    useState<(typeof demoAudiences)[number]>("Todos");
   const [brand, setBrand] = useState("Todas las marcas");
   const [priceRange, setPriceRange] = useState("Todos los precios");
   const [availability, setAvailability] = useState("Todas");
@@ -181,20 +290,26 @@ export function Tienda() {
   const [toast, setToast] = useState("");
   const [clearConfirm, setClearConfirm] = useState(false);
   const [checkoutChecked, setCheckoutChecked] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState<any>(null); // Guardará los datos del pedido exitoso
   const [mobileMenu, setMobileMenu] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
+  useEffect(
+    () => () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    },
+    [],
+  );
 
-    useEffect(() => {
+  useEffect(() => {
     fetch("/api/products")
       .then((res) => res.json())
       .then((data) => {
         const formatted = data.map((p: any) => ({
           ...p,
           id: String(p.id),
-          tone: "#9a68ef", 
-          notes: ["Nota 1", "Nota 2"], 
+          tone: "#9a68ef",
+          notes: ["Nota 1", "Nota 2"],
           status: p.status === "published" ? "Disponible" : "Agotado",
           featured: p.isFeatured,
         }));
@@ -225,16 +340,25 @@ export function Tienda() {
     go("Detalle");
   };
   const toggleFavorite = (id: string) => {
-    const next = favorites.includes(id) ? favorites.filter((item) => item !== id) : [...favorites, id];
+    const next = favorites.includes(id)
+      ? favorites.filter((item) => item !== id)
+      : [...favorites, id];
     setFavorites(next);
-    notify(next.includes(id) ? "Guardado en favoritos · solo en esta vista" : "Retirado de favoritos");
+    notify(
+      next.includes(id)
+        ? "Guardado en favoritos · solo en esta vista"
+        : "Retirado de favoritos",
+    );
   };
   const addToCart = (product: DemoProduct) => {
     if (product.stock <= 0) {
       notify("Esta referencia figura agotada en la DEMO");
       return;
     }
-    setCart((current) => ({ ...current, [product.id]: (current[product.id] ?? 0) + 1 }));
+    setCart((current) => ({
+      ...current,
+      [product.id]: (current[product.id] ?? 0) + 1,
+    }));
     notify(`${product.name} agregado · carrito no persistente`);
   };
   const changeQuantity = (id: string, amount: number) => {
@@ -248,25 +372,46 @@ export function Tienda() {
   };
   const cartItems = productsData.filter((product) => cart[product.id]);
   const cartCount = Object.values(cart).reduce((sum, count) => sum + count, 0);
-  const subtotal = cartItems.reduce((sum, product) => sum + product.price * (cart[product.id] ?? 0), 0);
+  const subtotal = cartItems.reduce(
+    (sum, product) => sum + product.price * (cart[product.id] ?? 0),
+    0,
+  );
   const visibleProducts = productsData
-    .filter((product) => family === "Todas las familias" || product.category === family)
+    .filter(
+      (product) =>
+        family === "Todas las familias" || product.category === family,
+    )
     .filter((product) => audience === "Todos" || product.audience === audience)
-    .filter((product) => brand === "Todas las marcas" || product.brand === brand)
+    .filter(
+      (product) => brand === "Todas las marcas" || product.brand === brand,
+    )
     .filter((product) => {
       if (priceRange === "Menos de $160.000") return product.price < 160000;
-      if (priceRange === "$160.000 a $200.000") return product.price >= 160000 && product.price <= 200000;
+      if (priceRange === "$160.000 a $200.000")
+        return product.price >= 160000 && product.price <= 200000;
       if (priceRange === "Más de $200.000") return product.price > 200000;
       return true;
     })
-    .filter((product) => availability === "Disponibles" ? product.stock > 0 : availability === "Agotados" ? product.stock === 0 : true)
+    .filter((product) =>
+      availability === "Disponibles"
+        ? product.stock > 0
+        : availability === "Agotados"
+          ? product.stock === 0
+          : true,
+    )
     .filter((product) => !favoritesOnly || favorites.includes(product.id))
-    .filter((product) => `${product.name} ${product.reference} ${product.brand} ${product.audience} ${product.category} ${product.notes.join(" ")}`.toLowerCase().includes(search.toLowerCase().trim()))
+    .filter((product) =>
+      `${product.name} ${product.reference} ${product.brand} ${product.audience} ${product.category} ${product.notes.join(" ")}`
+        .toLowerCase()
+        .includes(search.toLowerCase().trim()),
+    )
     .sort((a, b) => {
       if (sort === "price-low") return a.price - b.price;
       if (sort === "price-high") return b.price - a.price;
       if (sort === "name") return a.name.localeCompare(b.name, "es");
-      return Number(b.featured) - Number(a.featured) || a.id.localeCompare(b.id);
+      return (
+        Number(b.featured) - Number(a.featured) || a.id.localeCompare(b.id)
+      );
     });
 
   const navTo = (item: Page) => {
@@ -291,7 +436,9 @@ export function Tienda() {
           key={product.id}
           product={product}
           view={cardViews[product.id] ?? 0}
-          setView={(view) => setCardViews((current) => ({ ...current, [product.id]: view }))}
+          setView={(view) =>
+            setCardViews((current) => ({ ...current, [product.id]: view }))
+          }
           favorite={favorites.includes(product.id)}
           onFavorite={() => toggleFavorite(product.id)}
           onOpen={() => openProduct(product)}
@@ -303,37 +450,171 @@ export function Tienda() {
   );
 
   const renderCatalog = (home = false) => {
-    const products = home ? visibleProducts.filter((product) => product.featured).slice(0, 4) : visibleProducts;
+    const products = home
+      ? visibleProducts.filter((product) => product.featured).slice(0, 4)
+      : visibleProducts;
     return (
       <section className="tp-catalog-section" id="catalogo">
         <div className="tp-section-heading">
           <div>
-            <div className="tp-eyebrow"><span className="tp-eyebrow-line" /> {home ? "FRAGANCIAS SELECCIONADAS · DEMO" : "DESCUBRE TU PRÓXIMA FRAGANCIA"}</div>
-            <h2>{home ? <>Nuestro <em>Catálogo</em></> : <>Encuentra tu <em>fragancia</em></>}</h2>
+            <div className="tp-eyebrow">
+              <span className="tp-eyebrow-line" />{" "}
+              {home
+                ? "FRAGANCIAS SELECCIONADAS · DEMO"
+                : "DESCUBRE TU PRÓXIMA FRAGANCIA"}
+            </div>
+            <h2>
+              {home ? (
+                <>
+                  Nuestro <em>Catálogo</em>
+                </>
+              ) : (
+                <>
+                  Encuentra tu <em>fragancia</em>
+                </>
+              )}
+            </h2>
           </div>
           {home ? (
-            <button type="button" className="tp-text-link" onClick={() => go("Catálogo")}>Ver todo el catálogo <span className="tp-round-arrow"><ArrowRight size={14} /></span></button>
-          ) : <p className="tp-section-note">12 referencias ficticias para explorar esta experiencia visual.</p>}
+            <button
+              type="button"
+              className="tp-text-link"
+              onClick={() => go("Catálogo")}
+            >
+              Ver todo el catálogo{" "}
+              <span className="tp-round-arrow">
+                <ArrowRight size={14} />
+              </span>
+            </button>
+          ) : (
+            <p className="tp-section-note">
+              12 referencias ficticias para explorar esta experiencia visual.
+            </p>
+          )}
         </div>
         {!home && (
           <>
-            <div className="tp-audience-filter" role="group" aria-label="¿Para quién?">
+            <div
+              className="tp-audience-filter"
+              role="group"
+              aria-label="¿Para quién?"
+            >
               <span>¿Para quién?</span>
-              {demoAudiences.map((item) => <button key={item} type="button" className={audience === item ? "is-active" : ""} aria-pressed={audience === item} onClick={() => setAudience(item)}>{item}</button>)}
+              {demoAudiences.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={audience === item ? "is-active" : ""}
+                  aria-pressed={audience === item}
+                  onClick={() => setAudience(item)}
+                >
+                  {item}
+                </button>
+              ))}
             </div>
             <div className="tp-catalog-tools">
-              <label className="tp-filter-select"><span>Marca</span><select value={brand} onChange={(event) => setBrand(event.target.value)}><option>Todas las marcas</option>{demoBrands.map((item) => <option key={item}>{item}</option>)}</select><ChevronDown size={13} /></label>
-              <label className="tp-filter-select"><span>Precio</span><select value={priceRange} onChange={(event) => setPriceRange(event.target.value)}><option>Todos los precios</option><option>Menos de $160.000</option><option>$160.000 a $200.000</option><option>Más de $200.000</option></select><ChevronDown size={13} /></label>
-              <label className="tp-filter-select"><span>Disponibilidad</span><select value={availability} onChange={(event) => setAvailability(event.target.value)}><option>Todas</option><option>Disponibles</option><option>Agotados</option></select><ChevronDown size={13} /></label>
-              <button type="button" className={`tp-filter-chip ${favoritesOnly ? "is-selected" : ""}`} onClick={() => setFavoritesOnly(!favoritesOnly)}><Heart size={14} fill={favoritesOnly ? "currentColor" : "none"} /> Favoritos <span>{favorites.length}</span></button>
-              <label className="tp-sort"><ArrowDownWideNarrow size={15} /><select value={sort} onChange={(event) => setSort(event.target.value as SortMode)} aria-label="Ordenar productos"><option value="featured">Destacados</option><option value="price-low">Precio: menor a mayor</option><option value="price-high">Precio: mayor a menor</option><option value="name">Nombre A–Z</option></select><ChevronDown size={14} /></label>
+              <label className="tp-filter-select">
+                <span>Marca</span>
+                <select
+                  value={brand}
+                  onChange={(event) => setBrand(event.target.value)}
+                >
+                  <option>Todas las marcas</option>
+                  {demoBrands.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+                <ChevronDown size={13} />
+              </label>
+              <label className="tp-filter-select">
+                <span>Precio</span>
+                <select
+                  value={priceRange}
+                  onChange={(event) => setPriceRange(event.target.value)}
+                >
+                  <option>Todos los precios</option>
+                  <option>Menos de $160.000</option>
+                  <option>$160.000 a $200.000</option>
+                  <option>Más de $200.000</option>
+                </select>
+                <ChevronDown size={13} />
+              </label>
+              <label className="tp-filter-select">
+                <span>Disponibilidad</span>
+                <select
+                  value={availability}
+                  onChange={(event) => setAvailability(event.target.value)}
+                >
+                  <option>Todas</option>
+                  <option>Disponibles</option>
+                  <option>Agotados</option>
+                </select>
+                <ChevronDown size={13} />
+              </label>
+              <button
+                type="button"
+                className={`tp-filter-chip ${favoritesOnly ? "is-selected" : ""}`}
+                onClick={() => setFavoritesOnly(!favoritesOnly)}
+              >
+                <Heart
+                  size={14}
+                  fill={favoritesOnly ? "currentColor" : "none"}
+                />{" "}
+                Favoritos <span>{favorites.length}</span>
+              </button>
+              <label className="tp-sort">
+                <ArrowDownWideNarrow size={15} />
+                <select
+                  value={sort}
+                  onChange={(event) => setSort(event.target.value as SortMode)}
+                  aria-label="Ordenar productos"
+                >
+                  <option value="featured">Destacados</option>
+                  <option value="price-low">Precio: menor a mayor</option>
+                  <option value="price-high">Precio: mayor a menor</option>
+                  <option value="name">Nombre A–Z</option>
+                </select>
+                <ChevronDown size={14} />
+              </label>
             </div>
           </>
         )}
-        {!home && <div className="tp-family-list" aria-label="Filtrar por familia olfativa">{demoCategories.map((category) => <button key={category} type="button" onClick={() => setFamily(category)} className={family === category ? "is-active" : ""}>{category}</button>)}</div>}
-        {!home && <div className="tp-results-line"><span>{products.length.toString().padStart(2, "0")} FRAGANCIAS</span><span>PRECIOS Y DISPONIBILIDAD FICTICIOS · DEMO</span></div>}
-        {products.length ? renderProductGrid(products) : (
-          <div className="tp-empty-state"><Sparkles size={22} /><h3>Sin coincidencias por ahora.</h3><p>Prueba otra nota, familia o filtro.</p><button type="button" onClick={clearFilters}>Limpiar filtros <ArrowRight size={14} /></button></div>
+        {!home && (
+          <div
+            className="tp-family-list"
+            aria-label="Filtrar por familia olfativa"
+          >
+            {demoCategories.map((category) => (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setFamily(category)}
+                className={family === category ? "is-active" : ""}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        )}
+        {!home && (
+          <div className="tp-results-line">
+            <span>
+              {products.length.toString().padStart(2, "0")} FRAGANCIAS
+            </span>
+            <span>PRECIOS Y DISPONIBILIDAD FICTICIOS · DEMO</span>
+          </div>
+        )}
+        {products.length ? (
+          renderProductGrid(products)
+        ) : (
+          <div className="tp-empty-state">
+            <Sparkles size={22} />
+            <h3>Sin coincidencias por ahora.</h3>
+            <p>Prueba otra nota, familia o filtro.</p>
+            <button type="button" onClick={clearFilters}>
+              Limpiar filtros <ArrowRight size={14} />
+            </button>
+          </div>
         )}
       </section>
     );
@@ -343,19 +624,69 @@ export function Tienda() {
     <>
       <section className="tp-hero">
         <div className="tp-hero-copy">
-          <div className="tp-eyebrow"><span className="tp-eyebrow-line" /> ESENCIA QUE INSPIRA</div>
-          <h1>Fragancias que<br /><em>Dejan Huella</em></h1>
-          <p>Descubre el poder de un aroma único y hazlo parte de tu historia.</p>
-          <div className="tp-hero-actions"><button type="button" className="tp-button-primary" onClick={() => go("Catálogo")}>Explorar Catálogo <ArrowRight size={16} /></button></div>
+          <div className="tp-eyebrow">
+            <span className="tp-eyebrow-line" /> ESENCIA QUE INSPIRA
+          </div>
+          <h1>
+            Fragancias que
+            <br />
+            <em>Dejan Huella</em>
+          </h1>
+          <p>
+            Descubre el poder de un aroma único y hazlo parte de tu historia.
+          </p>
+          <div className="tp-hero-actions">
+            <button
+              type="button"
+              className="tp-button-primary"
+              onClick={() => go("Catálogo")}
+            >
+              Explorar Catálogo <ArrowRight size={16} />
+            </button>
+          </div>
         </div>
-        <div className="tp-hero-indicators" aria-label="Indicadores visuales de la portada"><span className="is-active" /><span /><span /><span /></div>
+        <div
+          className="tp-hero-indicators"
+          aria-label="Indicadores visuales de la portada"
+        >
+          <span className="is-active" />
+          <span />
+          <span />
+          <span />
+        </div>
       </section>
       {renderCatalog(true)}
       <section className="tp-benefits" aria-label="Beneficios de la tienda">
-        <div className="tp-benefit"><Truck size={27} /><span><strong>Envíos a todo el país</strong><small>3 a 4 días hábiles · DEMO</small></span></div>
-        <div className="tp-benefit"><ShieldCheck size={27} /><span><strong>Compra segura</strong><small>Prototipo visual · sin transacciones</small></span></div>
-        <div className="tp-benefit"><Headphones size={27} /><span><strong>Atención personalizada</strong><small>Canal de atención por configurar</small></span></div>
-        <button type="button" className="tp-whatsapp-demo" onClick={() => notify("WhatsApp es solo demostrativo en esta fase.")}><MessageCircle size={19} /><span>Comprar por WhatsApp</span><ArrowRight size={16} /></button>
+        <div className="tp-benefit">
+          <Truck size={27} />
+          <span>
+            <strong>Envíos a todo el país</strong>
+            <small>3 a 4 días hábiles · DEMO</small>
+          </span>
+        </div>
+        <div className="tp-benefit">
+          <ShieldCheck size={27} />
+          <span>
+            <strong>Compra segura</strong>
+            <small>Prototipo visual · sin transacciones</small>
+          </span>
+        </div>
+        <div className="tp-benefit">
+          <Headphones size={27} />
+          <span>
+            <strong>Atención personalizada</strong>
+            <small>Canal de atención por configurar</small>
+          </span>
+        </div>
+        <button
+          type="button"
+          className="tp-whatsapp-demo"
+          onClick={() => notify("WhatsApp es solo demostrativo en esta fase.")}
+        >
+          <MessageCircle size={19} />
+          <span>Comprar por WhatsApp</span>
+          <ArrowRight size={16} />
+        </button>
       </section>
       <section className="tp-discovery">
         <div className="tp-discovery-visual">
@@ -364,207 +695,1095 @@ export function Tienda() {
           <div className="tp-note-orbit orbit-a">FLORAL</div>
           <div className="tp-note-orbit orbit-b">FRESCA</div>
           <div className="tp-note-orbit orbit-c">AMADERADA</div>
-          <PerfumeBottle tone="#a782d0" view={0} label="Perfume ilustrativo" className="tp-discovery-bottle" />
+          <PerfumeBottle
+            tone="#a782d0"
+            view={0}
+            label="Perfume ilustrativo"
+            className="tp-discovery-bottle"
+          />
         </div>
         <div className="tp-discovery-copy">
-          <div className="tp-eyebrow"><span className="tp-eyebrow-line" /> UNA GUÍA SIN PRISA</div>
-          <h2>El perfume no se elige.<br /><em>Te encuentra.</em></h2>
-          <p>Empieza por las notas que te atraen, las sensaciones que quieres llevar contigo y la familia olfativa que mejor expresa tu personalidad.</p>
-          <button type="button" className="tp-button-outline" onClick={() => { setFamily("Todas las familias"); go("Catálogo"); }}>Encuentra tu familia <ArrowRight size={15} /></button>
-          <span className="tp-discovery-foot">EXPLORA LAS FAMILIAS OLFATIVAS · DEMO</span>
+          <div className="tp-eyebrow">
+            <span className="tp-eyebrow-line" /> UNA GUÍA SIN PRISA
+          </div>
+          <h2>
+            El perfume no se elige.
+            <br />
+            <em>Te encuentra.</em>
+          </h2>
+          <p>
+            Empieza por las notas que te atraen, las sensaciones que quieres
+            llevar contigo y la familia olfativa que mejor expresa tu
+            personalidad.
+          </p>
+          <button
+            type="button"
+            className="tp-button-outline"
+            onClick={() => {
+              setFamily("Todas las familias");
+              go("Catálogo");
+            }}
+          >
+            Encuentra tu familia <ArrowRight size={15} />
+          </button>
+          <span className="tp-discovery-foot">
+            EXPLORA LAS FAMILIAS OLFATIVAS · DEMO
+          </span>
         </div>
       </section>
       <section className="tp-quote-band">
         <div className="tp-quote-mark">“</div>
-        <p>Una fragancia es un lugar<br />al que siempre puedes volver</p>
-        <div className="tp-quote-caption">TU PERFUMERÍA <span>—</span> UNA IDEA PARA EXPLORAR</div>
+        <p>
+          Una fragancia es un lugar
+          <br />
+          al que siempre puedes volver
+        </p>
+        <div className="tp-quote-caption">
+          TU PERFUMERÍA <span>—</span> UNA IDEA PARA EXPLORAR
+        </div>
       </section>
       <section className="tp-family-preview">
         <div className="tp-family-preview-head">
-          <div><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> EXPLORA POR SENSACIÓN</div><h2>¿Qué te <em>llama?</em></h2></div>
-          <button type="button" className="tp-text-link" onClick={() => { setFamily("Todas las familias"); go("Catálogo"); }}>Ver todas las familias <ArrowRight size={15} /></button>
+          <div>
+            <div className="tp-eyebrow">
+              <span className="tp-eyebrow-line" /> EXPLORA POR SENSACIÓN
+            </div>
+            <h2>
+              ¿Qué te <em>llama?</em>
+            </h2>
+          </div>
+          <button
+            type="button"
+            className="tp-text-link"
+            onClick={() => {
+              setFamily("Todas las familias");
+              go("Catálogo");
+            }}
+          >
+            Ver todas las familias <ArrowRight size={15} />
+          </button>
         </div>
-        <div className="tp-family-tiles">{["Floral", "Oriental", "Fresca", "Amaderada", "Cítrica", "Dulce"].map((item, index) => <button type="button" key={item} className={`tp-family-tile family-${index}`} onClick={() => { setFamily(item); go("Catálogo"); }}><span>0{index + 1}</span><strong>{item}</strong><ArrowUpRight size={17} /></button>)}</div>
+        <div className="tp-family-tiles">
+          {[
+            "Floral",
+            "Oriental",
+            "Fresca",
+            "Amaderada",
+            "Cítrica",
+            "Dulce",
+          ].map((item, index) => (
+            <button
+              type="button"
+              key={item}
+              className={`tp-family-tile family-${index}`}
+              onClick={() => {
+                setFamily(item);
+                go("Catálogo");
+              }}
+            >
+              <span>0{index + 1}</span>
+              <strong>{item}</strong>
+              <ArrowUpRight size={17} />
+            </button>
+          ))}
+        </div>
       </section>
     </>
   );
 
   const renderDetail = () => (
     <section className="tp-detail-page">
-      <div className="tp-breadcrumb"><button type="button" onClick={() => go("Inicio")}>Inicio</button><span>/</span><button type="button" onClick={() => go("Catálogo")}>Catálogo</button><span>/</span><span>{selected.name}</span></div>
+      <div className="tp-breadcrumb">
+        <button type="button" onClick={() => go("Inicio")}>
+          Inicio
+        </button>
+        <span>/</span>
+        <button type="button" onClick={() => go("Catálogo")}>
+          Catálogo
+        </button>
+        <span>/</span>
+        <span>{selected.name}</span>
+      </div>
       <div className="tp-detail-layout">
-        <div className="tp-detail-gallery"><Gallery product={selected} view={detailView} setView={setDetailView} /><div className="tp-gallery-labels">{demoGalleryViews.map((label, index) => <button key={label} type="button" className={detailView === index ? "is-active" : ""} onClick={() => setDetailView(index)}><span>0{index + 1}</span>{label}</button>)}</div><span className="tp-swipe-hint">← DESLIZA O USA LAS FLECHAS DEL TECLADO →</span></div>
-        <div className="tp-detail-info"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> {selected.category.toUpperCase()} · {selected.reference} · DEMO</div><h1>{selected.name}<em>DEMO</em></h1><div className="tp-detail-rule" /><p className="tp-detail-desc">{selected.description} Una lectura sensorial provisional, creada para esta experiencia de demostración.</p><div className="tp-detail-tags">{selected.notes.map((note) => <span key={note}>{note}</span>)}</div><div className="tp-detail-specs"><div><span>CONCENTRACIÓN</span><strong>{selected.concentration}</strong></div><div><span>CONTENIDO</span><strong>{selected.size}</strong></div><div><span>FAMILIA</span><strong>{selected.category}</strong></div></div><div className="tp-detail-price">{formatCop(selected.price)} <DemoFlag>PRECIO DEMO</DemoFlag></div><div className="tp-detail-stock"><span className={selected.stock ? "tp-stock-dot" : "tp-stock-dot out"} />{selected.status} · stock ficticio: {selected.stock}</div><div className="tp-detail-actions"><button type="button" className="tp-button-primary" onClick={() => addToCart(selected)} disabled={selected.stock === 0}>{selected.stock === 0 ? "Agotado en DEMO" : "Agregar al carrito"} <ShoppingBag size={16} /></button><button type="button" className={`tp-detail-fav ${favorites.includes(selected.id) ? "is-favorite" : ""}`} onClick={() => toggleFavorite(selected.id)} aria-label="Guardar en favoritos"><Heart size={19} fill={favorites.includes(selected.id) ? "currentColor" : "none"} /></button></div><p className="tp-demo-disclaimer"><ShieldCheck size={14} /> Compra y disponibilidad no reales. Prototipo no transaccional.</p><button type="button" className="tp-next-product" onClick={() => openProduct(productsData[(productsData.findIndex((item) => item.id === selected.id) + 1) % productsData.length])}>SIGUIENTE FRAGANCIA <ArrowRight size={14} /></button></div>
+        <div className="tp-detail-gallery">
+          <Gallery
+            product={selected}
+            view={detailView}
+            setView={setDetailView}
+          />
+          <div className="tp-gallery-labels">
+            {demoGalleryViews.map((label, index) => (
+              <button
+                key={label}
+                type="button"
+                className={detailView === index ? "is-active" : ""}
+                onClick={() => setDetailView(index)}
+              >
+                <span>0{index + 1}</span>
+                {label}
+              </button>
+            ))}
+          </div>
+          <span className="tp-swipe-hint">
+            ← DESLIZA O USA LAS FLECHAS DEL TECLADO →
+          </span>
+        </div>
+        <div className="tp-detail-info">
+          <div className="tp-eyebrow">
+            <span className="tp-eyebrow-line" />{" "}
+            {selected.category.toUpperCase()} · {selected.reference} · DEMO
+          </div>
+          <h1>
+            {selected.name}
+            <em>DEMO</em>
+          </h1>
+          <div className="tp-detail-rule" />
+          <p className="tp-detail-desc">
+            {selected.description} Una lectura sensorial provisional, creada
+            para esta experiencia de demostración.
+          </p>
+          <div className="tp-detail-tags">
+            {selected.notes.map((note) => (
+              <span key={note}>{note}</span>
+            ))}
+          </div>
+          <div className="tp-detail-specs">
+            <div>
+              <span>CONCENTRACIÓN</span>
+              <strong>{selected.concentration}</strong>
+            </div>
+            <div>
+              <span>CONTENIDO</span>
+              <strong>{selected.size}</strong>
+            </div>
+            <div>
+              <span>FAMILIA</span>
+              <strong>{selected.category}</strong>
+            </div>
+          </div>
+          <div className="tp-detail-price">
+            {formatCop(selected.price)} <DemoFlag>PRECIO DEMO</DemoFlag>
+          </div>
+          <div className="tp-detail-stock">
+            <span
+              className={selected.stock ? "tp-stock-dot" : "tp-stock-dot out"}
+            />
+            {selected.status} · stock ficticio: {selected.stock}
+          </div>
+          <div className="tp-detail-actions">
+            <button
+              type="button"
+              className="tp-button-primary"
+              onClick={() => addToCart(selected)}
+              disabled={selected.stock === 0}
+            >
+              {selected.stock === 0 ? "Agotado en DEMO" : "Agregar al carrito"}{" "}
+              <ShoppingBag size={16} />
+            </button>
+            <button
+              type="button"
+              className={`tp-detail-fav ${favorites.includes(selected.id) ? "is-favorite" : ""}`}
+              onClick={() => toggleFavorite(selected.id)}
+              aria-label="Guardar en favoritos"
+            >
+              <Heart
+                size={19}
+                fill={favorites.includes(selected.id) ? "currentColor" : "none"}
+              />
+            </button>
+          </div>
+          <p className="tp-demo-disclaimer">
+            <ShieldCheck size={14} /> Compra y disponibilidad no reales.
+            Prototipo no transaccional.
+          </p>
+          <button
+            type="button"
+            className="tp-next-product"
+            onClick={() =>
+              openProduct(
+                productsData[
+                  (productsData.findIndex((item) => item.id === selected.id) +
+                    1) %
+                    productsData.length
+                ],
+              )
+            }
+          >
+            SIGUIENTE FRAGANCIA <ArrowRight size={14} />
+          </button>
+        </div>
       </div>
     </section>
   );
 
   const renderCart = () => (
     <section className="tp-page-shell tp-cart-page">
-      <div className="tp-eyebrow"><span className="tp-eyebrow-line" /> TU SELECCIÓN · NO PERSISTENTE</div><h1>Tu <em>carrito.</em></h1>
-      <div className="tp-cart-layout"><div className="tp-cart-items">
-        {cartItems.length ? cartItems.map((product) => (
-          <div className="tp-cart-row" key={product.id}><div className="tp-cart-thumb"><PerfumeBottle tone={product.tone} view={0} label={product.name} /></div><div className="tp-cart-product"><span>{product.category} · {product.reference}</span><button type="button" onClick={() => openProduct(product)}>{product.name} <DemoFlag /></button><small>{product.size} · {product.concentration}</small></div><div className="tp-quantity"><button type="button" onClick={() => changeQuantity(product.id, -1)} aria-label="Restar cantidad"><Minus size={14} /></button><span>{cart[product.id]}</span><button type="button" onClick={() => changeQuantity(product.id, 1)} aria-label="Sumar cantidad"><Plus size={14} /></button></div><div className="tp-cart-price">{formatCop(product.price * (cart[product.id] ?? 0))}<small>SUBTOTAL DEMO</small></div><button type="button" className="tp-remove-item" onClick={() => setCart((current) => { const next = { ...current }; delete next[product.id]; return next; })} aria-label={`Eliminar ${product.name}`}><Trash2 size={16} /></button></div>
-        )) : <div className="tp-cart-empty"><ShoppingBag size={27} /><h2>Tu carrito está en pausa.</h2><p>Explora las fragancias y guarda aquí tus favoritas para esta sesión.</p><button type="button" className="tp-button-outline" onClick={() => go("Catálogo")}>Ir al catálogo <ArrowRight size={15} /></button></div>}
-        {cartItems.length > 0 && <div className="tp-cart-controls"><button type="button" className="tp-text-link" onClick={() => go("Catálogo")}><ArrowLeft size={14} /> Seguir explorando</button><button type="button" className="tp-clear-cart" onClick={() => setClearConfirm(true)}><Trash2 size={14} /> Vaciar carrito</button></div>}
-      </div><aside className="tp-cart-summary"><span className="tp-summary-kicker">RESUMEN · DEMO</span><div className="tp-summary-line"><span>Productos ({cartCount})</span><strong>{formatCop(subtotal)}</strong></div><div className="tp-summary-shipping">+ envío según ubicación</div><div className="tp-summary-total"><span>Subtotal de productos</span><strong>{formatCop(subtotal)}</strong></div><button type="button" className="tp-button-primary tp-checkout-button" disabled={!cartCount} onClick={() => go("Checkout")}>Continuar a demostración <ArrowRight size={16} /></button><p><ShieldCheck size={14} /> No se realizará ningún pago ni pedido.</p><div className="tp-summary-delivery"><Truck size={16} /><span>{deliveryCopy}</span></div></aside></div>
-      {clearConfirm && <div className="tp-confirm-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setClearConfirm(false); }}><div className="tp-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="clear-title"><button type="button" className="tp-dialog-close" onClick={() => setClearConfirm(false)} aria-label="Cerrar"><X size={18} /></button><div className="tp-dialog-icon"><Trash2 size={20} /></div><h2 id="clear-title">¿Empezar de nuevo?</h2><p>Esto quitará todos los productos de tu carrito de demostración.</p><div><button type="button" className="tp-button-quiet" onClick={() => setClearConfirm(false)}>Conservar selección</button><button type="button" className="tp-button-primary" onClick={() => { setCart({}); setClearConfirm(false); notify("Carrito vacío · cambio solo local"); }}>Sí, vaciar carrito</button></div></div></div>}
+      <div className="tp-eyebrow">
+        <span className="tp-eyebrow-line" /> TU SELECCIÓN · NO PERSISTENTE
+      </div>
+      <h1>
+        Tu <em>carrito.</em>
+      </h1>
+      <div className="tp-cart-layout">
+        <div className="tp-cart-items">
+          {cartItems.length ? (
+            cartItems.map((product) => (
+              <div className="tp-cart-row" key={product.id}>
+                <div className="tp-cart-thumb">
+                  <PerfumeBottle
+                    tone={product.tone}
+                    view={0}
+                    label={product.name}
+                  />
+                </div>
+                <div className="tp-cart-product">
+                  <span>
+                    {product.category} · {product.reference}
+                  </span>
+                  <button type="button" onClick={() => openProduct(product)}>
+                    {product.name} <DemoFlag />
+                  </button>
+                  <small>
+                    {product.size} · {product.concentration}
+                  </small>
+                </div>
+                <div className="tp-quantity">
+                  <button
+                    type="button"
+                    onClick={() => changeQuantity(product.id, -1)}
+                    aria-label="Restar cantidad"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span>{cart[product.id]}</span>
+                  <button
+                    type="button"
+                    onClick={() => changeQuantity(product.id, 1)}
+                    aria-label="Sumar cantidad"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
+                <div className="tp-cart-price">
+                  {formatCop(product.price * (cart[product.id] ?? 0))}
+                  <small>SUBTOTAL DEMO</small>
+                </div>
+                <button
+                  type="button"
+                  className="tp-remove-item"
+                  onClick={() =>
+                    setCart((current) => {
+                      const next = { ...current };
+                      delete next[product.id];
+                      return next;
+                    })
+                  }
+                  aria-label={`Eliminar ${product.name}`}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="tp-cart-empty">
+              <ShoppingBag size={27} />
+              <h2>Tu carrito está en pausa.</h2>
+              <p>
+                Explora las fragancias y guarda aquí tus favoritas para esta
+                sesión.
+              </p>
+              <button
+                type="button"
+                className="tp-button-outline"
+                onClick={() => go("Catálogo")}
+              >
+                Ir al catálogo <ArrowRight size={15} />
+              </button>
+            </div>
+          )}
+          {cartItems.length > 0 && (
+            <div className="tp-cart-controls">
+              <button
+                type="button"
+                className="tp-text-link"
+                onClick={() => go("Catálogo")}
+              >
+                <ArrowLeft size={14} /> Seguir explorando
+              </button>
+              <button
+                type="button"
+                className="tp-clear-cart"
+                onClick={() => setClearConfirm(true)}
+              >
+                <Trash2 size={14} /> Vaciar carrito
+              </button>
+            </div>
+          )}
+        </div>
+        <aside className="tp-cart-summary">
+          <span className="tp-summary-kicker">RESUMEN · DEMO</span>
+          <div className="tp-summary-line">
+            <span>Productos ({cartCount})</span>
+            <strong>{formatCop(subtotal)}</strong>
+          </div>
+          <div className="tp-summary-shipping">+ envío según ubicación</div>
+          <div className="tp-summary-total">
+            <span>Subtotal de productos</span>
+            <strong>{formatCop(subtotal)}</strong>
+          </div>
+          <button
+            type="button"
+            className="tp-button-primary tp-checkout-button"
+            disabled={!cartCount}
+            onClick={() => go("Checkout")}
+          >
+            Continuar a demostración <ArrowRight size={16} />
+          </button>
+          <p>
+            <ShieldCheck size={14} /> No se realizará ningún pago ni pedido.
+          </p>
+          <div className="tp-summary-delivery">
+            <Truck size={16} />
+            <span>{deliveryCopy}</span>
+          </div>
+        </aside>
+      </div>
+      {clearConfirm && (
+        <div
+          className="tp-confirm-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setClearConfirm(false);
+          }}
+        >
+          <div
+            className="tp-confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="clear-title"
+          >
+            <button
+              type="button"
+              className="tp-dialog-close"
+              onClick={() => setClearConfirm(false)}
+              aria-label="Cerrar"
+            >
+              <X size={18} />
+            </button>
+            <div className="tp-dialog-icon">
+              <Trash2 size={20} />
+            </div>
+            <h2 id="clear-title">¿Empezar de nuevo?</h2>
+            <p>
+              Esto quitará todos los productos de tu carrito de demostración.
+            </p>
+            <div>
+              <button
+                type="button"
+                className="tp-button-quiet"
+                onClick={() => setClearConfirm(false)}
+              >
+                Conservar selección
+              </button>
+              <button
+                type="button"
+                className="tp-button-primary"
+                onClick={() => {
+                  setCart({});
+                  setClearConfirm(false);
+                  notify("Carrito vacío · cambio solo local");
+                }}
+              >
+                Sí, vaciar carrito
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
-  
-  const renderCheckout = () => (
-    <section className="tp-page-shell tp-checkout-page"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> RECORRIDO VISUAL · SIN TRANSACCIÓN</div><h1>Una pausa antes<br /><em>de continuar.</em></h1><div className="tp-checkout-banner"><CircleHelp size={18} /><div><strong>Esta pantalla es únicamente una demostración.</strong><span>No se crea un pedido, no se solicitan datos financieros y no se envía información.</span></div><DemoFlag>NO CONFIGURADO</DemoFlag></div><div className="tp-checkout-layout"><div className="tp-checkout-main"><div className="tp-stepper"><div className="is-current"><span>01</span><b>Revisión</b></div><i /><div><span>02</span><b>Entrega</b></div><i /><div><span>03</span><b>Confirmación</b></div></div><div className="tp-checkout-panel"><span className="tp-summary-kicker">PASO 01 · REVISIÓN DE LA DEMO</span><h2>Todo listo para imaginar.</h2><p>Tu selección permanece solo en esta pantalla. La tienda aún no tiene pagos ni pedidos configurados.</p><div className="tp-checkout-recap">{cartItems.map((product) => <div key={product.id}><span>{cart[product.id]} × {product.name} <DemoFlag /></span><strong>{formatCop(product.price * cart[product.id])}</strong></div>)}{!cartItems.length && <span>Tu carrito está vacío.</span>}</div>
-    
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-      <input 
-        placeholder="Nombre completo" 
-        value={checkoutData.name} 
-        onChange={(e) => setCheckoutData({...checkoutData, name: e.target.value})}
-        style={{ padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
-      />
-      <input 
-        placeholder="Teléfono de contacto" 
-        value={checkoutData.phone} 
-        onChange={(e) => setCheckoutData({...checkoutData, phone: e.target.value})}
-        style={{ padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
-      />
-      <input 
-        placeholder="Ciudad" 
-        value={checkoutData.city} 
-        onChange={(e) => setCheckoutData({...checkoutData, city: e.target.value})}
-        style={{ padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}
-      />
-      <input 
-        placeholder="Dirección de entrega" 
-        value={checkoutData.address} 
-        onChange={(e) => setCheckoutData({...checkoutData, address: e.target.value})}
-        style={{ padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }}/>
-    </div>
 
-  <button 
-    type="button" 
-    className={`tp-button-primary ${checkoutChecked ? "is-complete" : ""}`} 
-    onClick={async () => {
-      if (!checkoutData.name || !checkoutData.phone || !checkoutData.address) {
-        notify("Por favor completa los datos de envío.");
-        return;
-      }
-      
-      try {
-        // Aquí conectaremos con la API para guardar en la base de datos
-        const response = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            customerName: checkoutData.name,
-            customerPhone: checkoutData.phone,
-            customerCity: checkoutData.city,
-            customerAddress: checkoutData.address,
-            paymentMethod: "Nequi", // Temporal
-            items: cartItems.map(item => ({
-              productName: item.name,
-              reference: item.reference,
-              quantity: cart[item.id],
-              unitPrice: item.price,
-              subtotal: item.price * cart[item.id]
-            }))
-          })
-        }); 
-        const data = await response.json();// <--- AGREGA ESTO AQUÍ
+    const renderCheckout = () => {
+        if (orderSuccess) {
+      return (
+        <section className="tp-page-shell tp-checkout-page" style={{ textAlign: 'center', paddingTop: '120px', paddingBottom: '120px' }}>
+          <h1 style={{ fontSize: '56px', marginBottom: '20px' }}>¡Gracias por tu compra!</h1>
+          
+          <p style={{ fontSize: '20px', color: '#d8c495', marginBottom: '40px', fontWeight: '500' }}>
+            Tu pedido <strong>{orderSuccess.orderNumber}</strong> ha sido registrado.
+          </p>
+          
+          <div style={{ 
+            background: 'linear-gradient(145deg, #1b1821, #141217)', 
+            padding: '30px 40px', 
+            borderRadius: '12px', 
+            display: 'inline-block', 
+            border: '1px solid rgba(217,196,149,.3)',
+            maxWidth: '500px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+          }}>
+            <p style={{ fontSize: '18px', color: '#eee9e1', margin: 0, lineHeight: '1.6' }}>
+              En un momento uno de nuestros asesores se comunicará contigo para confirmar el pedido y coordinar el pago.
+            </p>
+          </div>
+          
+          <div style={{ marginTop: '50px' }}>
+            <button 
+              type="button" 
+              className="tp-button-outline" 
+              style={{ fontSize: '16px', padding: '15px 30px' }}
+              onClick={() => { setOrderSuccess(null); setCheckoutChecked(false); go("Inicio"); }}
+            >
+              Volver a la tienda <ArrowRight size={18} />
+            </button>
+          </div>
+        </section>
+      );
+    }
 
-        if (response.ok) {
-          setCheckoutChecked(true);
-        notify("Pedido guardado. Abriendo WhatsApp...");
+    return (
+      <section className="tp-page-shell tp-checkout-page">
+        <div className="tp-eyebrow">
+          <span className="tp-eyebrow-line" /> FINALIZAR PEDIDO
+        </div>
+        <h1>
+          Una pausa antes
+          <br />
+          <em>de continuar.</em>
+        </h1>
+        <div className="tp-checkout-banner" style={{ borderColor: 'rgba(217,196,149,.3)', background: '#17151b' }}>
+          <ShieldCheck size={18} color="#d8c495" />
+          <div>
+            <strong>Completa tus datos para guardar el pedido.</strong>
+            <span>
+              Al confirmar, guardaremos tu pedido y te enviaremos a WhatsApp para coordinar el pago.
+            </span>
+          </div>
+        </div>
+        <div className="tp-checkout-layout">
+          <div className="tp-checkout-main">
+            <div className="tp-stepper">
+              <div className="is-current">
+                <span>01</span>
+                <b>Revisión</b>
+              </div>
+              <i />
+              <div>
+                <span>02</span>
+                <b>Entrega</b>
+              </div>
+              <i />
+              <div>
+                <span>03</span>
+                <b>Confirmación</b>
+              </div>
+            </div>
+            <div className="tp-checkout-panel">
+              <span className="tp-summary-kicker">
+                PASO 01 · DATOS DE ENVÍO
+              </span>
+              <h2>Todo listo para continuar.</h2>
+              <p>
+                Revisa tu selección y completa los datos para coordinar la entrega.
+              </p>
+              <div className="tp-checkout-recap">
+                {cartItems.map((product) => (
+                  <div key={product.id}>
+                    <span>
+                      {cart[product.id]} × {product.name}
+                    </span>
+                    <strong>{formatCop(product.price * cart[product.id])}</strong>
+                  </div>
+                ))}
+                {!cartItems.length && <span>Tu carrito está vacío.</span>}
+              </div>
 
-        // Construir el mensaje de WhatsApp
-        const mensaje = `Hola, acabo de hacer un pedido en la tienda.%0A%0A` +
-          `*Número de pedido:* ${data.orderNumber}%0A` +
-          `*Nombre:* ${checkoutData.name}%0A` +
-          `*Teléfono:* ${checkoutData.phone}%0A` +
-          `*Ciudad:* ${checkoutData.city}%0A` +
-          `*Dirección:* ${checkoutData.address}%0A%0A` +
-          `*Productos:*%0A` +
-          cartItems.map(item => `- ${cart[item.id]}x ${item.name} (${item.reference}) - $${item.price * cart[item.id]}`).join('%0A') +
-          `%0A%0A*Subtotal:* $${subtotal.toLocaleString('es-CO')}%0A` +
-          `*+ envío según ubicación*`;
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  marginBottom: "20px",
+                }}
+              >
+                <input
+                  placeholder="Nombre completo"
+                  value={checkoutData.name}
+                  onChange={(e) =>
+                    setCheckoutData({ ...checkoutData, name: e.target.value })
+                  }
+                  style={{
+                    padding: "10px",
+                    background: "#1b1821",
+                    border: "1px solid #39333f",
+                    color: "#fff",
+                    borderRadius: "4px",
+                  }}
+                />
+                <input
+                  placeholder="Teléfono de contacto"
+                  value={checkoutData.phone}
+                  onChange={(e) =>
+                    setCheckoutData({ ...checkoutData, phone: e.target.value })
+                  }
+                  style={{
+                    padding: "10px",
+                    background: "#1b1821",
+                    border: "1px solid #39333f",
+                    color: "#fff",
+                    borderRadius: "4px",
+                  }}
+                />
+                <input
+                  placeholder="Ciudad"
+                  value={checkoutData.city}
+                  onChange={(e) =>
+                    setCheckoutData({ ...checkoutData, city: e.target.value })
+                  }
+                  style={{
+                    padding: "10px",
+                    background: "#1b1821",
+                    border: "1px solid #39333f",
+                    color: "#fff",
+                    borderRadius: "4px",
+                  }}
+                />
+                <input
+                  placeholder="Dirección de entrega"
+                  value={checkoutData.address}
+                  onChange={(e) =>
+                    setCheckoutData({ ...checkoutData, address: e.target.value })
+                  }
+                  style={{
+                    padding: "10px",
+                    background: "#1b1821",
+                    border: "1px solid #39333f",
+                    color: "#fff",
+                    borderRadius: "4px",
+                  }}
+                />
+              </div>
 
-        // Abrir WhatsApp (reemplaza el número por el de la tienda)
-        const numeroWhatsApp = "573238016233"; // Pon aquí el número de la tienda
-        window.open(`https://wa.me/${numeroWhatsApp}?text=${mensaje}`, '_blank');
-          // Aquí iría el código para abrir WhatsApp
-        } else {
-          notify("Error al guardar el pedido. Intenta de nuevo.");
-        }
-      } catch (error) {
-        notify("Error de conexión.");
-      }
-    }}
-  >
-    {checkoutChecked ? <><Check size={16} /> Pedido Guardado</> : <>Confirmar Pedido <ArrowRight size={16} /></>}
-</button>
-    
-    {checkoutChecked && <div className="tp-inline-feedback"><Check size={15} /> Vista completada. No se registró ninguna compra.</div>}</div></div><aside className="tp-checkout-aside"><span className="tp-summary-kicker">RESUMEN FICTICIO</span><div className="tp-summary-line"><span>Subtotal de productos</span><strong>{formatCop(subtotal)}</strong></div><div className="tp-summary-shipping">+ envío según ubicación</div><p>{deliveryCopy}</p><div className="tp-payment-visual"><CreditCard size={18} /><span>Medios de pago</span><DemoFlag>NO CONFIGURADO</DemoFlag></div></aside></div><button type="button" className="tp-text-link tp-back-cart" onClick={() => go("Carrito")}><ArrowLeft size={14} /> Volver al carrito</button></section>
-  );
+              <button
+                type="button"
+                className={`tp-button-primary ${checkoutChecked ? "is-complete" : ""}`}
+                disabled={checkoutChecked}
+                onClick={async () => {
+                  if (
+                    !checkoutData.name ||
+                    !checkoutData.phone ||
+                    !checkoutData.address
+                  ) {
+                    notify("Por favor completa los datos de envío.");
+                    return;
+                  }
+
+                  try {
+                    const response = await fetch("/api/orders", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        customerName: checkoutData.name,
+                        customerPhone: checkoutData.phone,
+                        customerCity: checkoutData.city,
+                        customerAddress: checkoutData.address,
+                        paymentMethod: "Nequi", // Temporal
+                        items: cartItems.map((item) => ({
+                          productName: item.name,
+                          reference: item.reference,
+                          quantity: cart[item.id],
+                          unitPrice: item.price,
+                          subtotal: item.price * cart[item.id],
+                        })),
+                      }),
+                    });
+                    const data = await response.json();
+
+                    if (response.ok) {
+                      setOrderSuccess(data);
+                      setCheckoutChecked(true);
+                      notify("Pedido guardado. Abriendo WhatsApp...");
+
+                  const mensaje = 
+                    `*Hola, acabo de hacer un pedido en la tienda.*\n\n` +
+                    `*DETALLES DEL PEDIDO*\n` +
+                    `Pedido: ${data.orderNumber}\n\n` +
+                    `*DATOS DEL CLIENTE*\n` +
+                    `Nombre: ${checkoutData.name}\n` +
+                    `Teléfono: ${checkoutData.phone}\n` +
+                    `Ciudad: ${checkoutData.city}\n` +
+                    `Dirección: ${checkoutData.address}\n\n` +
+                    `*PRODUCTOS*\n` +
+                    cartItems.map(item => 
+                      `- ${cart[item.id]}x ${item.name} (${item.reference})\n  Valor: $${(item.price * cart[item.id]).toLocaleString("es-CO")}`
+                    ).join('\n') +
+                    `\n\n*TOTAL*\n` +
+                    `Subtotal: $${subtotal.toLocaleString("es-CO")}\n` +
+                    `(+ envío según ubicación)\n\n` +
+                    `Por favor, confírmame los datos para coordinar el pago.`;
+
+                  const numeroWhatsApp = "573238016233";
+                  const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+                  window.open(urlWhatsApp, '_blank');
+
+                      setCart({});
+                    } else {
+                      notify("Error al guardar el pedido. Intenta de nuevo.");
+                    }
+                  } catch (error) {
+                    notify("Error de conexión.");
+                  }
+                }}
+              >
+                {checkoutChecked ? (
+                  <>
+                    <Check size={16} /> Procesando...
+                  </>
+                ) : (
+                  <>
+                    Confirmar Pedido <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          <aside className="tp-checkout-aside">
+            <span className="tp-summary-kicker">RESUMEN DE COMPRA</span>
+            <div className="tp-summary-line">
+              <span>Subtotal de productos</span>
+              <strong>{formatCop(subtotal)}</strong>
+            </div>
+            <div className="tp-summary-shipping">+ envío según ubicación</div>
+            <p>{deliveryCopy}</p>
+            <div className="tp-payment-visual">
+              <CreditCard size={18} />
+              <span>Medios de pago</span>
+            </div>
+          </aside>
+        </div>
+        <button
+          type="button"
+          className="tp-text-link tp-back-cart"
+          onClick={() => go("Carrito")}
+        >
+          <ArrowLeft size={14} /> Volver al carrito
+        </button>
+      </section>
+    );
+  };
 
   const renderBrand = () => (
-    <section className="tp-brand-page tp-page-shell"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> UNA MARCA PROVISIONAL</div><h1>Un universo<br />por <em>descubrir.</em></h1><div className="tp-brand-story"><div className="tp-brand-abstract"><span>TP</span><div className="tp-brand-ring ring-1" /><div className="tp-brand-ring ring-2" /><div className="tp-brand-ring ring-3" /><small>IDENTIDAD EN EXPLORACIÓN · DEMO</small></div><div className="tp-brand-text"><span>NO ES UNA HISTORIA DEFINITIVA</span><h2>Un nombre para<br />seguir el rastro.</h2><p>Tu Perfumería es una tienda de perfumes colombiana en etapa de concepto. Esta experiencia imagina un espacio para descubrir fragancias con calma, curiosidad y una mirada contemporánea.</p><p>La identidad, el catálogo y los relatos que lees aquí son material ficticio para un prototipo visual. No representan una marca, producto ni operación comercial configurada.</p><button type="button" className="tp-button-outline" onClick={() => go("Catálogo")}>Explorar el concepto <ArrowRight size={15} /></button></div></div><div className="tp-brand-values"><div><span>01</span><strong>Curiosidad</strong><p>Explorar antes de elegir.</p></div><div><span>02</span><strong>Sensibilidad</strong><p>Las notas también cuentan.</p></div><div><span>03</span><strong>Intención</strong><p>Una estela propia, sin prisa.</p></div></div><div className="tp-brand-note"><Sparkles size={17} /><span>Nombre, narrativa y propuesta comercial provisionales. DEMO sin historia definitiva.</span></div></section>
+    <section className="tp-brand-page tp-page-shell">
+      <div className="tp-eyebrow">
+        <span className="tp-eyebrow-line" /> UNA MARCA PROVISIONAL
+      </div>
+      <h1>
+        Un universo
+        <br />
+        por <em>descubrir.</em>
+      </h1>
+      <div className="tp-brand-story">
+        <div className="tp-brand-abstract">
+          <span>TP</span>
+          <div className="tp-brand-ring ring-1" />
+          <div className="tp-brand-ring ring-2" />
+          <div className="tp-brand-ring ring-3" />
+          <small>IDENTIDAD EN EXPLORACIÓN · DEMO</small>
+        </div>
+        <div className="tp-brand-text">
+          <span>NO ES UNA HISTORIA DEFINITIVA</span>
+          <h2>
+            Un nombre para
+            <br />
+            seguir el rastro.
+          </h2>
+          <p>
+            Tu Perfumería es una tienda de perfumes colombiana en etapa de
+            concepto. Esta experiencia imagina un espacio para descubrir
+            fragancias con calma, curiosidad y una mirada contemporánea.
+          </p>
+          <p>
+            La identidad, el catálogo y los relatos que lees aquí son material
+            ficticio para un prototipo visual. No representan una marca,
+            producto ni operación comercial configurada.
+          </p>
+          <button
+            type="button"
+            className="tp-button-outline"
+            onClick={() => go("Catálogo")}
+          >
+            Explorar el concepto <ArrowRight size={15} />
+          </button>
+        </div>
+      </div>
+      <div className="tp-brand-values">
+        <div>
+          <span>01</span>
+          <strong>Curiosidad</strong>
+          <p>Explorar antes de elegir.</p>
+        </div>
+        <div>
+          <span>02</span>
+          <strong>Sensibilidad</strong>
+          <p>Las notas también cuentan.</p>
+        </div>
+        <div>
+          <span>03</span>
+          <strong>Intención</strong>
+          <p>Una estela propia, sin prisa.</p>
+        </div>
+      </div>
+      <div className="tp-brand-note">
+        <Sparkles size={17} />
+        <span>
+          Nombre, narrativa y propuesta comercial provisionales. DEMO sin
+          historia definitiva.
+        </span>
+      </div>
+    </section>
   );
 
   const renderDelivery = () => (
-    <section className="tp-page-shell tp-info-page"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> INFORMACIÓN DE LA EXPERIENCIA</div><h1>Antes de<br /><em>imaginar tu pedido.</em></h1><p className="tp-info-intro">El prototipo presenta una estimación de referencia. No hay operador logístico ni métodos de pago configurados.</p><div className="tp-info-cards"><article className="tp-info-card tp-info-delivery"><span className="tp-info-index">01 / ENTREGA</span><div className="tp-info-icon"><Truck size={21} /></div><h2>Una referencia<br />para esta demo.</h2><p>{deliveryCopy}</p><DemoFlag>ESTIMACIÓN DEMO</DemoFlag></article><article className="tp-info-card"><span className="tp-info-index">02 / PAGOS</span><div className="tp-info-icon"><CreditCard size={21} /></div><h2>Métodos aún<br />no configurados.</h2><p>Esta tienda no recibe pagos. No introduzcas datos de tarjetas ni cuentas.</p><DemoFlag>NO CONFIGURADO</DemoFlag></article><article className="tp-info-card"><span className="tp-info-index">03 / PROTOTIPO</span><div className="tp-info-icon"><ShieldCheck size={21} /></div><h2>Solo una<br />experiencia visual.</h2><p>Los precios, disponibilidad y referencias son ficticios. No se confirma ni se despacha ningún pedido.</p><DemoFlag>NO TRANSACCIONAL</DemoFlag></article></div><button type="button" className="tp-button-outline" onClick={() => go("Contacto")}>¿Tienes una pregunta? <ArrowRight size={15} /></button></section>
+    <section className="tp-page-shell tp-info-page">
+      <div className="tp-eyebrow">
+        <span className="tp-eyebrow-line" /> INFORMACIÓN DE LA EXPERIENCIA
+      </div>
+      <h1>
+        Antes de
+        <br />
+        <em>imaginar tu pedido.</em>
+      </h1>
+      <p className="tp-info-intro">
+        El prototipo presenta una estimación de referencia. No hay operador
+        logístico ni métodos de pago configurados.
+      </p>
+      <div className="tp-info-cards">
+        <article className="tp-info-card tp-info-delivery">
+          <span className="tp-info-index">01 / ENTREGA</span>
+          <div className="tp-info-icon">
+            <Truck size={21} />
+          </div>
+          <h2>
+            Una referencia
+            <br />
+            para esta demo.
+          </h2>
+          <p>{deliveryCopy}</p>
+          <DemoFlag>ESTIMACIÓN DEMO</DemoFlag>
+        </article>
+        <article className="tp-info-card">
+          <span className="tp-info-index">02 / PAGOS</span>
+          <div className="tp-info-icon">
+            <CreditCard size={21} />
+          </div>
+          <h2>
+            Métodos aún
+            <br />
+            no configurados.
+          </h2>
+          <p>
+            Esta tienda no recibe pagos. No introduzcas datos de tarjetas ni
+            cuentas.
+          </p>
+          <DemoFlag>NO CONFIGURADO</DemoFlag>
+        </article>
+        <article className="tp-info-card">
+          <span className="tp-info-index">03 / PROTOTIPO</span>
+          <div className="tp-info-icon">
+            <ShieldCheck size={21} />
+          </div>
+          <h2>
+            Solo una
+            <br />
+            experiencia visual.
+          </h2>
+          <p>
+            Los precios, disponibilidad y referencias son ficticios. No se
+            confirma ni se despacha ningún pedido.
+          </p>
+          <DemoFlag>NO TRANSACCIONAL</DemoFlag>
+        </article>
+      </div>
+      <button
+        type="button"
+        className="tp-button-outline"
+        onClick={() => go("Contacto")}
+      >
+        ¿Tienes una pregunta? <ArrowRight size={15} />
+      </button>
+    </section>
   );
 
   const renderContact = () => (
-    <section className="tp-page-shell tp-contact-page"><div className="tp-eyebrow"><span className="tp-eyebrow-line" /> PUNTO DE CONTACTO · DEMO</div><h1>Hablemos<br /><em>de aromas.</em></h1><div className="tp-contact-card"><div className="tp-contact-card-art"><Mail size={30} /><span>UN ESPACIO<br />POR CONFIGURAR</span></div><div className="tp-contact-copy"><DemoFlag>CANAL NO CONFIGURADO</DemoFlag><h2>Estamos preparando<br />este espacio.</h2><p>En una tienda activa aquí encontrarás canales de atención. Este prototipo no tiene correo, teléfono, WhatsApp ni redes sociales configuradas.</p><button type="button" className="tp-button-outline" onClick={() => notify("Canal de contacto no configurado en esta DEMO")}><Mail size={15} /> Ver estado de contacto</button><span className="tp-contact-micro">NO SE ENVÍA NINGÚN MENSAJE</span></div></div><div className="tp-contact-bottom"><span>PRÓXIMAMENTE, EN ESTA HISTORIA.</span><span>BOGOTÁ · COLOMBIA · DEMO</span></div></section>
+    <section className="tp-page-shell tp-contact-page">
+      <div className="tp-eyebrow">
+        <span className="tp-eyebrow-line" /> PUNTO DE CONTACTO · DEMO
+      </div>
+      <h1>
+        Hablemos
+        <br />
+        <em>de aromas.</em>
+      </h1>
+      <div className="tp-contact-card">
+        <div className="tp-contact-card-art">
+          <Mail size={30} />
+          <span>
+            UN ESPACIO
+            <br />
+            POR CONFIGURAR
+          </span>
+        </div>
+        <div className="tp-contact-copy">
+          <DemoFlag>CANAL NO CONFIGURADO</DemoFlag>
+          <h2>
+            Estamos preparando
+            <br />
+            este espacio.
+          </h2>
+          <p>
+            En una tienda activa aquí encontrarás canales de atención. Este
+            prototipo no tiene correo, teléfono, WhatsApp ni redes sociales
+            configuradas.
+          </p>
+          <button
+            type="button"
+            className="tp-button-outline"
+            onClick={() =>
+              notify("Canal de contacto no configurado en esta DEMO")
+            }
+          >
+            <Mail size={15} /> Ver estado de contacto
+          </button>
+          <span className="tp-contact-micro">NO SE ENVÍA NINGÚN MENSAJE</span>
+        </div>
+      </div>
+      <div className="tp-contact-bottom">
+        <span>PRÓXIMAMENTE, EN ESTA HISTORIA.</span>
+        <span>BOGOTÁ · COLOMBIA · DEMO</span>
+      </div>
+    </section>
   );
 
-  if (loading) return <div style={{ color: 'white', padding: '50px' }}>Cargando tienda...</div>;
-  if (!selected) return <div style={{ color: 'white', padding: '50px' }}>No hay productos disponibles.</div>;
+  if (loading)
+    return (
+      <div style={{ color: "white", padding: "50px" }}>Cargando tienda...</div>
+    );
+  if (!selected)
+    return (
+      <div style={{ color: "white", padding: "50px" }}>
+        No hay productos disponibles.
+      </div>
+    );
 
   const mainContent = () => {
     switch (page) {
-      case "Inicio": return renderHome();
-      case "Catálogo": return <div className="tp-catalog-page">{renderCatalog(false)}</div>;
-      case "Detalle": return renderDetail();
-      case "Marca": return renderBrand();
-      case "Envíos y pagos": return renderDelivery();
-      case "Contacto": return renderContact();
-      case "Carrito": return renderCart();
-      case "Checkout": return renderCheckout();
-      case "Administración": return null;
+      case "Inicio":
+        return renderHome();
+      case "Catálogo":
+        return <div className="tp-catalog-page">{renderCatalog(false)}</div>;
+      case "Detalle":
+        return renderDetail();
+      case "Marca":
+        return renderBrand();
+      case "Envíos y pagos":
+        return renderDelivery();
+      case "Contacto":
+        return renderContact();
+      case "Carrito":
+        return renderCart();
+      case "Checkout":
+        return renderCheckout();
+      case "Administración":
+        return null;
     }
   };
 
   if (page === "Administración") {
-    return <div className="tp-root"><style>{styles}</style><Admin initialLogin onExit={() => go("Inicio")} /></div>;
+    return (
+      <div className="tp-root">
+        <style>{styles}</style>
+        <Admin initialLogin onExit={() => go("Inicio")} />
+      </div>
+    );
   }
 
   return (
     <div className="tp-root">
       <style>{styles}</style>
       <header className="tp-header">
-        <button type="button" className="tp-brand-lockup" onClick={() => go("Inicio")} aria-label="Tu Perfumería, inicio"><span className="tp-brand-symbol"><Flower2 size={30} strokeWidth={1.25} /></span><span className="tp-brand-wordmark">Tu Perfumería<small>ESENCIA QUE INSPIRA</small></span></button>
-        <nav className={`tp-nav ${mobileMenu ? "is-open" : ""}`} aria-label="Navegación principal">{publicPages.map(({ label, page: target }) => <button type="button" key={label} className={page === target || (label === "Catálogo" && page === "Detalle") ? "is-current" : ""} onClick={() => navTo(target)}>{label}</button>)}</nav>
-        <form className="tp-header-search" onSubmit={(event) => { event.preventDefault(); go("Catálogo"); }}>
-          <button type="submit" aria-label="Buscar"><Search size={16} /></button>
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar fragancia..." aria-label="Buscar fragancia" />
+        <button
+          type="button"
+          className="tp-brand-lockup"
+          onClick={() => go("Inicio")}
+          aria-label="Tu Perfumería, inicio"
+        >
+          <span className="tp-brand-symbol">
+            <Flower2 size={30} strokeWidth={1.25} />
+          </span>
+          <span className="tp-brand-wordmark">
+            Tu Perfumería<small>ESENCIA QUE INSPIRA</small>
+          </span>
+        </button>
+        <nav
+          className={`tp-nav ${mobileMenu ? "is-open" : ""}`}
+          aria-label="Navegación principal"
+        >
+          {publicPages.map(({ label, page: target }) => (
+            <button
+              type="button"
+              key={label}
+              className={
+                page === target || (label === "Catálogo" && page === "Detalle")
+                  ? "is-current"
+                  : ""
+              }
+              onClick={() => navTo(target)}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+        <form
+          className="tp-header-search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            go("Catálogo");
+          }}
+        >
+          <button type="submit" aria-label="Buscar">
+            <Search size={16} />
+          </button>
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Buscar fragancia..."
+            aria-label="Buscar fragancia"
+          />
         </form>
         <div className="tp-header-actions">
-          <button type="button" className="tp-account-button" onClick={() => go("Administración")} aria-label="Acceso administrativo DEMO"><UserRound size={20} /></button>
-          <button type="button" className="tp-cart-button" onClick={() => go("Carrito")} aria-label={`Carrito, ${cartCount} productos`}><ShoppingBag size={19} /><b>{cartCount}</b></button>
-          <button type="button" className="tp-mobile-toggle" onClick={() => setMobileMenu(!mobileMenu)} aria-label={mobileMenu ? "Cerrar menú" : "Abrir menú"}>{mobileMenu ? <X size={20} /> : <Menu size={20} />}</button>
+          <button
+            type="button"
+            className="tp-account-button"
+            onClick={() => go("Administración")}
+            aria-label="Acceso administrativo DEMO"
+          >
+            <UserRound size={20} />
+          </button>
+          <button
+            type="button"
+            className="tp-cart-button"
+            onClick={() => go("Carrito")}
+            aria-label={`Carrito, ${cartCount} productos`}
+          >
+            <ShoppingBag size={19} />
+            <b>{cartCount}</b>
+          </button>
+          <button
+            type="button"
+            className="tp-mobile-toggle"
+            onClick={() => setMobileMenu(!mobileMenu)}
+            aria-label={mobileMenu ? "Cerrar menú" : "Abrir menú"}
+          >
+            {mobileMenu ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </header>
       <main className="tp-main">{mainContent()}</main>
       <footer className="tp-footer">
         <div className="tp-footer-main">
-          <button type="button" className="tp-brand-lockup" onClick={() => go("Inicio")}><span className="tp-brand-symbol"><Flower2 size={31} strokeWidth={1.25} /></span><span className="tp-brand-wordmark">Tu Perfumería<small>BELLEZA EN CADA DETALLE</small></span></button>
-          <div className="tp-footer-legal"><button type="button" onClick={() => notify("Términos provisionales · tienda DEMO")}>Términos y condiciones</button><button type="button" onClick={() => notify("Política de privacidad por configurar · DEMO")}>Políticas de privacidad</button><button type="button" onClick={() => notify("Preguntas frecuentes por configurar · DEMO")}>Preguntas frecuentes</button></div>
-          <div className="tp-footer-social"><span>SÍGUENOS</span><button aria-label="Facebook, enlace no configurado" onClick={() => notify("Redes sociales no configuradas en esta DEMO.")}><Facebook size={16} /></button><button aria-label="Instagram, enlace no configurado" onClick={() => notify("Redes sociales no configuradas en esta DEMO.")}><Instagram size={16} /></button><button aria-label="TikTok, enlace no configurado" onClick={() => notify("Redes sociales no configuradas en esta DEMO.")}><Music2 size={16} /></button><button aria-label="YouTube, enlace no configurado" onClick={() => notify("Redes sociales no configuradas en esta DEMO.")}><Youtube size={16} /></button></div>
+          <button
+            type="button"
+            className="tp-brand-lockup"
+            onClick={() => go("Inicio")}
+          >
+            <span className="tp-brand-symbol">
+              <Flower2 size={31} strokeWidth={1.25} />
+            </span>
+            <span className="tp-brand-wordmark">
+              Tu Perfumería<small>BELLEZA EN CADA DETALLE</small>
+            </span>
+          </button>
+          <div className="tp-footer-legal">
+            <button
+              type="button"
+              onClick={() => notify("Términos provisionales · tienda DEMO")}
+            >
+              Términos y condiciones
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                notify("Política de privacidad por configurar · DEMO")
+              }
+            >
+              Políticas de privacidad
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                notify("Preguntas frecuentes por configurar · DEMO")
+              }
+            >
+              Preguntas frecuentes
+            </button>
+          </div>
+          <div className="tp-footer-social">
+            <span>SÍGUENOS</span>
+            <button
+              aria-label="Facebook, enlace no configurado"
+              onClick={() =>
+                notify("Redes sociales no configuradas en esta DEMO.")
+              }
+            >
+              <Facebook size={16} />
+            </button>
+            <button
+              aria-label="Instagram, enlace no configurado"
+              onClick={() =>
+                notify("Redes sociales no configuradas en esta DEMO.")
+              }
+            >
+              <Instagram size={16} />
+            </button>
+            <button
+              aria-label="TikTok, enlace no configurado"
+              onClick={() =>
+                notify("Redes sociales no configuradas en esta DEMO.")
+              }
+            >
+              <Music2 size={16} />
+            </button>
+            <button
+              aria-label="YouTube, enlace no configurado"
+              onClick={() =>
+                notify("Redes sociales no configuradas en esta DEMO.")
+              }
+            >
+              <Youtube size={16} />
+            </button>
+          </div>
         </div>
-        <div className="tp-footer-bottom"><span>© TU PERFUMERÍA · PROTOTIPO VISUAL NO TRANSACCIONAL</span><span>CONTENIDO FICTICIO · DEMO</span><button type="button" onClick={() => go("Envíos y pagos")}>Información de envíos</button></div>
+        <div className="tp-footer-bottom">
+          <span>© TU PERFUMERÍA · PROTOTIPO VISUAL NO TRANSACCIONAL</span>
+          <span>CONTENIDO FICTICIO · DEMO</span>
+          <button type="button" onClick={() => go("Envíos y pagos")}>
+            Información de envíos
+          </button>
+        </div>
       </footer>
-      {toast && <div className="tp-toast" role="status"><Check size={15} />{toast}<button type="button" onClick={() => setToast("")} aria-label="Cerrar aviso"><X size={14} /></button></div>}
+      {toast && (
+        <div className="tp-toast" role="status">
+          <Check size={15} />
+          {toast}
+          <button
+            type="button"
+            onClick={() => setToast("")}
+            aria-label="Cerrar aviso"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -612,7 +1831,7 @@ const styles = `
 .tp-cart-button { height:39px;padding:0 12px;border:1px solid rgba(217,196,149,.48);font-size:11px; }
 .tp-cart-button b { display:flex;align-items:center;justify-content:center;min-width:20px;height:20px;border-radius:50%;background:#d9c495;color:#16131b;font:9px "SFMono-Regular",Consolas,monospace; }
 .tp-mobile-toggle { display:none;background:none;border:0;padding:5px; }
-.tp-main { min-height:390px; }
+.tp-main { min-height:390px; flex: 1;}
 .tp-hero { min-height:600px; height:min(52vw,690px); max-height:730px; padding:0 8.1%; position:relative; display:grid; grid-template-columns:1fr 1fr; align-items:center; overflow:hidden; border-bottom:1px solid var(--tp-line); }
 .tp-hero::before { content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at 76% 47%,rgba(100,60,132,.12),transparent 39%),linear-gradient(90deg,#09090c 0%,rgba(9,9,12,.94) 41%,rgba(9,9,12,.13) 100%); }
 .tp-hero-copy { position:relative;z-index:2;max-width:590px;padding-bottom:22px; }
@@ -799,6 +2018,9 @@ const styles = `
   --tp-violet:#9b36e9;
   --tp-violet-bright:#eb70f3;
   background:var(--tp-ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 .tp-header {
   height:78px;

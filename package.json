@@ -15,6 +15,8 @@
     "@tailwindcss/oxide-win32-x64-msvc": "^4.3.5",
     "dotenv": "^18.0.10",
     "drizzle-orm": "catalog:",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.9",
     "lightningcss-win32-x64-msvc": "^1.33.0",
     "postgres": "^4.1.0",
     "xlsx": "^0.18.5"

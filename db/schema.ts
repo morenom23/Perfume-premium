@@ -53,3 +53,13 @@ export const orderItems = pgTable("order_items", {
   unitPrice: integer("unit_price").notNull(),
   subtotal: integer("subtotal").notNull(),
 });
+
+export const storeSettings = pgTable("store_settings", {
+  id: serial("id").primaryKey(),
+  whatsappMain: varchar("whatsapp_main", { length: 50 }).default("573000000000"),
+  whatsappSecondary: varchar("whatsapp_secondary", { length: 50 }),
+  bankAccount: text("bank_account"),
+  nequiNumber: varchar("nequi_number", { length: 50 }),
+  deliveryInfo: text("delivery_info"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});

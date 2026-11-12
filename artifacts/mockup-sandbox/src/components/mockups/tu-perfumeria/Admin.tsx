@@ -162,7 +162,7 @@ const demoOrders = [
 ];
 const formatCompact = (value: number) => `${value} M`;
 
-function DemoTag({ children = "DEMO · ilustrativo" }: { children?: string }) {
+function DemoTag({ children = "DEMO. " }: { children?: string }) {
   return <span className="ad-demo-tag">{children}</span>;
 }
 
@@ -213,7 +213,7 @@ function Metric({
         <span>
           <ArrowUpRight size={13} /> {delta}
         </span>
-        <DemoTag />
+        {/*<DemoTag />}*/}
       </div>
     </article>
   );
@@ -241,6 +241,8 @@ export function Admin({
   onExit,
 }: { initialLogin?: boolean; onExit?: () => void } = {}) {
   const [page, setPage] = useState<Page>("Dashboard");
+  const currentUserName = localStorage.getItem("admin_name") || "Admin";
+  const currentUserRole = localStorage.getItem("admin_role") || "Propietario";
   const [dbProducts, setDbProducts] = useState<any[]>([]);
   const [mobileNav, setMobileNav] = useState(false);
   const [loginView, setLoginView] = useState(() => {
@@ -261,6 +263,8 @@ export function Admin({
   const [period, setPeriod] = useState("Últimos 30 días");
   const [dbOrders, setDbOrders] = useState<any[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [settings, setSettings] = useState<any>(null);
+  const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
     fetch("/api/products")
@@ -274,6 +278,13 @@ export function Admin({
       .then((res) => res.json())
       .then((data) => setDbOrders(data))
       .catch((err) => console.error("Error cargando pedidos", err));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => setSettings(data))
+      .catch((err) => console.error("Error cargando configuración", err));
   }, []);
 
   const filteredProducts = useMemo(
@@ -593,8 +604,8 @@ export function Admin({
             >
               <span className="ad-avatar">AM</span>
               <span>
-                <b>Adriana M.</b>
-                <small>Administradora DEMO</small>
+                <b>{currentUserName}</b>
+                <small>{currentUserRole}</small>
               </span>
               <MoreHorizontal size={18} />
             </button>
@@ -616,7 +627,7 @@ export function Admin({
             </div>
             <div className="ad-top-actions">
               <div className="ad-mode-chip">
-                <span /> DEMO VISUAL <b>FASE 1</b>
+                <span /> Online <b>V.1</b>
               </div>
               <button
                 className="ad-icon-button"
@@ -642,7 +653,7 @@ export function Admin({
                 onClick={() => setLoginView(true)}
               >
                 <span className="ad-avatar">AM</span>
-                <span>Adriana M.</span>
+                <span>{currentUserName}</span>
                 <ChevronDown size={13} />
               </button>
             </div>
@@ -653,15 +664,11 @@ export function Admin({
                 <WandSparkles size={15} />
               </span>
               <span>
-                <b>Espacio de demostración.</b> Todas las cifras, productos y
-                registros son ilustrativos; no representan operaciones reales ni
-                se guardan.
+                <b>Espacio solo para Administradores.</b> Cualquier duda en
+                cuanto a la configuración, contactar con el desarrollador.
               </span>
-              <button
-                aria-label="Ir a configuración demo"
-                onClick={() => go("Configuración comercial")}
-              >
-                <span>Sobre este demo</span>
+              <button onClick={() => setShowContact(true)}>
+                <span>Contactar</span>
                 <ChevronRight size={15} />
               </button>
             </div>
@@ -671,6 +678,8 @@ export function Admin({
                 setPeriod={setPeriod}
                 go={go}
                 notify={notify}
+                dbProducts={dbProducts}
+                dbOrders={dbOrders}
               />
             )}
             {page === "Productos" && (
@@ -701,6 +710,7 @@ export function Admin({
                 showInventory={showInventory}
                 setShowInventory={setShowInventory}
                 notify={notify}
+                dbProducts={dbProducts}
               />
             )}
             {page === "Ventas" && (
@@ -721,7 +731,13 @@ export function Admin({
                 notify={notify}
               />
             )}
-            {page === "Configuración comercial" && <Settings notify={notify} />}
+            {page === "Configuración comercial" && (
+              <Settings
+                notify={notify}
+                settings={settings}
+                setSettings={setSettings}
+              />
+            )}
             {page === "Actividad / Auditoría" && <ActivityPage />}
             <footer className="ad-footer">
               <span>
@@ -752,6 +768,90 @@ export function Admin({
           <Check size={16} /> {toast}
         </div>
       )}
+
+      {showContact && (
+        <div
+          className="ad-editor-backdrop"
+          role="presentation"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setShowContact(false);
+          }}
+        >
+          <section
+            className="ad-editor-card"
+            role="dialog"
+            aria-modal="true"
+            style={{ maxWidth: "500px", width: "100%" }}
+          >
+            <header className="ad-editor-heading">
+              <div>
+                <span className="ad-eyebrow" style={{ fontSize: "14px" }}>
+                  CONTACTO DIRECTO
+                </span>
+                <h2 style={{ fontSize: "24px" }}>Soporte Técnico</h2>
+              </div>
+              <button
+                className="ad-row-action"
+                onClick={() => setShowContact(false)}
+              >
+                <X size={20} />
+              </button>
+            </header>
+            <div
+              style={{
+                padding: "30px",
+                color: "#eee9e1",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    fontSize: "14px",
+                    color: "#d8c495",
+                    display: "block",
+                    marginBottom: "8px",
+                  }}
+                >
+                  Nombre
+                </span>
+                <p style={{ margin: 0, fontSize: "18px" }}>Administrador</p>
+              </div>
+              <div>
+                <span
+                  style={{
+                    fontSize: "14px",
+                    color: "#d8c495",
+                    display: "block",
+                    marginBottom: "8px",
+                  }}
+                >
+                  Correo Electrónico
+                </span>
+                <p style={{ margin: 0, fontSize: "18px" }}>
+                  admin@tuperfumeria.com
+                </p>
+              </div>
+              <div>
+                <span
+                  style={{
+                    fontSize: "14px",
+                    color: "#d8c495",
+                    display: "block",
+                    marginBottom: "8px",
+                  }}
+                >
+                  Teléfono / WhatsApp
+                </span>
+                <p style={{ margin: 0, fontSize: "18px" }}>3238016233</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
       {selectedOrder && (
         <div
           className="ad-editor-backdrop"
@@ -867,22 +967,75 @@ function Dashboard({
   setPeriod,
   go,
   notify,
+  dbProducts,
+  dbOrders,
 }: {
   period: string;
   setPeriod: (v: string) => void;
   go: (p: Page) => void;
   notify: (s: string) => void;
+  dbProducts: any[];
+  dbOrders: any[];
 }) {
+  const totalProducts = dbProducts.length;
+  const totalOrders = dbOrders.length;
+  const pendingOrders = dbOrders.filter((o) => o.status === "pending").length;
+
+  const realSales = dbOrders.filter((o) =>
+    ["paid", "shipped", "delivered"].includes(o.status),
+  );
+  const totalSalesAmount = realSales.reduce((sum, o) => sum + o.subtotal, 0);
+  const stockAtRisk = dbProducts.filter((p) => p.stock < 5).length;
+
+  // Agrupar ventas por día para el gráfico
+  const salesByDay = dbOrders
+    .filter((o) => ["paid", "shipped", "delivered"].includes(o.status))
+    .reduce(
+      (acc, order) => {
+        const date = new Date(order.createdAt).toLocaleDateString("es-CO", {
+          day: "2-digit",
+          month: "short",
+        });
+        acc[date] = (acc[date] || 0) + order.subtotal;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+  const realSalesSeries = Object.keys(salesByDay)
+    .map((day) => ({
+      day: day,
+      amount: salesByDay[day],
+    }))
+    .slice(-10);
+
+  // Calcular distribución real por familia
+  const familiesCount = dbProducts.reduce(
+    (acc, p) => {
+      acc[p.category] = (acc[p.category] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const realCategorySeries = Object.keys(familiesCount)
+    .map((category) => ({
+      name: category,
+      value: Math.round((familiesCount[category] / totalProducts) * 100),
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+
   return (
     <div className="ad-page">
       <SectionHeader
-        eyebrow="MARTES, 18 DE JUNIO · VISTA GENERAL"
+        eyebrow="RESUMEN GENERAL"
         title="Buenos días, Adriana"
-        description="Un pulso de muestra para la casa de fragancias."
+        description="Un pulso real de tu casa de fragancias."
         action={
           <div className="ad-heading-actions">
             <select
-              aria-label="Periodo ilustrativo"
+              aria-label="Periodo"
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
             >
@@ -893,9 +1046,7 @@ function Dashboard({
             <button
               className="ad-outline"
               onClick={() =>
-                notify(
-                  "El informe es únicamente ilustrativo; no se descargó ningún archivo.",
-                )
+                notify("Exportación disponible en la sección de Reportes.")
               }
             >
               <Download size={15} /> Exportar vista
@@ -903,44 +1054,44 @@ function Dashboard({
           </div>
         }
       />
+
       <div className="ad-metrics">
         <Metric
-          label="Ventas ilustrativas"
-          value="$ 8,42 M"
-          delta="+12,8% vs. periodo anterior"
+          label="Ventas registradas"
+          value={formatCop(totalSalesAmount)}
+          delta={`${realSales.length} ventas cerradas`}
           icon={Wallet}
         />
         <Metric
-          label="Pedidos de muestra"
-          value="128"
-          delta="+8,2% vs. periodo anterior"
+          label="Pedidos totales"
+          value={String(totalOrders)}
+          delta={`${pendingOrders} pendientes`}
           icon={ShoppingBag}
           accent="gold"
         />
         <Metric
-          label="Ticket promedio"
-          value="$ 65.781"
-          delta="+3,4% vs. periodo anterior"
-          icon={CreditCard}
+          label="Stock en riesgo"
+          value={String(stockAtRisk)}
+          delta="Productos por agotarse"
+          icon={Activity}
           accent="rose"
         />
         <Metric
-          label="Unidades en catálogo"
-          value="81"
-          delta="12 referencias demo"
+          label="Productos en catálogo"
+          value={String(totalProducts)}
+          delta="Referencias registradas"
           icon={Package}
           accent="green"
         />
       </div>
+
       <div className="ad-dashboard-grid">
         <section className="ad-panel ad-sales-panel">
           <div className="ad-panel-heading">
             <div>
-              <span className="ad-eyebrow">
-                RITMO DE LA CASA <DemoTag />
-              </span>
-              <h2>Ventas de demostración</h2>
-              <p>Valores ficticios · miles de COP</p>
+              <span className="ad-eyebrow">RITMO DE LA CASA</span>
+              <h2>Ventas registradas</h2>
+              <p>Ingresos por día · COP</p>
             </div>
             <button className="ad-text-link" onClick={() => go("Ventas")}>
               Ver análisis <ChevronRight size={14} />
@@ -948,14 +1099,14 @@ function Dashboard({
           </div>
           <div className="ad-chart-key">
             <span>
-              <i /> Valor ilustrativo
+              <i /> Ventas
             </span>
             <span className="ad-chart-period">{period}</span>
           </div>
           <div className="ad-line-chart">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={salesSeries}
+                data={realSalesSeries}
                 margin={{ top: 14, right: 8, left: -17, bottom: 0 }}
               >
                 <defs>
@@ -995,11 +1146,8 @@ function Dashboard({
                     color: "#f3eee6",
                     fontSize: 12,
                   }}
-                  formatter={(value) => [
-                    `$${value} mil COP · DEMO`,
-                    "Valor ilustrativo",
-                  ]}
-                  labelFormatter={(label) => `Día ${label} · datos demo`}
+                  formatter={(value) => [formatCop(value as number), "Ventas"]}
+                  labelFormatter={(label) => `Fecha: ${label}`}
                 />
                 <Area
                   type="monotone"
@@ -1018,18 +1166,17 @@ function Dashboard({
             </ResponsiveContainer>
           </div>
         </section>
+
         <section className="ad-panel ad-category-panel">
           <div className="ad-panel-heading">
             <div>
-              <span className="ad-eyebrow">
-                PERFIL OLFATIVO <DemoTag />
-              </span>
+              <span className="ad-eyebrow">PERFIL OLFATIVO</span>
               <h2>Interés por familia</h2>
-              <p>Composición ilustrativa · no ventas reales</p>
+              <p>Distribución de productos por familia</p>
             </div>
             <button
               className="ad-square-button"
-              aria-label="Más detalles de categorías"
+              aria-label="Más detalles"
               onClick={() => go("Categorías / Marcas")}
             >
               <MoreHorizontal size={18} />
@@ -1038,7 +1185,7 @@ function Dashboard({
           <div className="ad-bar-chart">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={categorySeries}
+                data={realCategorySeries}
                 layout="vertical"
                 margin={{ top: 5, right: 26, left: -12, bottom: 0 }}
               >
@@ -1064,10 +1211,7 @@ function Dashboard({
                     color: "#f3eee6",
                     fontSize: 12,
                   }}
-                  formatter={(value) => [
-                    `${value}% · DEMO`,
-                    "Distribución ficticia",
-                  ]}
+                  formatter={(value) => [`${value}%`, "Distribución"]}
                 />
                 <Bar
                   dataKey="value"
@@ -1083,15 +1227,14 @@ function Dashboard({
           </button>
         </section>
       </div>
+
       <div className="ad-lower-grid">
         <section className="ad-panel ad-recent-panel">
           <div className="ad-panel-heading">
             <div>
-              <span className="ad-eyebrow">
-                ACTIVIDAD RECIENTE <DemoTag />
-              </span>
-              <h2>Pedidos de muestra</h2>
-              <p>Registros enteramente ficticios</p>
+              <span className="ad-eyebrow">ACTIVIDAD RECIENTE</span>
+              <h2>Últimos pedidos</h2>
+              <p>Actividad reciente en la tienda</p>
             </div>
             <button className="ad-text-link" onClick={() => go("Pedidos")}>
               Todos los pedidos <ChevronRight size={14} />
@@ -1101,29 +1244,40 @@ function Dashboard({
             <table className="ad-table">
               <thead>
                 <tr>
-                  <th>REFERENCIA DEMO</th>
-                  <th>CLIENTE FICTICIO</th>
-                  <th>PRODUCTO ILUSTRATIVO</th>
+                  <th>NÚMERO PEDIDO</th>
+                  <th>CLIENTE</th>
+                  <th>PRODUCTO</th>
                   <th>ESTADO</th>
-                  <th>VALOR DEMO</th>
+                  <th>VALOR</th>
                 </tr>
               </thead>
               <tbody>
-                {demoOrders.slice(0, 3).map((order) => (
+                {dbOrders.slice(0, 3).map((order) => (
                   <tr key={order.id}>
-                    <td className="ad-mono">{order.id}</td>
-                    <td>{order.person}</td>
-                    <td>{order.products}</td>
+                    <td className="ad-mono">{order.orderNumber}</td>
+                    <td>{order.customerName}</td>
                     <td>
-                      <StatusBadge status={order.status} />
+                      {order.items && order.items.length > 0
+                        ? order.items[0].productName
+                        : "Sin detalle"}
                     </td>
-                    <td>{formatCop(order.amount)}</td>
+                    <td>
+                      <StatusBadge
+                        status={
+                          order.status === "pending"
+                            ? "Pendiente"
+                            : order.status
+                        }
+                      />
+                    </td>
+                    <td>{formatCop(order.subtotal)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </section>
+
         <section className="ad-stock-card">
           <div className="ad-stock-orb" />
           <div className="ad-stock-top">
@@ -1131,26 +1285,25 @@ function Dashboard({
             <Boxes size={17} />
           </div>
           <div className="ad-stock-num">
-            03 <span>referencias</span>
+            {String(stockAtRisk).padStart(2, "0")} <span>referencias</span>
           </div>
-          <p>Inventario bajo en esta muestra ficticia.</p>
+          <p>Referencias con stock bajo (menos de 5 unidades).</p>
           <div className="ad-stock-bottom">
-            <span>DEMO · no representa existencias reales</span>
+            <span>Estado actual del inventario</span>
             <button onClick={() => go("Inventario")}>
               Revisar <ChevronRight size={13} />
             </button>
           </div>
         </section>
       </div>
+
       <div className="ad-note-strip">
         <Sparkles size={14} />
         <span>
-          Este tablero es una composición de datos ficticios para revisión
-          visual. Ningún valor representa ventas u operaciones reales.
+          Este tablero muestra información real y actualizada desde la base de
+          datos.
         </span>
-        <button onClick={() => go("Configuración comercial")}>
-          Revisar avisos
-        </button>
+        <button onClick={() => go("Pedidos")}>Ver todos los pedidos</button>
       </div>
     </div>
   );
@@ -1374,7 +1527,7 @@ function ProductEditor({
   close,
   notify,
 }: {
-  product?: DemoProduct;
+  product?: any;
   close: () => void;
   notify: (message: string) => void;
 }) {
@@ -1388,6 +1541,7 @@ function ProductEditor({
       category: formData.get("category"),
       audience: formData.get("audience"),
       price: Number(formData.get("price")),
+      cost: Number(formData.get("cost")), // <-- AGREGADO
       stock: Number(formData.get("stock")),
       size: formData.get("size"),
       status: "published",
@@ -1395,11 +1549,9 @@ function ProductEditor({
     };
 
     try {
-      // AQUÍ VAN LAS DOS LÍNEAS NUEVAS:
       const url = product ? `/api/products/${product.id}` : "/api/products";
       const method = product ? "PUT" : "POST";
 
-      // Y AQUÍ VA EL FETCH (ya modificado):
       const res = await fetch(url, {
         method: method,
         headers: { "Content-Type": "application/json" },
@@ -1407,7 +1559,7 @@ function ProductEditor({
       });
 
       if (res.ok) {
-        alert("¡Producto guardado exitosamente en la base de datos!");
+        alert("¡Producto guardado exitosamente!");
         close();
         window.location.reload();
       } else {
@@ -1503,7 +1655,7 @@ function ProductEditor({
               </select>
             </label>
             <label>
-              Precio ficticio (COP)
+              Precio venta (COP)
               <input
                 name="price"
                 type="number"
@@ -1514,7 +1666,18 @@ function ProductEditor({
               />
             </label>
             <label>
-              Unidades DEMO
+              Costo interno (Privado)
+              <input
+                name="cost"
+                type="number"
+                min="0"
+                defaultValue={product?.cost ?? ""}
+                placeholder="0"
+                required
+              />
+            </label>
+            <label>
+              Unidades en stock
               <input
                 name="stock"
                 type="number"
@@ -1525,13 +1688,13 @@ function ProductEditor({
               />
             </label>
             <label>
-              Contenido de muestra
+              Contenido (ml)
               <input name="size" defaultValue={product?.size ?? "100 ml"} />
             </label>
           </div>
           <p className="ad-editor-disclaimer">
-            <ShieldCheck size={14} /> Vista previa solamente. No se crea ni
-            modifica ningún producto.
+            <ShieldCheck size={14} /> Los datos se guardan directamente en la
+            base de datos.
           </p>
           <div className="ad-editor-actions">
             <button type="button" className="ad-outline" onClick={close}>
@@ -1833,27 +1996,38 @@ function Inventory({
   showInventory,
   setShowInventory,
   notify,
+  dbProducts,
 }: {
   showInventory: boolean;
   setShowInventory: (v: boolean) => void;
   notify: (s: string) => void;
+  dbProducts: any[];
 }) {
-  const rows = demoProducts.slice().sort((a, b) => a.stock - b.stock);
+  // Ordenar por stock de menor a mayor
+  const rows = dbProducts.slice().sort((a, b) => a.stock - b.stock);
   const shown = showInventory ? rows : rows.slice(0, 7);
+
+  // Cálculos dinámicos
+  const totalReferencias = dbProducts.length;
+  const totalUnidades = dbProducts.reduce((sum, p) => sum + p.stock, 0);
+  const bajoStock = dbProducts.filter((p) => p.stock < 5 && p.stock > 0).length;
+  const agotados = dbProducts.filter((p) => p.stock === 0).length;
+  const [editingStock, setEditingStock] = useState<any>(null);
+
   return (
     <div className="ad-page">
       <SectionHeader
-        eyebrow="OPERACIÓN · STOCK DE MUESTRA"
+        eyebrow="OPERACIÓN · INVENTARIO REAL"
         title="Inventario"
-        description="Existencias ficticias para probar alertas, filtros y lectura rápida."
+        description="Existencias conectadas a la base de datos en tiempo real."
         action={
           <button
             className="ad-outline"
             onClick={() =>
-              notify("La sincronización está desactivada en este prototipo.")
+              notify("La sincronización manual estará disponible próximamente.")
             }
           >
-            <Activity size={15} /> Sin sincronización
+            <Activity size={15} /> Sincronizado
           </button>
         }
       />
@@ -1862,57 +2036,49 @@ function Inventory({
           <ArrowDownRight size={17} />
         </span>
         <span>
-          <b>3 referencias con stock bajo en esta muestra</b>
+          <b>{bajoStock} referencias con stock bajo</b>
           <small>
-            Las unidades son completamente ficticias; no representan inventario
-            real.
+            Consideramos bajo stock cuando quedan menos de 5 unidades.
           </small>
         </span>
-        <DemoTag />
       </div>
       <div className="ad-inventory-metrics">
         <div>
           <span>REFERENCIAS</span>
-          <b>12</b>
-          <small>productos de muestra</small>
+          <b>{totalReferencias}</b>
+          <small>productos registrados</small>
         </div>
         <div>
-          <span>UNIDADES ILUSTRATIVAS</span>
-          <b>81</b>
-          <small>conteo de demostración</small>
+          <span>UNIDADES TOTALES</span>
+          <b>{totalUnidades}</b>
+          <small>en inventario</small>
         </div>
         <div>
-          <span>BAJO UMBRAL DEMO</span>
-          <b>03</b>
-          <small>menos de 5 unidades ficticias</small>
+          <span>AGOTADOS / BAJO STOCK</span>
+          <b>
+            {agotados} / {bajoStock}
+          </b>
+          <small>requieren atención</small>
         </div>
         <div className="ad-inventory-action">
           <button
             className="ad-primary"
-            onClick={() =>
-              notify(
-                "Ajustar inventario no está habilitado; ningún dato se modifica.",
-              )
-            }
+            onClick={() => setEditingStock(dbProducts[0])}
           >
             <Pencil size={15} /> Ajustar inventario
           </button>
-          <small>No se guarda en esta demo</small>
         </div>
       </div>
       <section className="ad-panel ad-inventory-table">
         <div className="ad-panel-heading">
           <div>
-            <span className="ad-eyebrow">REFERENCIAS POR NIVEL DE MUESTRA</span>
-            <h2>
-              Stock del catálogo <DemoTag />
-            </h2>
+            <h2>STOCK DEL CATÁLOGO</h2>
           </div>
           <button
             className="ad-text-link"
             onClick={() => setShowInventory(!showInventory)}
           >
-            {showInventory ? "Ver menos" : "Ver las 12"}{" "}
+            {showInventory ? "Ver menos" : "Ver todos"}{" "}
             <ChevronRight size={14} />
           </button>
         </div>
@@ -1920,11 +2086,11 @@ function Inventory({
           <table className="ad-table">
             <thead>
               <tr>
-                <th>PRODUCTO FICTICIO</th>
-                <th>REFERENCIA DEMO</th>
+                <th>PRODUCTO</th>
+                <th>REFERENCIA</th>
                 <th>FAMILIA</th>
-                <th>UNIDADES DE MUESTRA</th>
-                <th>NIVEL ILUSTRATIVO</th>
+                <th>UNIDADES</th>
+                <th>NIVEL</th>
                 <th>INDICADOR</th>
               </tr>
             </thead>
@@ -1936,7 +2102,7 @@ function Inventory({
                       <ProductThumb product={product} size="small" />
                       <span>
                         <b>{product.name}</b>
-                        <small>Producto ilustrativo</small>
+                        <small>{product.brand}</small>
                       </span>
                     </div>
                   </td>
@@ -1949,7 +2115,7 @@ function Inventory({
                     <div className="ad-stock-bar">
                       <i
                         style={{
-                          width: `${Math.max(2, Math.min((product.stock / 16) * 100, 100))}%`,
+                          width: `${Math.max(2, Math.min((product.stock / 20) * 100, 100))}%`,
                         }}
                       />
                     </div>
@@ -1960,9 +2126,9 @@ function Inventory({
                     >
                       <i />
                       {product.stock === 0
-                        ? "Agotado DEMO"
+                        ? "Agotado"
                         : product.stock < 5
-                          ? "Bajo DEMO"
+                          ? "Bajo"
                           : "Disponible"}
                     </span>
                   </td>
@@ -1972,6 +2138,103 @@ function Inventory({
           </table>
         </div>
       </section>
+
+      {editingStock && (
+        <div
+          className="ad-editor-backdrop"
+          role="presentation"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setEditingStock(null);
+          }}
+        >
+          <section
+            className="ad-editor-card"
+            role="dialog"
+            aria-modal="true"
+            style={{ maxWidth: "400px" }}
+          >
+            <header className="ad-editor-heading">
+              <div>
+                <span className="ad-eyebrow">AJUSTAR INVENTARIO</span>
+                <h2>{editingStock.name}</h2>
+              </div>
+              <button
+                className="ad-row-action"
+                onClick={() => setEditingStock(null)}
+              >
+                <X size={17} />
+              </button>
+            </header>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const formData = new FormData(
+                  e.currentTarget as HTMLFormElement,
+                );
+                const newStock = Number(formData.get("stock"));
+
+                try {
+                  const res = await fetch(
+                    `/api/products/${editingStock.id}/stock`,
+                    {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ stock: newStock }),
+                    },
+                  );
+                  if (res.ok) {
+                    alert("Inventario actualizado");
+                    window.location.reload();
+                  }
+                } catch (err) {
+                  alert("Error de conexión");
+                }
+              }}
+              style={{ padding: "20px", color: "#eee9e1" }}
+            >
+              <label style={{ display: "block", marginBottom: "20px" }}>
+                <span style={{ fontSize: "13px", color: "#d8c495" }}>
+                  Nuevo Stock:
+                </span>
+                <input
+                  name="stock"
+                  type="number"
+                  min="0"
+                  defaultValue={editingStock.stock}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    marginTop: "8px",
+                    background: "#1b1821",
+                    border: "1px solid #39333f",
+                    color: "#fff",
+                    borderRadius: "4px",
+                  }}
+                />
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "10px",
+                }}
+              >
+                <button
+                  type="button"
+                  className="ad-outline"
+                  onClick={() => setEditingStock(null)}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className="ad-primary">
+                  <Check size={15} /> Guardar Stock
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
@@ -2275,19 +2538,53 @@ function Reports({
             className="ad-outline"
             onClick={() => {
               import("xlsx").then((XLSX) => {
-                const ws = XLSX.utils.json_to_sheet(
-                  dbOrders.map((o) => ({
-                    Pedido: o.orderNumber,
-                    Cliente: o.customerName,
-                    Teléfono: o.customerPhone,
-                    Ciudad: o.customerCity,
-                    Estado: o.status,
-                    Subtotal: o.subtotal,
-                  })),
-                );
+                const data = dbOrders.map((o) => ({
+                  Pedido: o.orderNumber,
+                  Cliente: o.customerName,
+                  Teléfono: o.customerPhone,
+                  Ciudad: o.customerCity,
+                  Estado: o.status,
+                  Subtotal: o.subtotal,
+                }));
+
+                // Encabezados y metadatos
+                const meta = [
+                  ["REPORTE DE PEDIDOS - TU PERFUMERÍA"],
+                  [`Generado el: ${new Date().toLocaleString("es-CO")}`],
+                  [`Exportado por: Administrador`],
+                  [],
+                  [
+                    "Pedido",
+                    "Cliente",
+                    "Teléfono",
+                    "Ciudad",
+                    "Estado",
+                    "Subtotal (COP)",
+                  ],
+                ];
+
+                const ws = XLSX.utils.aoa_to_sheet(meta);
+                XLSX.utils.sheet_add_json(ws, data, {
+                  origin: "A6",
+                  skipHeader: true,
+                });
+
+                // Ajustar ancho de columnas
+                ws["!cols"] = [
+                  { wch: 25 },
+                  { wch: 20 },
+                  { wch: 15 },
+                  { wch: 15 },
+                  { wch: 15 },
+                  { wch: 15 },
+                ];
+
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
-                XLSX.writeFile(wb, "Reporte_Pedidos.xlsx");
+                XLSX.writeFile(
+                  wb,
+                  `Reporte_Pedidos_${new Date().toISOString().split("T")[0]}.xlsx`,
+                );
               });
             }}
           >
@@ -2295,11 +2592,46 @@ function Reports({
           </button>
           <button
             className="ad-outline"
-            onClick={() =>
-              notify("PDF · control visual únicamente. No se generó archivo.")
-            }
+            onClick={() => {
+              import("jspdf").then(({ jsPDF }) => {
+                import("jspdf-autotable").then((autoTable) => {
+                  const doc = new jsPDF();
+
+                  doc.setFontSize(16);
+                  doc.text("TU PERFUMERÍA - REPORTE DE PEDIDOS", 14, 20);
+
+                  doc.setFontSize(10);
+                  doc.text(
+                    `Generado el: ${new Date().toLocaleString("es-CO")}`,
+                    14,
+                    28,
+                  );
+                  doc.text(`Exportado por: Administrador`, 14, 34);
+
+                  const tableData = dbOrders.map((o) => [
+                    o.orderNumber,
+                    o.customerName,
+                    o.customerCity,
+                    o.status,
+                    `$${o.subtotal.toLocaleString("es-CO")}`,
+                  ]);
+
+                  (autoTable as any).default(doc, {
+                    head: [
+                      ["Pedido", "Cliente", "Ciudad", "Estado", "Subtotal"],
+                    ],
+                    body: tableData,
+                    startY: 40,
+                  });
+
+                  doc.save(
+                    `Reporte_Pedidos_${new Date().toISOString().split("T")[0]}.pdf`,
+                  );
+                });
+              });
+            }}
           >
-            PDF <span>DEMO</span>
+            Exportar <span>PDF</span>
           </button>
         </div>
       </section>
@@ -2319,14 +2651,16 @@ function UsersPage({
   return (
     <div className="ad-page">
       <SectionHeader
-        eyebrow="ADMINISTRACIÓN · PERMISOS SIMULADOS"
+        eyebrow="ADMINISTRACIÓN · USUARIOS"
         title="Usuarios / Permisos"
-        description="Una vista de roles para revisar la experiencia. El interruptor es local y no se guarda."
+        description="Gestión de accesos al panel administrativo."
         action={
           <button
             className="ad-primary"
             onClick={() =>
-              notify("Invitar usuario no está disponible en esta demo.")
+              notify(
+                "La invitación de usuarios estará disponible próximamente.",
+              )
             }
           >
             <Plus size={16} /> Invitar usuario
@@ -2336,52 +2670,51 @@ function UsersPage({
       <div className="ad-users-note">
         <ShieldCheck size={17} />
         <span>
-          <b>Sin acceso real ni autenticación.</b> Las personas y roles aquí son
-          ficticios. El estado de usuarios solo existe en memoria mientras esta
-          vista permanece abierta.
+          <b>Acceso seguro.</b> Solo las cuentas autorizadas pueden ingresar al
+          panel. No compartas tus credenciales.
         </span>
-        <DemoTag />
       </div>
       <div className="ad-user-layout">
         <section className="ad-panel ad-users-panel">
           <div className="ad-panel-heading">
             <div>
-              <span className="ad-eyebrow">PERFILES DE DEMOSTRACIÓN</span>
+              <span className="ad-eyebrow">PERFILES</span>
               <h2>Accesos del espacio</h2>
             </div>
-            <span className="ad-user-total">02 perfiles demo</span>
+            <span className="ad-user-total">01 perfil activo</span>
           </div>
           <div className="ad-user-row">
-            <span className="ad-avatar ad-avatar-large">AM</span>
+            <span className="ad-avatar ad-avatar-large">AD</span>
             <div className="ad-user-details">
-              <b>Adriana M.</b>
-              <small>Propietaria · identidad ficticia</small>
-              <span className="ad-user-email">
-                adriana@demo.local <i>· no es un correo operativo</i>
-              </span>
+              <b>Admin</b>
+              <small style={{ fontSize: "14px" }}>
+                Propietario · Acceso Total
+              </small>
+              <span className="ad-user-email" style={{ fontSize: "14px", color: "#a49ba8" }}></span>
             </div>
-            <span className="ad-role-tag">PROPIETARIA DEMO</span>
+            <span className="ad-role-tag" style={{ fontSize: "13px" }}></span>
             <span className="ad-user-state active">
               <i /> Activa
             </span>
             <button
               className="ad-row-action"
-              aria-label="Editar perfil de Adriana"
-              onClick={() => notify("Perfil de muestra · edición desactivada.")}
+              aria-label="Editar perfil"
+              onClick={() =>
+                notify("La edición de perfil estará disponible próximamente.")
+              }
             >
               <MoreHorizontal size={16} />
             </button>
           </div>
+
           <div className="ad-user-row">
-            <span className="ad-avatar ad-avatar-large secondary">LC</span>
+            <span className="ad-avatar ad-avatar-large secondary">AS</span>
             <div className="ad-user-details">
-              <b>Lucía C.</b>
-              <small>Asistente de catálogo · persona ficticia</small>
-              <span className="ad-user-email">
-                lucia@demo.local <i>· no es un correo operativo</i>
-              </span>
+              <b>Administrador Secundario</b>
+              <small>Asistente · Sin acceso</small>
+              <span className="ad-user-email">secundario@tuperfumeria.com</span>
             </div>
-            <span className="ad-role-tag">CATÁLOGO DEMO</span>
+            <span className="ad-role-tag">SECUNDARIO</span>
             <span className={`ad-user-state ${active ? "active" : "inactive"}`}>
               <i />
               {active ? "Activa" : "Inactiva"}
@@ -2393,43 +2726,40 @@ function UsersPage({
               onClick={() => {
                 setActive(!active);
                 notify(
-                  `Estado local de muestra: ${active ? "inactiva" : "activa"}. No se guardó.`,
+                  `Administrador secundario ${active ? "desactivado" : "activado"}.`,
                 );
               }}
-              aria-label="Alternar estado local del perfil de Lucía"
+              aria-label="Alternar estado del administrador secundario"
             >
               <i />
             </button>
-          </div>
-          <div className="ad-local-warning">
-            <LockKeyhole size={14} /> Activar / desactivar solo cambia la vista
-            local. El cambio no se guarda ni otorga permisos reales.
           </div>
         </section>
         <aside className="ad-permission-aside">
           <div className="ad-permission-symbol">
             <ShieldCheck size={22} />
           </div>
-          <span className="ad-eyebrow">MATRIZ DE DEMOSTRACIÓN</span>
-          <h3>Permisos visibles</h3>
+          <span className="ad-eyebrow">MATRIZ DE PERMISOS</span>
+          <h3>Control de roles</h3>
           <p>
-            Los roles son muestras de interfaz, no controles de acceso reales.
+            El propietario tiene acceso total. El secundario puede gestionar
+            catálogo y pedidos (si se activa).
           </p>
-          <div className="ad-perm-line">
+          <div className="ad-perm-line ">
             <span>Catálogo</span>
-            <span>Gestionar · DEMO</span>
+            <span>Gestionar</span>
           </div>
-          <div className="ad-perm-line">
+          <div className="ad-perm-line" style={{ fontSize: "14px" }}>
             <span>Pedidos</span>
-            <span>Solo lectura · DEMO</span>
+            <span>Gestionar</span>
           </div>
-          <div className="ad-perm-line">
+          <div className="ad-perm-line" style={{ fontSize: "14px" }}>
             <span>Reportes</span>
-            <span>Solo lectura · DEMO</span>
+            <span>Solo lectura</span>
           </div>
-          <div className="ad-perm-line">
+          <div className="ad-perm-line" style={{ fontSize: "14px" }}>
             <span>Configuración</span>
-            <span>Sin acceso · DEMO</span>
+            <span>Sin acceso</span>
           </div>
         </aside>
       </div>
@@ -2437,140 +2767,214 @@ function UsersPage({
   );
 }
 
-function Settings({ notify }: { notify: (s: string) => void }) {
+function Settings({
+  notify,
+  settings,
+  setSettings,
+}: {
+  notify: (s: string) => void;
+  settings: any;
+  setSettings: (s: any) => void;
+}) {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+
+    const newSettings = {
+      whatsappMain: formData.get("whatsappMain"),
+      whatsappSecondary: formData.get("whatsappSecondary"),
+      nequiNumber: formData.get("nequiNumber"),
+      bankAccount: formData.get("bankAccount"),
+      deliveryInfo: formData.get("deliveryInfo"),
+    };
+
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newSettings),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSettings(data);
+        notify("Configuración guardada correctamente.");
+      } else {
+        notify("Error al guardar la configuración.");
+      }
+    } catch (err) {
+      notify("Error de conexión.");
+    }
+  };
+
   return (
     <div className="ad-page">
       <SectionHeader
-        eyebrow="ADMINISTRACIÓN · SIN CONEXIONES ACTIVAS"
+        eyebrow="ADMINISTRACIÓN · CONFIGURACIÓN REAL"
         title="Configuración comercial"
-        description="Canales y destinos preparados como placeholders. No hay credenciales ni datos de contacto."
+        description="Estos datos se usarán en la tienda pública y en los enlaces de WhatsApp."
         action={
           <span className="ad-visual-only">
-            <EyeOff size={14} /> NO CONECTADO
+            <Settings2 size={14} /> CONECTADO
           </span>
         }
       />
-      <div className="ad-setup-banner">
-        <span className="ad-setup-mark">
-          <Settings2 size={18} />
-        </span>
+
+      <form
+        onSubmit={handleSave}
+        className="ad-panel"
+        style={{
+          padding: "30px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+        }}
+      >
         <div>
-          <b>Todo permanece sin configurar.</b>
-          <span>
-            Este prototipo no se conecta a servicios, entidades financieras ni
-            números telefónicos.
-          </span>
-        </div>
-        <DemoTag />
-      </div>
-      <div className="ad-settings-grid">
-        <section className="ad-panel ad-setting-card">
-          <div className="ad-setting-card-top">
-            <span className="ad-setting-icon">
-              <Wallet size={19} />
-            </span>
-            <span className="ad-connection-state">
-              <i /> Sin configurar
-            </span>
-          </div>
-          <span className="ad-eyebrow">DESTINO DE PAGO</span>
-          <h2>Cuenta de recaudo</h2>
-          <p>
-            Configura el destino de pago en una etapa futura. No se muestra ni
-            solicita información bancaria.
-          </p>
-          <div className="ad-unset-box">
-            <LockKeyhole size={15} />
-            <span>
-              <b>Sin cuenta vinculada</b>
-              <small>Sin banco · sin número · sin credenciales</small>
-            </span>
-            <span className="ad-unset-pill">PLACEHOLDER</span>
-          </div>
-          <button
-            className="ad-outline ad-config-button"
-            onClick={() =>
-              notify(
-                "No se solicitan ni guardan datos financieros en este prototipo.",
-              )
-            }
+          <label
+            style={{
+              display: "block",
+              color: "#d8c495",
+              marginBottom: "8px",
+              fontSize: "14px",
+            }}
           >
-            Vista de configuración <ChevronRight size={14} />
-          </button>
-        </section>
-        <section className="ad-panel ad-setting-card">
-          <div className="ad-setting-card-top">
-            <span className="ad-setting-icon whatsapp">
-              <MessageCircle size={19} />
-            </span>
-            <span className="ad-connection-state">
-              <i /> Sin configurar
-            </span>
-          </div>
-          <span className="ad-eyebrow">CANAL DE ATENCIÓN</span>
-          <h2>WhatsApp comercial</h2>
-          <p>
-            El canal está sin configurar. No se proporciona un número ficticio
-            ni se abre ninguna conexión.
-          </p>
-          <div className="ad-unset-box">
-            <MessageCircle size={15} />
-            <span>
-              <b>Sin número vinculado</b>
-              <small>Sin contacto · sin integración · desconectado</small>
-            </span>
-            <span className="ad-unset-pill">PLACEHOLDER</span>
-          </div>
-          <button
-            className="ad-outline ad-config-button"
-            onClick={() =>
-              notify(
-                "WhatsApp permanece sin configurar: no hay conexión activa.",
-              )
-            }
+            WhatsApp Principal
+          </label>
+          <input
+            name="whatsappMain"
+            defaultValue={settings?.whatsappMain || ""}
+            placeholder="Ej: 573001234567"
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#1b1821",
+              border: "1px solid #39333f",
+              color: "#fff",
+              borderRadius: "4px",
+            }}
+          />
+          <small style={{ color: "#888", display: "block", marginTop: "5px" }}>
+            Incluye el código de país (57 para Colombia).
+          </small>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              color: "#d8c495",
+              marginBottom: "8px",
+              fontSize: "14px",
+            }}
           >
-            Vista de configuración <ChevronRight size={14} />
+            WhatsApp Secundario (Opcional)
+          </label>
+          <input
+            name="whatsappSecondary"
+            defaultValue={settings?.whatsappSecondary || ""}
+            placeholder="Ej: 573009876543"
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#1b1821",
+              border: "1px solid #39333f",
+              color: "#fff",
+              borderRadius: "4px",
+            }}
+          />
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              color: "#d8c495",
+              marginBottom: "8px",
+              fontSize: "14px",
+            }}
+          >
+            Número Nequi
+          </label>
+          <input
+            name="nequiNumber"
+            defaultValue={settings?.nequiNumber || ""}
+            placeholder="Ej: 3001234567"
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#1b1821",
+              border: "1px solid #39333f",
+              color: "#fff",
+              borderRadius: "4px",
+            }}
+          />
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              color: "#d8c495",
+              marginBottom: "8px",
+              fontSize: "14px",
+            }}
+          >
+            Cuenta Bancaria (Opcional)
+          </label>
+          <input
+            name="bankAccount"
+            defaultValue={settings?.bankAccount || ""}
+            placeholder="Ej: Bancolombia Ahorros 123-456789-00"
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#1b1821",
+              border: "1px solid #39333f",
+              color: "#fff",
+              borderRadius: "4px",
+            }}
+          />
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              color: "#d8c495",
+              marginBottom: "8px",
+              fontSize: "14px",
+            }}
+          >
+            Texto de Entrega
+          </label>
+          <textarea
+            name="deliveryInfo"
+            defaultValue={settings?.deliveryInfo || ""}
+            rows={3}
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#1b1821",
+              border: "1px solid #39333f",
+              color: "#fff",
+              borderRadius: "4px",
+              resize: "vertical",
+            }}
+          />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "10px",
+          }}
+        >
+          <button type="submit" className="ad-primary">
+            <Check size={16} /> Guardar Configuración
           </button>
-        </section>
-      </div>
-      <section className="ad-panel ad-business-details">
-        <div className="ad-panel-heading">
-          <div>
-            <span className="ad-eyebrow">
-              PERFIL DE LA TIENDA · AMBIENTACIÓN DEMO
-            </span>
-            <h2>Identidad de muestra</h2>
-            <p>
-              Contexto ficticio usado exclusivamente para vestir esta interfaz.
-            </p>
-          </div>
-          <DemoTag />
         </div>
-        <div className="ad-details-row">
-          <span>Nombre visible</span>
-          <b>
-            Tu Perfumería <small>· provisional</small>
-          </b>
-        </div>
-        <div className="ad-details-row">
-          <span>País de referencia</span>
-          <b>
-            Colombia <small>· contexto ilustrativo</small>
-          </b>
-        </div>
-        <div className="ad-details-row">
-          <span>Moneda de la interfaz</span>
-          <b>
-            COP <small>· no son tarifas reales</small>
-          </b>
-        </div>
-        <div className="ad-details-row">
-          <span>Conexiones externas</span>
-          <b className="ad-none-connected">
-            <i /> Ninguna activa
-          </b>
-        </div>
-      </section>
+      </form>
     </div>
   );
 }
@@ -2866,8 +3270,8 @@ const styles = `
 .ad-order-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(210px,1.3fr);gap:9px;margin:0 0 13px}.ad-order-summary>div{min-height:93px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:11px 13px;border:1px solid rgba(226,216,197,.09);border-radius:6px;background:#17151b}.ad-order-summary>div>span:first-child{font:8px var(--ad-mono);letter-spacing:.6px;color:#918a96}.ad-order-summary>div>b{font-size:20px;margin:3px 0 0;font-weight:650}.ad-order-summary>div>small{font-size:8px;color:#928b96}.ad-order-summary-message{position:relative;display:grid!important;grid-template-columns:22px 1fr;align-items:center!important;gap:4px 8px!important;background:#1c1820!important;border-color:rgba(163,124,224,.12)!important;color:#a8a0ac;font-size:8px}.ad-order-summary-message svg{color:#c1a3e4}.ad-order-summary-message .ad-demo-tag{grid-column:2;justify-self:start;font-size:7px;padding:2px 4px}.ad-order-panel{padding:15px 16px 0}.ad-order-tools{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}.ad-order-tools h2{font-size:14px;margin:5px 0 0}.ad-order-tools h2 .ad-demo-tag{vertical-align:2px;font-size:7px}.ad-order-tools select{height:31px;font-size:9px}.ad-order-panel .ad-table th,.ad-order-panel .ad-table td{padding-right:13px}.ad-cell-sub{display:block;font-size:8px;color:#7f7884;margin-top:2px}
 .ad-inventory-alert{display:flex;align-items:center;gap:10px;padding:11px 13px;margin-bottom:12px;border:1px solid rgba(214,190,139,.18);border-radius:6px;background:linear-gradient(90deg,rgba(214,190,139,.085),rgba(214,190,139,.025))}.ad-alert-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:5px;color:#d6be8b;background:rgba(214,190,139,.1)}.ad-inventory-alert>span:nth-child(2){display:grid;gap:2px;flex:1}.ad-inventory-alert b{font-size:10px;color:#e1d4b4}.ad-inventory-alert small{font-size:8px;color:#a49aa1}.ad-inventory-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(175px,.8fr);gap:9px;margin-bottom:13px}.ad-inventory-metrics>div{display:flex;flex-direction:column;gap:2px;padding:11px 13px;background:#17151b;border:1px solid rgba(226,216,197,.09);border-radius:6px}.ad-inventory-metrics>div>span{font:8px var(--ad-mono);color:#89828e;letter-spacing:.4px}.ad-inventory-metrics>div>b{font-size:20px;line-height:1.3}.ad-inventory-metrics>div>small{color:#8b8490;font-size:8px}.ad-inventory-metrics .ad-inventory-action{align-items:center;justify-content:center;background:#1c1820;border-color:rgba(163,124,224,.15)}.ad-inventory-action .ad-primary{height:30px}.ad-inventory-table{padding:15px 15px 0}.ad-inventory-table .ad-table td{height:46px}.ad-stock-bar{width:84px;height:4px;border-radius:3px;background:#302b33;overflow:hidden}.ad-stock-bar i{height:100%;display:block;background:#a286cb;border-radius:3px}.ad-level{display:inline-flex;align-items:center;gap:5px;font-size:8px}.ad-level i{width:5px;height:5px;border-radius:50%;background:#91bd99}.ad-level.low{color:#d6be8b}.ad-level.low i{background:#d6be8b}.ad-level.zero{color:#d3979a}.ad-level.zero i{background:#cc8b90}
 .ad-synthetic-callout,.ad-users-note,.ad-audit-notice{display:flex;align-items:center;gap:9px;padding:10px 12px;margin-bottom:13px;border:1px solid rgba(214,190,139,.15);border-radius:5px;background:rgba(214,190,139,.045);color:#b4a99b;font-size:9px}.ad-synthetic-callout>svg,.ad-audit-notice>svg{color:#d6be8b;flex:none}.ad-synthetic-callout b,.ad-users-note b,.ad-audit-notice b{color:#e1d2b2}.ad-sales-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:13px}.ad-sales-summary article{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:14px 15px;background:#17151b;border:1px solid rgba(226,216,197,.09);border-radius:6px}.ad-sales-summary article>span{font:8px var(--ad-mono);letter-spacing:.5px;color:#96909b}.ad-sales-summary article>b{font-size:23px;margin:7px 0 3px}.ad-sales-summary article>small{font-size:8px;color:#8e8793}.ad-sales-summary article>i{display:flex;align-items:center;gap:4px;font-style:normal;font-size:8px;color:#8fbd9b;margin-top:11px}.ad-sales-highlight{background:linear-gradient(140deg,rgba(163,124,224,.13),#17151b 77%)!important;border-color:rgba(163,124,224,.17)!important}.ad-sales-chart-panel{padding:15px 17px 10px;background:#17151b;border:1px solid rgba(226,216,197,.09);border-radius:7px}.ad-chart-unit{font:9px var(--ad-mono);color:#d6be8b}.ad-chart-unit small{color:#89828d}.ad-large-chart{height:250px;margin-top:7px}.ad-sales-chart-foot{display:flex;justify-content:space-between;padding-top:9px;border-top:1px solid rgba(226,216,197,.07);font-size:8px;color:#8d8692}.ad-sales-chart-foot span:first-child{display:flex;align-items:center;gap:6px}.ad-sales-chart-foot i{background:#d6be8b}.ad-sales-bottom{display:flex;align-items:center;gap:25px;padding:12px 3px;margin-top:11px;border-top:1px solid rgba(226,216,197,.08)}.ad-sales-bottom>div{display:grid;gap:4px}.ad-sales-bottom .ad-eyebrow{font-size:7px}.ad-sales-bottom>div>b{font-size:10px}.ad-sales-bottom>div>b small{font-weight:400;color:#928a96;font-size:8px;margin-left:5px}.ad-sales-bottom .ad-outline{margin-left:auto}
-.ad-visual-only{display:inline-flex;align-items:center;gap:6px;color:#bda6d7;border:1px solid rgba(163,124,224,.17);background:rgba(163,124,224,.07);padding:7px 9px;border-radius:4px;font:8px var(--ad-mono);letter-spacing:.5px}.ad-report-hero{margin-bottom:13px;min-height:105px}.ad-report-orb{color:#c5a4e8;border-color:rgba(193,165,237,.27);background:rgba(163,124,224,.08)}.ad-report-hero h2{font-size:19px}.ad-report-hero .ad-eyebrow{color:#c7a8e4}.ad-report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.ad-report-card{position:relative;overflow:hidden;min-height:195px;padding:13px 14px;border:1px solid rgba(226,216,197,.1);border-radius:6px;background:linear-gradient(145deg,rgba(154,118,202,.1),transparent 65%),#17151b}.ad-report-card.gold{background:linear-gradient(145deg,rgba(214,190,139,.1),transparent 65%),#17151b}.ad-report-card.rose{background:linear-gradient(145deg,rgba(192,123,166,.1),transparent 65%),#17151b}.ad-report-card.mint{background:linear-gradient(145deg,rgba(126,177,144,.09),transparent 65%),#17151b}.ad-report-card-top{display:flex;align-items:center;gap:8px}.ad-report-icon{width:31px;height:31px;border-radius:6px;display:grid;place-items:center;color:#c9afe6;background:rgba(163,124,224,.1);border:1px solid rgba(163,124,224,.14)}.ad-report-card.gold .ad-report-icon{color:#dfc994;background:rgba(214,190,139,.08);border-color:rgba(214,190,139,.13)}.ad-report-card.rose .ad-report-icon{color:#dca3bc}.ad-report-card.mint .ad-report-icon{color:#9bcea7}.ad-report-card-top>span:nth-child(2){font:8px var(--ad-mono);color:#938b98;flex:1}.ad-report-card-top>svg{color:#726c77}.ad-report-spark{height:48px;margin:6px 0 2px;opacity:.9}.ad-report-spark svg{width:100%;height:100%;overflow:visible}.ad-report-spark path{fill:none;stroke:#b99af7;stroke-width:2}.ad-report-card.gold .ad-report-spark path{stroke:#d6be8b}.ad-report-card.rose .ad-report-spark path{stroke:#ce91ae}.ad-report-card.mint .ad-report-spark path{stroke:#91bd9b}.ad-report-card>.ad-eyebrow{font-size:7px;color:#928a96}.ad-report-card h3{font-size:12px;margin:3px 0;font-weight:650}.ad-report-card p{font-size:8px;color:#8e8793;margin:0}.ad-report-card>button{display:flex;align-items:center;gap:3px;background:none;border:0;color:#c3a2e1;font-size:8px;margin-top:8px;padding:0}.ad-report-notice{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;margin-top:12px;border:1px solid rgba(163,124,224,.16);border-radius:5px;background:rgba(163,124,224,.07)}.ad-report-notice>div{display:flex;align-items:center;gap:9px;color:#bca2d6}.ad-report-notice>div span{display:grid;gap:2px}.ad-report-notice b{font-size:9px;color:#ded0e9}.ad-report-notice small{font-size:8px;color:#948c99}.ad-close-notice{border:0;background:none;color:#a49ba9}.ad-export-panel{display:flex;align-items:center;gap:12px;margin-top:13px;padding:12px;background:#17151b;border:1px solid rgba(226,216,197,.09);border-radius:6px}.ad-export-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:6px;color:#d6be8b;background:rgba(214,190,139,.08)}.ad-export-panel>div:nth-child(2){flex:1}.ad-export-panel b{font-size:9px}.ad-export-panel p{font-size:8px;color:#8f8793;margin:3px 0 0}.ad-export-actions{display:flex;gap:6px}.ad-export-actions .ad-outline{height:29px;font-size:8px}.ad-export-actions .ad-outline span{font:7px var(--ad-mono);color:#d3bc8f}
-.ad-users-note{margin-bottom:13px}.ad-users-note>svg{color:#c4a5e5;flex:none}.ad-users-note>span{flex:1}.ad-user-layout{display:grid;grid-template-columns:minmax(0,1fr) 265px;gap:12px}.ad-users-panel{padding:15px 16px}.ad-user-total{font:8px var(--ad-mono);color:#998fa0;border:1px solid var(--tp-line);border-radius:4px;padding:4px 6px}.ad-user-row{display:flex;align-items:center;gap:11px;padding:16px 0;border-bottom:1px solid rgba(226,216,197,.08)}.ad-user-row:first-of-type{margin-top:5px}.ad-avatar-large{width:39px;height:39px;font-size:11px}.ad-avatar.secondary{color:#e0c5d6;background:#3c2934;border-color:rgba(207,146,170,.2)}.ad-user-details{display:grid;gap:3px;flex:1}.ad-user-details>b{font-size:10px}.ad-user-details>small{font-size:8px;color:#958d99}.ad-user-email{font:8px var(--ad-mono);color:#b49bc9}.ad-user-email i{font:7px var(--ad-font);color:#746e79}.ad-role-tag{font:7px var(--ad-mono);padding:4px 5px;color:#c5a7e2;background:rgba(163,124,224,.08);border:1px solid rgba(163,124,224,.14);border-radius:3px}.ad-user-state{display:flex;align-items:center;gap:5px;font-size:8px;color:#9d969f;min-width:55px}.ad-user-state i{width:5px;height:5px;background:#777;border-radius:50%}.ad-user-state.active{color:#9cc6a5}.ad-user-state.active i{background:#88bb94}.ad-user-state.inactive{color:#cf999a}.ad-user-state.inactive i{background:#ca898d}.ad-switch{width:32px;height:18px;padding:2px;border:1px solid #57505b;border-radius:20px;background:#29252d;transition:background .18s}.ad-switch i{display:block;width:12px;height:12px;border-radius:50%;background:#8f8793;transition:transform .18s,background .18s}.ad-switch.on{background:#725492;border-color:#9270b4}.ad-switch.on i{transform:translateX(13px);background:#ead8fb}.ad-local-warning{display:flex;align-items:center;gap:7px;padding:10px 0 0;color:#948c98;font-size:8px}.ad-local-warning svg{color:#d6be8b}.ad-permission-aside{padding:15px;background:linear-gradient(150deg,rgba(163,124,224,.1),transparent 58%),#1a171e;border:1px solid rgba(163,124,224,.13);border-radius:6px}.ad-permission-symbol{width:34px;height:34px;display:grid;place-items:center;border-radius:7px;background:rgba(163,124,224,.11);color:#c3a5e1;margin-bottom:12px}.ad-permission-aside>.ad-eyebrow{font-size:8px;color:#b89dd3}.ad-permission-aside h3{font-size:13px;margin:4px 0}.ad-permission-aside>p{font-size:8px;color:#958d99;line-height:1.6;margin:0 0 13px}.ad-perm-line{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid rgba(226,216,197,.08);font-size:8px;color:#b8b0ba}.ad-perm-line span:last-child{color:#c0a5d9;font:7px var(--ad-mono)}
+.ad-visual-only{display:inline-flex;align-items:center;gap:6px;color:#bda6d7;border:1px solid rgba(163,124,224,.17);background:rgba(163,124,224,.07);padding:7px 9px;border-radius:4px;font:8px var(--ad-mono);letter-spacing:.5px}.ad-report-hero{margin-bottom:13px;min-height:105px}.ad-report-orb{color:#c5a4e8;border-color:rgba(193,165,237,.27);background:rgba(163,124,224,.08)}.ad-report-hero h2{font-size:19px}.ad-report-hero .ad-eyebrow{color:#c7a8e4}.ad-report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.ad-report-card{position:relative;overflow:hidden;min-height:195px;padding:13px 14px;border:1px solid rgba(226,216,197,.1);border-radius:6px;background:linear-gradient(145deg,rgba(154,118,202,.1),transparent 65%),#17151b}.ad-report-card.gold{background:linear-gradient(145deg,rgba(214,190,139,.1),transparent 65%),#17151b}.ad-report-card.rose{background:linear-gradient(145deg,rgba(192,123,166,.1),transparent 65%),#17151b}.ad-report-card.mint{background:linear-gradient(145deg,rgba(126,177,144,.09),transparent 65%),#17151b}.ad-report-card-top{display:flex;align-items:center;gap:8px}.ad-report-icon{width:31px;height:31px;border-radius:6px;display:grid;place-items:center;color:#c9afe6;background:rgba(163,124,224,.1);bord<small>Propietarior:1px solid rgba(163,124,224,.14)}.ad-report-card.gold .ad-report-icon{color:#dfc994;background:rgba(214,190,139,.08);border-color:rgba(214,190,139,.13)}.ad-report-card.rose .ad-report-icon{color:#dca3bc}.ad-report-card.mint .ad-report-icon{color:#9bcea7}.ad-report-card-top>span:nth-child(2){font:8px var(--ad-mono);color:#938b98;flex:1}.ad-report-card-top>svg{color:#726c77}.ad-report-spark{height:48px;margin:6px 0 2px;opacity:.9}.ad-report-spark svg{width:100%;height:100%;overflow:visible}.ad-report-spark path{fill:none;stroke:#b99af7;stroke-width:2}.ad-report-card.gold .ad-report-spark path{stroke:#d6be8b}.ad-report-card.rose .ad-report-spark path{stroke:#ce91ae}.ad-report-card.mint .ad-report-spark path{stroke:#91bd9b}.ad-report-card>.ad-eyebrow{font-size:7px;color:#928a96}.ad-report-card h3{font-size:12px;margin:3px 0;font-weight:650}.ad-report-card p{font-size:8px;color:#8e8793;margin:0}.ad-report-card>button{display:flex;align-items:center;gap:3px;background:none;border:0;color:#c3a2e1;font-size:8px;margin-top:8px;padding:0}.ad-report-notice{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;margin-top:12px;border:1px solid rgba(163,124,224,.16);border-radius:5px;background:rgba(163,124,224,.07)}.ad-report-notice>div{display:flex;align-items:center;gap:9px;color:#bca2d6}.ad-report-notice>div span{display:grid;gap:2px}.ad-report-notice b{font-size:9px;color:#ded0e9}.ad-report-notice small{font-size:8px;color:#948c99}.ad-close-notice{border:0;background:none;color:#a49ba9}.ad-export-panel{display:flex;align-items:center;gap:12px;margin-top:13px;padding:12px;background:#17151b;border:1px solid rgba(226,216,197,.09);border-radius:6px}.ad-export-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:6px;color:#d6be8b;background:rgba(214,190,139,.08)}.ad-export-panel>div:nth-child(2){flex:1}.ad-export-panel b{font-size:9px}.ad-export-panel p{font-size:8px;color:#8f8793;margin:3px 0 0}.ad-export-actions{display:flex;gap:6px}.ad-export-actions .ad-outline{height:29px;font-size:8px}.ad-export-actions .ad-outline span{font:7px var(--ad-mono);color:#d3bc8f}
+.ad-users-note{margin-bottom:13px}.ad-users-note>svg{color:#c4a5e5;flex:none}.ad-users-note>span{flex:1}.ad-user-layout{display:grid;grid-template-columns:minmax(0,1fr) 265px;gap:12px}.ad-users-panel{padding:15px 16px}.ad-user-total{font:8px var(--ad-mono);color:#998fa0;border:1px solid var(--tp-line);border-radius:4px;padding:4px 6px}.ad-user-row{display:flex;align-items:center;gap:11px;padding:16px 0;border-bottom:1px solid rgba(226,216,197,.08)}.ad-user-row:first-of-type{margin-top:5px}.ad-avatar-large{width:39px;height:39px;font-size:11px}.ad-avatar.secondary{color:#e0c5d6;background:#3c2934;border-color:rgba(207,146,170,.2)}.ad-user-details{display:grid;gap:3px;flex:1}.ad-user-details>b{font-size:16px}.ad-user-details>small{font-size:12px;color:#958d99}.ad-user-email{font:12px var(--ad-mono);color:#b49bc9}.ad-user-email i{font:7px var(--ad-font);color:#746e79}.ad-role-tag{font:7px var(--ad-mono);padding:4px 5px;color:#c5a7e2;background:rgba(163,124,224,.08);border:1px solid rgba(163,124,224,.14);border-radius:3px}.ad-user-state{display:flex;align-items:center;gap:5px;font-size:8px;color:#9d969f;min-width:55px}.ad-user-state i{width:5px;height:5px;background:#777;border-radius:50%}.ad-user-state.active{color:#9cc6a5}.ad-user-state.active i{background:#88bb94}.ad-user-state.inactive{color:#cf999a}.ad-user-state.inactive i{background:#ca898d}.ad-switch{width:32px;height:18px;padding:2px;border:1px solid #57505b;border-radius:20px;background:#29252d;transition:background .18s}.ad-switch i{display:block;width:12px;height:12px;border-radius:50%;background:#8f8793;transition:transform .18s,background .18s}.ad-switch.on{background:#725492;border-color:#9270b4}.ad-switch.on i{transform:translateX(13px);background:#ead8fb}.ad-local-warning{display:flex;align-items:center;gap:7px;padding:10px 0 0;color:#948c98;font-size:8px}.ad-local-warning svg{color:#d6be8b}.ad-permission-aside{padding:15px;background:linear-gradient(150deg,rgba(163,124,224,.1),transparent 58%),#1a171e;border:1px solid rgba(163,124,224,.13);border-radius:6px}.ad-permission-symbol{width:34px;height:34px;display:grid;place-items:center;border-radius:7px;background:rgba(163,124,224,.11);color:#c3a5e1;margin-bottom:12px}.ad-permission-aside>.ad-eyebrow{font-size:8px;color:#b89dd3}.ad-permission-aside h3{font-size:13px;margin:4px 0}.ad-permission-aside>p{font-size:8px;color:#958d99;line-height:1.6;margin:0 0 13px}.ad-perm-line{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid rgba(226,216,197,.08);font-size:8px;color:#b8b0ba}.ad-perm-line span:last-child{color:#c0a5d9;font:7px var(--ad-mono)}
 .ad-setup-banner{display:flex;align-items:center;gap:11px;padding:12px 14px;margin-bottom:13px;border:1px solid rgba(214,190,139,.16);border-radius:6px;background:linear-gradient(90deg,rgba(214,190,139,.07),rgba(214,190,139,.02))}.ad-setup-mark{width:31px;height:31px;display:grid;place-items:center;border-radius:6px;color:#d6be8b;background:rgba(214,190,139,.09)}.ad-setup-banner>div{display:grid;gap:2px;flex:1}.ad-setup-banner b{font-size:10px;color:#e0d2b3}.ad-setup-banner>div>span{font-size:8px;color:#a198a2}.ad-settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:13px}.ad-setting-card{padding:16px}.ad-setting-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.ad-setting-icon{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(214,190,139,.18);border-radius:8px;color:#d6be8b;background:rgba(214,190,139,.07)}.ad-setting-icon.whatsapp{color:#9cc9a5;border-color:rgba(145,189,155,.19);background:rgba(145,189,155,.07)}.ad-connection-state{display:flex;align-items:center;gap:6px;color:#aaa1ac;font:8px var(--ad-mono)}.ad-connection-state i{width:5px;height:5px;border-radius:50%;background:#888}.ad-setting-card>.ad-eyebrow{font-size:8px}.ad-setting-card h2{font-size:15px;margin:4px 0}.ad-setting-card>p{font-size:9px;color:#958d99;line-height:1.6;min-height:43px;margin:0 0 13px}.ad-unset-box{min-height:55px;display:flex;align-items:center;gap:9px;padding:9px;border:1px dashed rgba(226,216,197,.16);border-radius:5px;color:#938b97;background:rgba(10,9,12,.14)}.ad-unset-box>svg{flex:none;color:#9e91a8}.ad-unset-box>span:nth-child(2){display:grid;gap:3px;flex:1}.ad-unset-box b{font-size:9px;color:#c8c0ca;font-weight:600}.ad-unset-box small{font-size:7px;color:#837c87}.ad-unset-pill{font:7px var(--ad-mono);color:#a298a5;border:1px solid rgba(226,216,197,.12);border-radius:3px;padding:4px}.ad-config-button{margin-top:12px;height:30px;font-size:8px}.ad-business-details{padding:15px 17px}.ad-details-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(226,216,197,.07);font-size:9px;color:#9b939f}.ad-details-row>b{font-size:9px;font-weight:550;color:#ded7df}.ad-details-row>b small{font-size:8px;color:#8d8691;font-weight:400}.ad-none-connected{display:flex;align-items:center;gap:6px}.ad-none-connected i{width:5px;height:5px;border-radius:50%;background:#87818a}
 .ad-audit-notice>span{flex:1}.ad-timeline-panel{padding:16px 17px 0}.ad-timezone{color:#89818d;font:8px var(--ad-mono)}.ad-timeline{padding:12px 0 3px}.ad-timeline-item{min-height:61px;display:grid;grid-template-columns:58px 32px minmax(0,1fr) auto;align-items:center;gap:10px;position:relative}.ad-timeline-item:not(:last-child):before{content:"";position:absolute;left:83px;top:41px;height:27px;border-left:1px solid rgba(193,165,237,.18)}.ad-timeline-time{justify-self:end;color:#8b8490;font:9px var(--ad-mono)}.ad-timeline-node{width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(193,165,237,.18);border-radius:50%;color:#b99af7;background:#211c27;z-index:1}.ad-timeline-item:nth-child(even) .ad-timeline-node{color:#d6be8b;border-color:rgba(214,190,139,.2);background:#24201d}.ad-timeline-copy{display:grid;gap:3px}.ad-timeline-copy b{font-size:9px;font-weight:600;color:#dcd5de}.ad-timeline-copy small{font-size:8px;color:#8f8794}.ad-timeline-kind{font:7px var(--ad-mono);color:#a991c2;border:1px solid rgba(163,124,224,.12);padding:3px 5px;border-radius:3px}.ad-timeline-foot{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(226,216,197,.07);color:#746d79;font:7px var(--ad-mono);letter-spacing:.4px}
 .ad-modal-backdrop{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:20px;background:rgba(5,4,7,.78);backdrop-filter:blur(8px);animation:ad-fade .18s ease-out}@keyframes ad-fade{from{opacity:0}to{opacity:1}}.ad-gallery-modal{width:min(810px,96vw);max-height:90vh;overflow:auto;border:1px solid rgba(214,190,139,.2);border-radius:9px;background:#17141b;box-shadow:0 22px 90px rgba(0,0,0,.56)}.ad-gallery-header{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 20px 12px}.ad-gallery-header h2{margin:4px 0 2px;font-size:17px}.ad-gallery-header p{margin:0;color:#9b939f;font-size:9px}.ad-gallery-header p span{color:#c4a4e5;padding:0 4px}.ad-gallery-disclaimer{display:flex;align-items:center;gap:8px;margin:0 20px 15px;padding:9px 10px;color:#b2a6b5;background:rgba(163,124,224,.07);border:1px solid rgba(163,124,224,.12);border-radius:4px;font-size:8px}.ad-gallery-disclaimer svg{color:#c6a8e5;flex:none}.ad-gallery-disclaimer span{flex:1}.ad-gallery-disclaimer b{font:7px var(--ad-mono);color:#d8c295}.ad-gallery-main{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:17px;padding:0 20px 19px}.ad-gallery-large{min-height:355px;position:relative;display:grid;place-items:center;overflow:hidden;border:1px solid rgba(226,216,197,.08);border-radius:6px;background:radial-gradient(ellipse at 50% 55%,rgba(163,124,224,.18),transparent 56%),linear-gradient(145deg,#211c25,#17141a)}.ad-gallery-large:before,.ad-gallery-large:after{content:"";position:absolute;width:275px;height:275px;border:1px solid rgba(214,190,139,.12);border-radius:50%;transform:scaleX(.58) rotate(35deg)}.ad-gallery-large:after{width:225px;height:225px;border-color:rgba(193,165,237,.13);transform:scaleX(.72) rotate(-28deg)}.ad-gallery-backdrop{width:210px;height:245px;display:grid;place-items:center;z-index:1}.ad-gallery-backdrop svg{height:245px;width:215px;filter:drop-shadow(0 15px 20px rgba(0,0,0,.48))}.ad-gallery-large-tag{position:absolute;left:12px;bottom:11px;color:#a39aa7;font:8px var(--ad-mono);letter-spacing:.6px}.ad-principal-badge{position:absolute;right:10px;top:10px;display:flex;align-items:center;gap:4px;padding:4px 6px;color:#ead8b3;border:1px solid rgba(214,190,139,.2);border-radius:3px;background:rgba(214,190,139,.08);font-size:8px}.ad-gallery-details{display:flex;flex-direction:column;min-width:0}.ad-gallery-details>.ad-eyebrow{font-size:8px;color:#bd9fda}.ad-gallery-details h3{font:500 20px var(--ad-display);margin:5px 0}.ad-gallery-details>p{margin:0;color:#99919d;font-size:9px}.ad-gallery-views-label{display:flex;align-items:center;justify-content:space-between;margin:20px 0 9px}.ad-gallery-views-label b{font-size:9px}.ad-gallery-views-label span{font:8px var(--ad-mono);color:#9c8ca7}.ad-gallery-thumbs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.ad-gallery-thumb{height:126px;position:relative;overflow:hidden;border:1px solid rgba(226,216,197,.1);border-radius:5px;background:#201c24}.ad-gallery-thumb.selected{border-color:rgba(214,190,139,.43);box-shadow:inset 0 0 0 1px rgba(214,190,139,.09)}.ad-thumb-select{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#aaa1ae;background:transparent;border:0;font-size:8px}.ad-thumb-select svg{width:77px;height:83px}.ad-thumb-select>span{display:flex;align-items:center;gap:3px}.ad-thumb-select>span svg{width:11px;height:11px;color:#d6be8b}.ad-thumb-delete,.ad-thumb-move{width:21px;height:21px;display:grid;place-items:center;position:absolute;right:4px;top:4px;background:#151219c9;color:#b6aab9;border:1px solid rgba(226,216,197,.09);border-radius:4px}.ad-thumb-delete:hover{color:#dc999c}.ad-thumb-move{right:auto;left:4px}.ad-add-view{min-height:126px;display:flex;align-items:center;justify-content:center;gap:7px;color:#c1a5df;border:1px dashed rgba(193,165,237,.25);border-radius:5px;background:rgba(163,124,224,.035);font-size:8px;text-align:left}.ad-add-view>span{display:grid;gap:3px}.ad-add-view small{color:#817987;font-size:7px}.ad-gallery-local-note{display:flex;align-items:center;gap:6px;color:#918994;font-size:8px;margin-top:auto;padding:12px 0 8px}.ad-gallery-local-note svg{color:#d6be8b}.ad-gallery-close{width:100%;height:32px}.ad-toast{position:fixed;right:22px;bottom:20px;z-index:50;display:flex;align-items:center;gap:8px;padding:11px 14px;border:1px solid rgba(214,190,139,.2);border-radius:6px;background:#24202a;color:#e7d9bc;font-size:10px;box-shadow:0 9px 28px rgba(0,0,0,.4);animation:ad-enter .2s ease-out}.ad-toast svg{color:#95c19a}
