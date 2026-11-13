@@ -56,10 +56,11 @@ router.post("/orders", async (req, res) => {
 router.post("/products", async (req, res) => {
   try {
     const { name, brand, reference, price, cost, stock, category, audience, description, concentration, size, isFeatured, status } = req.body;
-    
-    const [newProduct] = await db.insert(products).values({
-      name, brand, reference, price: Number(price), stock: Number(stock), category, audience, description, concentration, size, isFeatured, cost
-    }).returning();
+
+// ...
+const [newProduct] = await db.insert(products).values({
+  name, brand, reference, price: Number(price), cost: Number(cost), stock: Number(stock), category, audience, description, concentration, size, isFeatured, status
+}).returning();
 
     res.json({ success: true, product: newProduct });
   } catch (error) {

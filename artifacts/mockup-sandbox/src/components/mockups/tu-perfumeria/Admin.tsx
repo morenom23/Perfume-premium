@@ -611,7 +611,15 @@ export function Admin({
             </button>
           </div>
         </aside>
-        <main className="ad-main">
+        <main
+          className="ad-main"
+          style={{
+            height: "100vh",
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <header className="ad-topbar">
             <div className="ad-top-left">
               <button
@@ -741,11 +749,9 @@ export function Admin({
             {page === "Actividad / Auditoría" && <ActivityPage />}
             <footer className="ad-footer">
               <span>
-                Tu Perfumería <i>·</i> Panel privado de demostración
+                Tu Perfumería <i>·</i> Panel Administrativo
               </span>
-              <span>
-                FASE 1 <i>·</i> SIN DATOS REALES
-              </span>
+              <span>SISTEMA CONECTADO</span>
             </footer>
           </div>
         </main>
@@ -1332,16 +1338,15 @@ function Products({
   return (
     <div className="ad-page">
       <SectionHeader
-        eyebrow="CATÁLOGO · 12 REFERENCIAS FICTICIAS"
+        eyebrow="CATÁLOGO DE PRODUCTOS"
         title="Productos"
-        description="Una vitrina de muestra, lista para explorar. Los cambios solo viven en esta sesión."
+        description="Gestiona tu catálogo, precios y disponibilidad."
         action={
           <button
             className="ad-primary"
             onClick={() => setEditorProduct("new")}
           >
             <Plus size={16} /> Nuevo producto{" "}
-            <span className="ad-mini-demo">DEMO</span>
           </button>
         }
       />
@@ -1369,27 +1374,26 @@ function Products({
           <span className="ad-result-count">{products.length} resultados</span>
         </div>
       </div>
-      <div className="ad-product-layout">
+      <div
+        className="ad-product-layout"
+        style={{ display: "grid", gridTemplateColumns: "1fr" }}
+      >
         <section className="ad-product-table-panel">
           <div className="ad-table-caption">
             <div>
-              <b>Catálogo de muestra</b>
-              <small>
-                Los doce productos son demo; ningún dato es comercial.
-              </small>
+              <b>Lista de productos</b>
             </div>
-            <DemoTag />
           </div>
           <div className="ad-table-wrap">
             <table className="ad-table ad-products-table">
               <thead>
                 <tr>
-                  <th>PRODUCTO DEMO</th>
+                  <th>PRODUCTO</th>
                   <th>FAMILIA</th>
                   <th>¿PARA QUIÉN?</th>
                   <th>PRECIO ILUSTRATIVO</th>
-                  <th>STOCK DEMO</th>
-                  <th>ESTADO DEMO</th>
+                  <th>STOCK</th>
+                  <th>ESTADO</th>
                   <th />
                 </tr>
               </thead>
@@ -1427,7 +1431,9 @@ function Products({
                         className={`ad-product-status ${product.stock ? "" : "unavailable"}`}
                       >
                         <i />
-                        {product.status}
+                        {(product.status as string) === "published"
+                          ? "Publicado"
+                          : product.status}
                       </span>
                     </td>
                     <td>
@@ -1473,43 +1479,9 @@ function Products({
             </table>
           </div>
           <div className="ad-table-end">
-            Mostrando {products.length} de 12 productos <span>·</span> DEMO ·
-            datos ilustrativos
+            Mostrando {products.length} productos en total.
           </div>
         </section>
-        <aside className="ad-catalog-aside">
-          <div className="ad-catalog-art">
-            <div className="ad-catalog-art-glow" />
-            <PerfumeBottle tone="#a37be0" label="NOCTURNE" />
-            <span className="ad-art-stamp">
-              ESSENCE
-              <br />
-              DEMO 01
-            </span>
-          </div>
-          <div className="ad-aside-copy">
-            <span className="ad-eyebrow">CURADURÍA VISUAL</span>
-            <h3>
-              Una colección
-              <br />
-              para descubrir.
-            </h3>
-            <p>
-              La gestión de imágenes admite cuatro vistas temporales por
-              producto. Nada se guarda al salir.
-            </p>
-            <button onClick={() => openGallery(demoProducts[0])}>
-              Abrir galería de muestra <ChevronRight size={14} />
-            </button>
-          </div>
-          <div className="ad-aside-foot">
-            <span>12</span>
-            <div>
-              <b>fragancias de muestra</b>
-              <small>Todos los nombres y valores son ficticios.</small>
-            </div>
-          </div>
-        </aside>
       </div>
       {editorProduct && (
         <ProductEditor
@@ -1531,6 +1503,9 @@ function ProductEditor({
   close: () => void;
   notify: (message: string) => void;
 }) {
+  const [autoRef, setAutoRef] = useState(product?.reference ?? "");
+  const [newBrand, setNewBrand] = useState(false);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
@@ -1541,9 +1516,11 @@ function ProductEditor({
       category: formData.get("category"),
       audience: formData.get("audience"),
       price: Number(formData.get("price")),
-      cost: Number(formData.get("cost")), // <-- AGREGADO
+      cost: Number(formData.get("cost")),
       stock: Number(formData.get("stock")),
       size: formData.get("size"),
+      concentration: formData.get("concentration"),
+      description: formData.get("description"),
       status: "published",
       isFeatured: false,
     };
@@ -1586,12 +1563,11 @@ function ProductEditor({
       >
         <header className="ad-editor-heading">
           <div>
-            <span className="ad-eyebrow">PRODUCTO · VISTA DE DEMOSTRACIÓN</span>
+            <span className="ad-eyebrow">CATÁLOGO DE PRODUCTOS</span>
             <h2 id="ad-editor-title">
               {product ? "Editar producto" : "Crear producto"}
             </h2>
           </div>
-          <DemoTag />
           <button
             className="ad-row-action"
             onClick={close}
@@ -1603,38 +1579,70 @@ function ProductEditor({
         <form onSubmit={handleSubmit}>
           <div className="ad-editor-grid">
             <label>
-              Nombre ficticio
+              Nombre del producto
               <input
                 name="name"
                 defaultValue={product?.name ?? ""}
-                placeholder="Nombre de demostración"
+                placeholder="Ej: Noche Violeta"
                 required
+                onChange={(e) => {
+                  if (product) return; // Si estamos editando, no cambiamos la referencia
+                  const nombre = e.target.value;
+                  if (nombre.length >= 2) {
+                    const iniciales = nombre.substring(0, 2).toUpperCase();
+                    // Genera un número aleatorio de 3 dígitos
+                    const numero = Math.floor(Math.random() * 900) + 100;
+                    setAutoRef(`${iniciales}-${numero}`);
+                  } else {
+                    setAutoRef("");
+                  }
+                }}
               />
             </label>
             <label>
-              Referencia demo
+              Referencia / SKU
               <input
                 name="reference"
-                defaultValue={product?.reference ?? "DEMO-NUEVO"}
+                value={autoRef}
+                readOnly
+                style={{ opacity: 0.7, cursor: "not-allowed" }}
+                placeholder="Se genera automáticamente"
                 required
               />
             </label>
             <label>
-              Marca ficticia
-              <select
-                name="brand"
-                defaultValue={product?.brand ?? demoBrands[0]}
-              >
-                {demoBrands.map((item) => (
-                  <option key={item}>{item}</option>
-                ))}
-              </select>
+              Marca
+              {newBrand ? (
+                <input
+                  name="brand"
+                  autoFocus
+                  defaultValue={product?.brand ?? ""}
+                  placeholder="Escribe la nueva marca"
+                  required
+                />
+              ) : (
+                <select
+                  name="brand"
+                  defaultValue={product?.brand ?? "Tu Perfumería"}
+                  onChange={(e) => {
+                    if (e.target.value === "NUEVA") {
+                      setNewBrand(true);
+                    }
+                  }}
+                  required
+                >
+                  {demoBrands.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                  <option value="NUEVA">+ Escribir nueva marca...</option>
+                </select>
+              )}
             </label>
             <label>
               Familia olfativa
               <select
                 name="category"
-                defaultValue={product?.category ?? demoCategories[1]}
+                defaultValue={product?.category ?? "Amaderada"}
               >
                 {demoCategories.slice(1).map((item) => (
                   <option key={item}>{item}</option>
@@ -1647,11 +1655,9 @@ function ProductEditor({
                 name="audience"
                 defaultValue={product?.audience ?? "Unisex"}
               >
-                {demoAudiences
-                  .filter((item) => item !== "Todos")
-                  .map((item) => (
-                    <option key={item}>{item}</option>
-                  ))}
+                <option>Hombre</option>
+                <option>Mujer</option>
+                <option>Unisex</option>
               </select>
             </label>
             <label>
@@ -1691,6 +1697,32 @@ function ProductEditor({
               Contenido (ml)
               <input name="size" defaultValue={product?.size ?? "100 ml"} />
             </label>
+            <label>
+              Concentración
+              <input
+                name="concentration"
+                defaultValue={product?.concentration ?? ""}
+                placeholder="EDP, EDT, Parfum..."
+              />
+            </label>
+            <label style={{ gridColumn: "1 / -1" }}>
+              Descripción
+              <textarea
+                name="description"
+                defaultValue={product?.description ?? ""}
+                placeholder="Descripción del producto..."
+                rows={3}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  background: "#1b1821",
+                  border: "1px solid #39333f",
+                  color: "#fff",
+                  borderRadius: "4px",
+                  resize: "vertical",
+                }}
+              />
+            </label>
           </div>
           <p className="ad-editor-disclaimer">
             <ShieldCheck size={14} /> Los datos se guardan directamente en la
@@ -1701,7 +1733,8 @@ function ProductEditor({
               Cancelar
             </button>
             <button type="submit" className="ad-primary">
-              <Check size={15} /> Guardar Producto
+              <Check size={15} />{" "}
+              {product ? "Guardar Cambios" : "Crear Producto"}
             </button>
           </div>
         </form>
@@ -2690,7 +2723,10 @@ function UsersPage({
               <small style={{ fontSize: "14px" }}>
                 Propietario · Acceso Total
               </small>
-              <span className="ad-user-email" style={{ fontSize: "14px", color: "#a49ba8" }}></span>
+              <span
+                className="ad-user-email"
+                style={{ fontSize: "14px", color: "#a49ba8" }}
+              ></span>
             </div>
             <span className="ad-role-tag" style={{ fontSize: "13px" }}></span>
             <span className="ad-user-state active">
@@ -2699,9 +2735,16 @@ function UsersPage({
             <button
               className="ad-row-action"
               aria-label="Editar perfil"
-              onClick={() =>
-                notify("La edición de perfil estará disponible próximamente.")
-              }
+              onClick={() => {
+                const nuevoNombre = prompt(
+                  "Ingresa el nuevo nombre del administrador:",
+                  localStorage.getItem("admin_name") || "Admin",
+                );
+                if (nuevoNombre) {
+                  localStorage.setItem("admin_name", nuevoNombre);
+                  window.location.reload();
+                }
+              }}
             >
               <MoreHorizontal size={16} />
             </button>
@@ -3337,8 +3380,319 @@ const styles = `
   font-size: revert !important;
 }
 
-/* Ajuste de tablas para que respiren con el nuevo tamaño */
+/* Ajuste de tablas para que respiren con el nuevo tamaño ------------*/
 .ad-root td, .ad-root th {
   padding: 12px 10px !important;
 }
+  /* Ajuste de legibilidad para la tabla de productos------------------- */
+  .ad-products-table td {
+    font-size: 14px !important;
+  }
+  .ad-products-table .ad-product-cell b {
+    font-size: 15px !important;
+  }
+  .ad-products-table .ad-product-cell small {
+    font-size: 13px !important;
+    color: #a49ba8 !important;
+  }
+  .ad-products-table .ad-mono {
+    font-size: 13px !important;
+  }
+  .ad-products-table th {
+    font-size: 13px !important;
+  }
+
+    /* Ajuste de legibilidad para el Sidebar --------------------------- */
+  .ad-nav-label {
+    font-size: 13px !important;
+    color: #e0d8e4 !important;
+  }
+  .ad-nav-link span {
+    font-size: 14px !important;
+  }
+  .ad-store-switch b {
+    font-size: 14px !important;
+  }
+  .ad-store-switch small {
+    font-size: 12px !important;
+  }
+  .ad-brand-name b {
+    font-size: 19px !important;
+  }
+  .ad-brand-name span {
+    font-size: 12px !important;
+  }
+  .ad-profile b {
+    font-size: 15px !important;
+  }
+  .ad-profile small {
+    font-size: 12px !important;
+  }
+
+    /* Ajuste de legibilidad para Pedidos ----------*/
+  .ad-order-panel td {
+    font-size: 14px !important;
+  }
+  .ad-order-panel td b {
+    font-size: 15px !important;
+  }
+  .ad-order-panel td small {
+    font-size: 12px !important;
+    color: #a49ba8 !important;
+  }
+  .ad-order-panel th {
+    font-size: 13px !important;
+  }
+  .ad-order-status {
+    font-size: 13px !important;
+    padding: 4px 8px !important;
+  }
+  .ad-order-tools select {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+    height: auto !important;
+  }
+  .ad-order-summary b {
+    font-size: 20px !important;
+  }
+  .ad-order-summary span {
+    font-size: 12px !important;
+  }
+  
+    /* Ajuste de legibilidad para Inventario ------------*/
+  .ad-inventory-table td {
+    font-size: 14px !important;
+  }
+  .ad-inventory-table td b {
+    font-size: 15px !important;
+  }
+  .ad-inventory-table td small {
+    font-size: 12px !important;
+    color: #a49ba8 !important;
+  }
+  .ad-inventory-table th {
+    font-size: 13px !important;
+  }
+  .ad-inventory-table .ad-level {
+    font-size: 13px !important;
+  }
+  .ad-inventory-alert b {
+    font-size: 15px !important;
+  }
+  .ad-inventory-alert small {
+    font-size: 13px !important;
+  }
+  .ad-inventory-metrics span {
+    font-size: 12px !important;
+  }
+  .ad-inventory-metrics b {
+    font-size: 22px !important;
+  }
+  .ad-inventory-metrics small {
+    font-size: 13px !important;
+  }
+
+    /* Ajuste de legibilidad para el Dashboard------------------ */
+  .ad-metric-top span {
+    font-size: 13px !important;
+    color: #a49ba8 !important;
+  }
+  .ad-metric-value {
+    font-size: 28px !important;
+  }
+  .ad-metric-bottom span {
+    font-size: 13px !important;
+  }
+  .ad-panel-heading h2 {
+    font-size: 20px !important;
+  }
+  .ad-panel-heading p {
+    font-size: 13px !important;
+  }
+  .ad-eyebrow {
+    font-size: 12px !important;
+  }
+  .ad-chart-key span {
+    font-size: 13px !important;
+  }
+  .ad-stock-num {
+    font-size: 32px !important;
+  }
+  .ad-stock-card p {
+    font-size: 14px !important;
+  }
+  .ad-stock-bottom span {
+    font-size: 12px !important;
+  }
+
+    /* Ajuste de legibilidad para Reportes -------------*/
+  .ad-report-card h3 {
+    font-size: 18px !important;
+  }
+  .ad-report-card p {
+    font-size: 14px !important;
+  }
+  .ad-report-card .ad-eyebrow {
+    font-size: 12px !important;
+  }
+  .ad-report-card-top {
+    font-size: 13px !important;
+  }
+  .ad-export-panel b {
+    font-size: 16px !important;
+  }
+  .ad-export-panel p {
+    font-size: 14px !important;
+  }
+  .ad-export-actions button {
+    font-size: 14px !important;
+    padding: 10px 15px !important;
+  }
+  .ad-report-notice b {
+    font-size: 15px !important;
+  }
+  .ad-report-notice small {
+    font-size: 13px !important;
+  }
+
+    /* Ajuste de legibilidad para Categorías / Marcas ---------------------*/
+  .ad-category-intro h2 {
+    font-size: 28px !important;
+  }
+  .ad-category-intro p {
+    font-size: 14px !important;
+  }
+  .ad-category-intro .ad-eyebrow {
+    font-size: 12px !important;
+  }
+  .ad-family-card h3 {
+    font-size: 18px !important;
+  }
+  .ad-family-card p {
+    font-size: 13px !important;
+  }
+  .ad-family-card .ad-family-count {
+    font-size: 12px !important;
+  }
+  .ad-family-bottom span {
+    font-size: 12px !important;
+  }
+  .ad-brand-sample b {
+    font-size: 16px !important;
+  }
+  .ad-brand-sample small {
+    font-size: 12px !important;
+  }
+  .ad-brand-kind {
+    font-size: 12px !important;
+  }
+  .ad-panel-heading h2 {
+    font-size: 22px !important;
+  }
+  .ad-panel-heading p {
+    font-size: 14px !important;
+  }
+
+    /* Ajuste de legibilidad para Usuarios / Permisos------------------ */
+  .ad-user-details b {
+    font-size: 16px !important;
+  }
+  .ad-user-details small {
+    font-size: 13px !important;
+  }
+  .ad-user-email {
+    font-size: 13px !important;
+  }
+  .ad-role-tag {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+  }
+  .ad-user-state {
+    font-size: 13px !important;
+  }
+  .ad-user-total {
+    font-size: 13px !important;
+  }
+  .ad-perm-line span {
+    font-size: 13px !important;
+  }
+  .ad-permission-aside h3 {
+    font-size: 18px !important;
+  }
+  .ad-permission-aside p {
+    font-size: 13px !important;
+  }
+  .ad-users-note span {
+    font-size: 13px !important;
+  }
+
+    /* Ajuste de legibilidad para Configuración Comercial -------------------------*/
+  .ad-setting-card h2 {
+    font-size: 20px !important;
+  }
+  .ad-setting-card p {
+    font-size: 14px !important;
+  }
+  .ad-setting-card .ad-eyebrow {
+    font-size: 12px !important;
+  }
+  .ad-unset-box b {
+    font-size: 14px !important;
+  }
+  .ad-unset-box small {
+    font-size: 12px !important;
+  }
+  .ad-details-row span {
+    font-size: 14px !important;
+  }
+  .ad-details-row b {
+    font-size: 15px !important;
+  }
+  .ad-details-row small {
+    font-size: 12px !important;
+  }
+  .ad-business-details h2 {
+    font-size: 20px !important;
+  }
+  .ad-business-details p {
+    font-size: 14px !important;
+  }
+
+  /* ====== FORZAR ANCHO Y SIDEBAR FIJO ====== */
+.ad-shell {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+  display: flex !important; /* Cambiamos a Flexbox para control total */
+  min-height: 100vh;
+}
+
+.ad-sidebar {
+  width: 260px !important;
+  flex-shrink: 0 !important;
+  background: #100e14;
+  border-right: 1px solid var(--tp-line);
+  padding: 24px 14px 14px;
+  /* Al usar Flexbox, el sticky nativo funciona si el contenedor tiene altura natural */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.ad-main {
+  flex: 1 !important; /* Ocupa todo el espacio restante */
+  min-width: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.ad-content {
+  padding: 30px 40px !important;
+  flex: 1;
+  width: 100%;
+  max-width: 100% !important;
+}
+  
 `;
