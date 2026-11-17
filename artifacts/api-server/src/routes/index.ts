@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import healthRouter from "./health";
 import { db } from "../../../../db";
 import { products, orders, orderItems, storeSettings } from "../../../../db/schema";
+import { products, orders, orderItems, storeSettings, brands } from "../../../../db/schema";
 import { eq, desc } from "drizzle-orm";
 
 const router: IRouter = Router();
@@ -188,6 +189,27 @@ router.put("/settings", async (req, res) => {
   } catch (error) {
     console.error("Error updating settings:", error);
     res.status(500).json({ error: "Error al actualizar configuración" });
+  }
+});
+
+router.get("/brands", async (req, res) => {
+  try {
+    const allBrands = await db.select().from(brands);
+    res.json(allBrands);
+  } catch (error) {
+    console.error("Error fetching brands:", error);
+    res.status(500).json({ error: "Error al obtener las marcas" });
+  }
+});
+
+router.post("/brands", async (req, res) => {
+  try {
+    const { name } = req.body;
+    const [newBrand] = await db.insert(brands).values({ name }).returning();
+    res.json(newBrand);
+  } catch (error) {
+    console.error("Error creating brand:", error);
+    res.status(500).json({ error: "Error al crear la marca" });
   }
 });
 

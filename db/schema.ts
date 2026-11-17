@@ -63,3 +63,9 @@ export const storeSettings = pgTable("store_settings", {
   deliveryInfo: text("delivery_info"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const brands = pgTable("brands", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

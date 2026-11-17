@@ -262,6 +262,7 @@ export function Admin({
   const [reportNotice, setReportNotice] = useState(false);
   const [period, setPeriod] = useState("Últimos 30 días");
   const [dbOrders, setDbOrders] = useState<any[]>([]);
+  const [dbBrands, setDbBrands] = useState<any[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [settings, setSettings] = useState<any>(null);
   const [showContact, setShowContact] = useState(false);
@@ -271,6 +272,13 @@ export function Admin({
       .then((res) => res.json())
       .then((data) => setDbProducts(data))
       .catch((err) => console.error("Error cargando productos en admin", err));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/brands")
+      .then(res => res.json())
+      .then(data => setDbBrands(data))
+      .catch(err => console.error("Error cargando marcas", err));
   }, []);
 
   useEffect(() => {
@@ -698,11 +706,11 @@ export function Admin({
                 setCategory={setCategory}
                 products={filteredProducts}
                 openGallery={openGallery}
-                notify={notify}
+                notify={notify} dbBrands={dbBrands}
               />
             )}
             {page === "Categorías / Marcas" && (
-              <Categories go={go} notify={notify} />
+              <Categories go={go} notify={notify} dbBrands={dbBrands} setDbBrands={setDbBrands} dbProducts={dbProducts}/>
             )}
             {page === "Pedidos" && (
               <Orders
@@ -1317,22 +1325,9 @@ function Dashboard({
   );
 }
 
-function Products({
-  search,
-  setSearch,
-  category,
-  setCategory,
-  products,
-  openGallery,
-  notify,
-}: {
-  search: string;
-  setSearch: (v: string) => void;
-  category: string;
-  setCategory: (v: string) => void;
-  products: DemoProduct[];
-  openGallery: (p: DemoProduct) => void;
-  notify: (s: string) => void;
+function Products({ search, setSearch, category, setCategory, products, openGallery, notify, dbBrands }: {
+  search: string; setSearch: (v: string) => void; category: string; setCategory: (v: string) => void;
+  products: any[]; openGallery: (p: any) => void; notify: (s: string) => void; dbBrands: any[];
 }) {
   const [editorProduct, setEditorProduct] = useState<
     DemoProduct | "new" | null
@@ -1489,7 +1484,7 @@ function Products({
         <ProductEditor
           product={editorProduct === "new" ? undefined : editorProduct}
           close={() => setEditorProduct(null)}
-          notify={notify}
+          notify={notify} dbBrands={dbBrands}
         />
       )}
     </div>
@@ -1500,10 +1495,12 @@ function ProductEditor({
   product,
   close,
   notify,
+   dbBrands,
 }: {
   product?: any;
   close: () => void;
   notify: (message: string) => void;
+  dbBrands: any[];
 }) {
   const [autoRef, setAutoRef] = useState(product?.reference ?? "");
   const [newBrand, setNewBrand] = useState(false);
@@ -1625,7 +1622,7 @@ function ProductEditor({
               ) : (
                 <select
                   name="brand"
-                  defaultValue={product?.brand ?? "Tu Perfumería"}
+                  defaultValue={product?.brand ?? (dbBrands.length > 0 ? dbBrands[0].name : "")}
                   onChange={(e) => {
                     if (e.target.value === "NUEVA") {
                       setNewBrand(true);
@@ -1633,8 +1630,8 @@ function ProductEditor({
                   }}
                   required
                 >
-                  {demoBrands.map((item) => (
-                    <option key={item}>{item}</option>
+                  {dbBrands.map((brand) => (
+                    <option key={brand.id} value={brand.name}>{brand.name}</option>
                   ))}
                   <option value="NUEVA">+ Escribir nueva marca...</option>
                 </select>
@@ -1745,112 +1742,141 @@ function ProductEditor({
   );
 }
 
-function Categories({
-  go,
-  notify,
-}: {
-  go: (p: Page) => void;
-  notify: (s: string) => void;
-}) {
-  const familyCopy: Record<string, string> = {
-    Amaderada: "Maderas pulidas, resinas y matices verdes.",
-    Cítrica: "Acordes luminosos con salida vibrante.",
-    Dulce: "Texturas suaves y envolventes.",
-    Floral: "Pétalos de carácter contemporáneo.",
-    Fresca: "Composiciones limpias y aireadas.",
-    Oriental: "Especias, ámbar y profundidad.",
+function Categories({ go, notify, dbBrands, setDbBrands, dbProducts}: { go: (p: Page) => void; notify: (s: string) => void; dbBrands: any[]; setDbBrands: (b: any[]) => void; dbProducts: any[] }) {
+  const familyCopy: Record<string, string> = { "Amaderada": "Maderas pulidas, resinas y matices verdes.", "Cítrica": "Acordes luminosos con salida vibrante.", "Dulce": "Texturas suaves y envolventes.", "Floral": "Pétalos de carácter contemporáneo.", "Fresca": "Composiciones limpias y aireadas.", "Oriental": "Especias, ámbar y profundidad." };
+
+  const [showBrandModal, setShowBrandModal] = useState(false);
+  
+  const handleNewBrand = async () => {
+    const name = prompt("Ingresa el nombre de la nueva marca:");
+    if (!name) return;
+    try {
+      const res = await fetch("/api/brands", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+      });
+      if (res.ok) {
+        const newBrand = await res.json();
+        setDbBrands([...dbBrands, newBrand]);
+        notify(`Marca "${name}" creada exitosamente.`);
+      } else {
+        notify("Error al crear la marca. Puede que ya exista.");
+      }
+    } catch (err) {
+      notify("Error de conexión.");
+    }
   };
+
   return (
     <div className="ad-page">
-      <SectionHeader
-        eyebrow="ORGANIZACIÓN DEL CATÁLOGO · DEMO"
-        title="Categorías / Marcas"
-        description="Familias olfativas y sellos ficticios para ordenar la colección."
-        action={
-          <button
-            className="ad-primary"
-            onClick={() =>
-              notify("Esta acción es solo visual; no se guardaron cambios.")
-            }
-          >
-            <Plus size={16} /> Nueva categoría
-          </button>
-        }
+      <SectionHeader 
+        eyebrow="ORGANIZACIÓN DEL CATÁLOGO" 
+        title="Categorías / Marcas" 
+        description="Familias olfativas y sellos para ordenar la colección." 
+        action={<button className="ad-primary" onClick={() => setShowBrandModal(true)}>
+  <Plus size={16} /> Nueva marca
+</button>} 
       />
+      
       <div className="ad-category-intro">
-        <div className="ad-category-orbit">
-          <Flower2 size={28} />
-        </div>
+        <div className="ad-category-orbit"><Flower2 size={28} /></div>
         <div>
-          <span className="ad-eyebrow">MAPA OLFATIVO · DATOS ILUSTRATIVOS</span>
-          <h2>Seis familias, doce historias.</h2>
-          <p>
-            Taxonomía de demostración · no representa marcas comerciales
-            disponibles.
-          </p>
+          <span className="ad-eyebrow">MAPA OLFATIVO</span>
+          <h2>Familias olfativas</h2>
+          <p>Clasificación de tus productos.</p>
         </div>
-        <DemoTag />
       </div>
+
       <div className="ad-family-grid">
-        {demoCategories.slice(1).map((family, index) => (
-          <article
-            className="ad-family-card"
-            key={family}
-            style={{ "--family-index": index } as CSSProperties}
-          >
-            <span className="ad-family-count">0{index + 1}</span>
-            <span className="ad-family-icon">
-              <Flower2 size={19} />
-            </span>
-            <h3>{family}</h3>
-            <p>{familyCopy[family]}</p>
-            <div className="ad-family-bottom">
-              <span>
-                {demoProducts.filter((p) => p.category === family).length}{" "}
-                referencias DEMO
-              </span>
-              <button
-                onClick={() => go("Productos")}
-                aria-label={`Ver productos de ${family}`}
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </article>
-        ))}
+        {Object.keys(familyCopy).map((family, index) => {
+          const count = dbProducts.filter((p) => p.category === family).length;
+          return (
+            <article className="ad-family-card" key={family} style={{ "--family-index": index } as CSSProperties}>
+              <span className="ad-family-count">0{index + 1}</span>
+              <span className="ad-family-icon"><Flower2 size={19} /></span>
+              <h3>{family}</h3>
+              <p>{familyCopy[family]}</p>
+              <div className="ad-family-bottom">
+                <span>{count} referencias</span>
+                <button onClick={() => go("Productos")} aria-label={`Ver productos de ${family}`}><ChevronRight size={16} /></button>
+              </div>
+            </article>
+          )
+        })}
       </div>
+
       <section className="ad-panel ad-brand-panel">
         <div className="ad-panel-heading">
           <div>
-            <span className="ad-eyebrow">MARCAS DE EJEMPLO</span>
-            <h2>Firmas que viven en esta maqueta</h2>
-            <p>
-              Nombres inventados para ambientar el catálogo. Sin relación
-              comercial.
-            </p>
+            <span className="ad-eyebrow">MARCAS</span>
+            <h2>Firmas en tu catálogo</h2>
+            <p>Estas marcas se pueden usar al crear o editar un producto.</p>
           </div>
-          <DemoTag />
         </div>
         <div className="ad-brands-row">
-          {[
-            "Atelier Niebla",
-            "Orbe Parfums",
-            "Casa Sillage",
-            "Lumen No. 4",
-          ].map((brand, i) => (
-            <div key={brand} className="ad-brand-sample">
-              <span className="ad-brand-monogram">
-                {["AN", "OP", "CS", "L4"][i]}
-              </span>
-              <span>
-                <b>{brand}</b>
-                <small>MARCA FICTICIA · DEMO</small>
-              </span>
-              <span className="ad-brand-kind">Sello de muestra</span>
+          {dbBrands.map((brand) => (
+            <div key={brand.id} className="ad-brand-sample">
+              <span className="ad-brand-monogram">{brand.name.substring(0, 2).toUpperCase()}</span>
+              <span><b>{brand.name}</b><small>MARCA ACTIVA</small></span>
+              <span className="ad-brand-kind">Ver productos</span>
             </div>
           ))}
+          {dbBrands.length === 0 && <p style={{ color: '#a49ba8', padding: '20px' }}>No hay marcas registradas. Haz clic en "Nueva marca" para empezar.</p>}
         </div>
       </section>
+      
+            {showBrandModal && (
+        <div className="ad-editor-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setShowBrandModal(false); }}>
+          <section className="ad-editor-card" role="dialog" aria-modal="true" style={{ maxWidth: '400px' }}>
+            <header className="ad-editor-heading">
+              <div><span className="ad-eyebrow">NUEVA MARCA</span><h2>Registrar marca</h2></div>
+              <button className="ad-row-action" onClick={() => setShowBrandModal(false)}><X size={17} /></button>
+            </header>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget as HTMLFormElement);
+              const name = formData.get("brandName") as string;
+              
+              if (!name) return;
+
+              try {
+                const res = await fetch("/api/brands", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ name })
+                });
+                if (res.ok) {
+                  const newBrand = await res.json();
+                  setDbBrands([...dbBrands, newBrand]);
+                  notify(`Marca "${name}" creada exitosamente.`);
+                  setShowBrandModal(false);
+                } else {
+                  notify("Error al crear la marca. Puede que ya exista.");
+                }
+              } catch (err) {
+                notify("Error de conexión.");
+              }
+            }} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <label style={{ display: 'block' }}>
+                <span style={{ fontSize: '14px', color: '#d8c495', display: 'block', marginBottom: '8px' }}>Nombre de la marca</span>
+                <input 
+                  name="brandName" 
+                  autoFocus 
+                  placeholder="Ej: Atelier Niebla" 
+                  required 
+                  style={{ width: '100%', padding: '10px', background: '#1b1821', border: '1px solid #39333f', color: '#fff', borderRadius: '4px' }} 
+                />
+              </label>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                <button type="button" className="ad-outline" onClick={() => setShowBrandModal(false)}>Cancelar</button>
+                <button type="submit" className="ad-primary"><Check size={15} /> Guardar Marca</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
+
     </div>
   );
 }
