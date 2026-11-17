@@ -687,7 +687,7 @@ export function Admin({
                 go={go}
                 notify={notify}
                 dbProducts={dbProducts}
-                dbOrders={dbOrders}
+                dbOrders={dbOrders}  currentUserName={currentUserName}
               />
             )}
             {page === "Productos" && (
@@ -975,6 +975,7 @@ function Dashboard({
   notify,
   dbProducts,
   dbOrders,
+  currentUserName,
 }: {
   period: string;
   setPeriod: (v: string) => void;
@@ -982,6 +983,7 @@ function Dashboard({
   notify: (s: string) => void;
   dbProducts: any[];
   dbOrders: any[];
+  currentUserName: string;
 }) {
   const totalProducts = dbProducts.length;
   const totalOrders = dbOrders.length;
@@ -1036,7 +1038,7 @@ function Dashboard({
     <div className="ad-page">
       <SectionHeader
         eyebrow="RESUMEN GENERAL"
-        title="Buenos días, Adriana"
+        title={`Bienvenido, ${currentUserName}`}
         description="Un pulso real de tu casa de fragancias."
         action={
           <div className="ad-heading-actions">
@@ -3290,7 +3292,9 @@ function GalleryModal({
 }
 
 const styles = `
-.ad-root{--tp-ink:#0c0b10;--tp-surface:#141219;--tp-surface-raised:#1b1821;--tp-line:rgba(227,216,199,.11);--tp-paper:#eee9e1;--tp-muted:#96909c;--tp-violet:#a17ce0;--tp-violet-bright:#c1a5ed;--tp-champagne:#d7bf8d;--ad-font:"Avenir Next",Avenir,"Trebuchet MS",sans-serif;--ad-display:"Iowan Old Style",Georgia,serif;--ad-mono:"SFMono-Regular",Consolas,monospace;background:#0c0b10;color:#eee9e1;font-family:var(--ad-font);font-size:13px;line-height:1.45;min-height:100vh;position:relative;overflow-x:hidden}
+.ad-root{--tp-ink:#141518;--tp-surface:#1a1c21;--tp-surface-raised:#22252a;--tp-line:rgba(255,255,255,.08);--tp-paper:#d1d5db;--tp-muted:#8a8d93;--tp-violet:#e05a33;--tp-violet-bright:#f07d59;--tp-champagne:#d4a373;--ad-font:"Avenir Next",Avenir,"Trebuchet MS",sans-serif;--ad-display:"Iowan Old Style",Georgia,serif;--ad-mono:"SFMono-Regular",Consolas,monospace;background:#141518;color:#d1d5db;font-family:var(--ad-font);font-size:13px;line-height:1.45;min-height:100vh;position:relative;overflow-x:hidden}
+
+
 .ad-root button,.ad-root select,.ad-root input{font-family:var(--ad-font)}
 .ad-root button{cursor:pointer}
 .ad-root button:disabled{cursor:not-allowed;opacity:.5}
@@ -3386,7 +3390,7 @@ const styles = `
 }
   /* Ajuste de legibilidad para la tabla de productos------------------- */
   .ad-products-table td {
-    font-size: 14px !important;
+    font-size: 15px !important;
   }
   .ad-products-table .ad-product-cell b {
     font-size: 15px !important;
@@ -3408,7 +3412,7 @@ const styles = `
     color: #e0d8e4 !important;
   }
   .ad-nav-link span {
-    font-size: 14px !important;
+    font-size: 15px !important;
   }
   .ad-store-switch b {
     font-size: 14px !important;
@@ -3431,29 +3435,29 @@ const styles = `
 
     /* Ajuste de legibilidad para Pedidos ----------*/
   .ad-order-panel td {
-    font-size: 14px !important;
-  }
-  .ad-order-panel td b {
     font-size: 15px !important;
   }
+  .ad-order-panel td b {
+    font-size: 16px !important;
+  }
   .ad-order-panel td small {
-    font-size: 12px !important;
+    font-size: 13px !important;
     color: #a49ba8 !important;
   }
   .ad-order-panel th {
-    font-size: 13px !important;
+    font-size: 14px !important;
   }
   .ad-order-status {
     font-size: 13px !important;
     padding: 4px 8px !important;
   }
   .ad-order-tools select {
-    font-size: 14px !important;
+    font-size: 15px !important;
     padding: 8px 12px !important;
     height: auto !important;
   }
   .ad-order-summary b {
-    font-size: 20px !important;
+    font-size: 22px !important;
   }
   .ad-order-summary span {
     font-size: 12px !important;
@@ -3461,29 +3465,29 @@ const styles = `
   
     /* Ajuste de legibilidad para Inventario ------------*/
   .ad-inventory-table td {
-    font-size: 14px !important;
+    font-size: 15px !important;
   }
   .ad-inventory-table td b {
     font-size: 15px !important;
   }
   .ad-inventory-table td small {
-    font-size: 12px !important;
+    font-size: 13px !important;
     color: #a49ba8 !important;
   }
   .ad-inventory-table th {
-    font-size: 13px !important;
+    font-size: 14px !important;
   }
   .ad-inventory-table .ad-level {
-    font-size: 13px !important;
+    font-size: 14px !important;
   }
   .ad-inventory-alert b {
-    font-size: 15px !important;
+    font-size: 18px !important;
   }
   .ad-inventory-alert small {
-    font-size: 13px !important;
+    font-size: 14px !important;
   }
   .ad-inventory-metrics span {
-    font-size: 12px !important;
+    font-size: 13px !important;
   }
   .ad-inventory-metrics b {
     font-size: 22px !important;
@@ -3494,8 +3498,8 @@ const styles = `
 
     /* Ajuste de legibilidad para el Dashboard------------------ */
   .ad-metric-top span {
-    font-size: 13px !important;
-    color: #a49ba8 !important;
+    font-size: 15px !important;
+    color: #a49ba8 !important; 
   }
   .ad-metric-value {
     font-size: 28px !important;
@@ -3513,16 +3517,16 @@ const styles = `
     font-size: 12px !important;
   }
   .ad-chart-key span {
-    font-size: 13px !important;
+    font-size: 14px !important;
   }
   .ad-stock-num {
     font-size: 32px !important;
   }
   .ad-stock-card p {
-    font-size: 14px !important;
+    font-size: 16px !important;
   }
   .ad-stock-bottom span {
-    font-size: 12px !important;
+    font-size: 14px !important;
   }
 
     /* Ajuste de legibilidad para Reportes -------------*/
@@ -3694,5 +3698,7 @@ const styles = `
   width: 100%;
   max-width: 100% !important;
 }
+
+
   
 `;

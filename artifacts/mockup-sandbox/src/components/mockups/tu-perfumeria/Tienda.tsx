@@ -1789,23 +1789,8 @@ export function Tienda() {
 }
 
 const styles = `
-.tp-root {
-  --tp-ink: #09090c;
-  --tp-surface: #111116;
-  --tp-raised: #19181f;
-  --tp-line: rgba(226,216,197,.14);
-  --tp-paper: #f3eee6;
-  --tp-muted: #a19ba8;
-  --tp-violet: #a27be2;
-  --tp-violet-bright: #c9b1fa;
-  --tp-champagne: #d9c495;
-  background: #09090c;
-  color: var(--tp-paper);
-  font-family: "DM Sans", "Avenir Next", Avenir, ui-sans-serif, system-ui, sans-serif;
-  min-height: 100vh;
-  overflow: hidden;
-  font-synthesis: none;
-}
+.tp-root{--tp-ink:#141518;--tp-surface:#1a1c21;--tp-raised:#22252a;--tp-line:rgba(255,255,255,.08);--tp-paper:#d1d5db;--tp-muted:#8a8d93;--tp-violet:#e05a33;--tp-violet-bright:#f07d59;--tp-champagne:#d4a373;background:#141518;color:#d1d5db;min-height:100vh;display:flex;flex-direction:column;font-synthesis:none}
+
 .tp-root button { cursor: pointer; }
 .tp-root button:disabled { cursor: not-allowed; opacity: .45; }
 .tp-root button, .tp-root input, .tp-root select { color: inherit; }
@@ -2443,6 +2428,9 @@ const styles = `
 }
 /*BOTON ENCUENTRA TU FAMILIA*/
 .tp-discovery .tp-eyebrow { font-size: 16px !important; }
+
 /*---------------------NOMBRE EN DAETALLES PERFUMES DORADO--------*/
 .tp-detail-info .tp-eyebrow { font-size: 15px !important; }
+
+
 `;

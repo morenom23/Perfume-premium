@@ -126,6 +126,7 @@
 
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
+  
 
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;
@@ -183,3 +184,8 @@
     pointer-events: none;
   }
 }
+
+/*body {
+  background-color: #FA3518 !important;
+  color: #d1d5db !important;
+}*/
